@@ -1,0 +1,62 @@
+# ===========================
+# Dependencies
+# ===========================
+node_modules/
+vendor/
+
+# ===========================
+# Build outputs
+# ===========================
+dist/
+build/
+public/build/
+
+# ===========================
+# Environment & secrets
+# ===========================
+.env
+.env.local
+.env.*.local
+.env.production
+*.pem
+*.key
+*.cert
+
+# ===========================
+# Logs
+# ===========================
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===========================
+# OS & editor files
+# ===========================
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# ===========================
+# Laravel specific
+# ===========================
+/backend/storage/*.key
+/backend/bootstrap/cache/
+/backend/storage/app/public/*
+!/backend/storage/app/public/.gitkeep
+
+# ===========================
+# Generator/temp scripts (tidak perlu di-push)
+# ===========================
+generate_admin.js
+generate_backend.js
+generate_frontend.js
+generate_premium_design.js
+stitch_home.json
+
+# ===========================
+# Vite cache
+# ===========================
+.vite/
