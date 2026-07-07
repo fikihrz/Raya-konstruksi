@@ -82,8 +82,8 @@ const Home = () => {
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-24 px-8 max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+      <section id="about" className="py-24 px-8 bg-white">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
           <div className="relative h-[500px] w-full lg:col-span-6">
             <div className="w-4/5 h-[400px] rounded-2xl overflow-hidden shadow-xl">
               <img
@@ -92,7 +92,7 @@ const Home = () => {
                 alt="Architects working"
               />
             </div>
-            <div className="absolute right-0 bottom-4 w-3/5 h-[260px] rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
+            <div className="absolute right-0 bottom-4 w-3/5 h-[260px] rounded-2xl overflow-hidden shadow-2xl border-4 border-blue-100">
               <img
                 className="w-full h-full object-cover"
                 src="/galery/WhatsApp Image 2026-07-01 at 23.38.36 (1).jpeg"
@@ -193,7 +193,7 @@ const Home = () => {
       </section>
 
       {/* Why Choose Us & Services Section */}
-      <section className="py-24 bg-surface-container-low px-8 border-t border-b border-outline-variant/30">
+      <section className="py-24 bg-blue-50 px-8 border-t border-b border-blue-100">
         <div className="max-w-7xl mx-auto space-y-24">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
             <div className="lg:col-span-5 space-y-4">
@@ -227,8 +227,8 @@ const Home = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {services.map((service, idx) => (
-                <div key={idx} className="group relative bg-surface-variant border border-outline-variant/30 rounded-xl overflow-hidden shadow-sm flex flex-col justify-between h-[360px]">
-                  <div className="h-44 overflow-hidden bg-secondary relative">
+                <div key={idx} className="group relative bg-white border border-blue-100 rounded-xl overflow-hidden shadow-sm flex flex-col justify-between h-[360px]">
+                  <div className="h-44 overflow-hidden bg-blue-900 relative">
                     <img
                       src={service.img}
                       alt={service.title}
@@ -257,11 +257,11 @@ const Home = () => {
       </section>
 
       {/* Client Logos Section */}
-      <section className="py-20 bg-surface-variant border-t border-outline-variant/20 border-b border-outline-variant/20 overflow-hidden">
+      <section className="py-20 bg-blue-950 overflow-hidden">
         <div className="max-w-7xl mx-auto px-8 mb-12 text-center space-y-2">
-          <span className="text-primary font-bold uppercase tracking-widest text-xs">Trusted By</span>
-          <h2 className="text-3xl md:text-4xl font-black text-on-surface">Klien & Mitra Kami</h2>
-          <p className="text-on-surface-variant text-sm max-w-xl mx-auto">
+          <span className="text-blue-400 font-bold uppercase tracking-widest text-xs">Trusted By</span>
+          <h2 className="text-3xl md:text-4xl font-black text-white">Klien & Mitra Kami</h2>
+          <p className="text-blue-200/70 text-sm max-w-xl mx-auto">
             Dipercaya oleh perusahaan-perusahaan terkemuka di berbagai sektor industri di Indonesia.
           </p>
         </div>
@@ -292,12 +292,12 @@ const Home = () => {
               ].map((client, idx) => (
                 <div
                   key={idx}
-                  className="flex items-center gap-3 bg-white/60 border border-outline-variant/20 rounded-xl px-6 py-4 flex-shrink-0 hover:bg-white hover:shadow-md transition-all duration-300 group"
+                  className="flex items-center gap-3 bg-blue-900/40 border border-blue-800/50 rounded-xl px-6 py-4 flex-shrink-0 hover:border-blue-400 hover:shadow-md transition-all duration-300 group"
                 >
-                  <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <span className="text-[9px] font-black text-primary group-hover:text-primary leading-none text-center">{client.abbr}</span>
+                  <div className="w-9 h-9 rounded-lg bg-blue-800/50 flex items-center justify-center flex-shrink-0">
+                    <span className="text-[9px] font-black text-blue-300 leading-none text-center">{client.abbr}</span>
                   </div>
-                  <span className="text-sm font-semibold text-on-surface whitespace-nowrap">{client.name}</span>
+                  <span className="text-sm font-semibold text-white whitespace-nowrap">{client.name}</span>
                 </div>
               ))}
             </div>
@@ -306,8 +306,9 @@ const Home = () => {
       </section>
 
       {/* Projects Section */}
-      <section id="projects" className="py-24 px-8 max-w-7xl mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-16 border-b border-outline-variant/20 pb-8">
+      <section id="projects" className="py-24 px-8 bg-slate-50">
+        <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 mb-16 border-b border-slate-200 pb-8">
           <div className="space-y-3">
             <span className="text-primary font-bold uppercase tracking-widest text-sm">Portfolio Project</span>
             <h2 className="text-4xl md:text-5xl font-black text-on-surface">Architectural Masterpieces</h2>
@@ -352,6 +353,7 @@ const Home = () => {
               </div>
             </div>
           ))}
+        </div>
         </div>
       </section>
 
@@ -451,7 +453,7 @@ const Home = () => {
             alt="Construction site" 
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-[#1a1208]/95 via-[#1a1208]/90 to-[#1a1208]/95"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-blue-950/95 via-blue-950/90 to-blue-950/95"></div>
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto text-center">

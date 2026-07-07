@@ -2,7 +2,7 @@ import { FiMapPin, FiPhone, FiMail } from 'react-icons/fi';
 
 const Footer = () => {
   return (
-    <footer className="bg-[#12100e] text-white py-16 border-t border-white/[0.08]">
+    <footer className="bg-slate-950 text-white py-16 border-t border-slate-900">
       <div className="container mx-auto px-6 max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12 pb-16">
           
