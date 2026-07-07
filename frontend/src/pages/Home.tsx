@@ -227,7 +227,7 @@ const Home = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
               {services.map((service, idx) => (
-                <div key={idx} className="group relative bg-white border border-outline-variant/20 rounded-xl overflow-hidden shadow-sm flex flex-col justify-between h-[360px]">
+                <div key={idx} className="group relative bg-surface-variant border border-outline-variant/30 rounded-xl overflow-hidden shadow-sm flex flex-col justify-between h-[360px]">
                   <div className="h-44 overflow-hidden bg-secondary relative">
                     <img
                       src={service.img}
@@ -434,7 +434,7 @@ const Home = () => {
               initial={{ scale: 0.9, y: 20 }}
               animate={{ scale: 1, y: 0 }}
               exit={{ scale: 0.9, y: 20 }}
-              className="bg-white text-on-surface max-w-4xl w-full rounded-2xl overflow-hidden shadow-2xl grid grid-cols-1 md:grid-cols-2 relative"
+              className="bg-surface text-on-surface border border-outline-variant/30 max-w-4xl w-full rounded-2xl overflow-hidden shadow-2xl grid grid-cols-1 md:grid-cols-2 relative"
               onClick={(e) => e.stopPropagation()}
             >
               <button
