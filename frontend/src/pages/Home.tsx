@@ -306,7 +306,7 @@ const Home = () => {
       </section>
 
       {/* Fabrication Section */}
-      <section id="fabrication" className="py-24 px-8 bg-surface-variant border-t border-b border-outline-variant/30">
+      <section id="fabrication" className="py-24 px-8 bg-blue-950 text-white border-t border-b border-blue-900">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
             
@@ -319,7 +319,7 @@ const Home = () => {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-4 -right-4 w-2/5 h-44 rounded-2xl overflow-hidden shadow-2xl border-4 border-surface">
+              <div className="absolute -bottom-4 -right-4 w-2/5 h-44 rounded-2xl overflow-hidden shadow-2xl border-4 border-blue-950">
                 <img
                   src="/galery/WhatsApp Image 2026-07-01 at 23.39.22 (2).jpeg"
                   alt="Workshop Fabrikasi"
@@ -331,11 +331,11 @@ const Home = () => {
             {/* Right: Content */}
             <div className="lg:col-span-7 space-y-8">
               <div className="space-y-3">
-                <span className="text-primary font-bold uppercase tracking-widest text-xs">Bidang Unggulan</span>
-                <h2 className="text-4xl md:text-5xl font-black text-on-surface leading-tight">
-                  Fabrikasi <span className="text-primary">Baja & Logam</span>
+                <span className="text-blue-400 font-bold uppercase tracking-widest text-xs">Bidang Unggulan</span>
+                <h2 className="text-4xl md:text-5xl font-black text-white leading-tight">
+                  Fabrikasi <span className="text-blue-400">Baja & Logam</span>
                 </h2>
-                <p className="text-on-surface-variant leading-relaxed">
+                <p className="text-blue-100/80 leading-relaxed">
                   Workshop fabrikasi kami dilengkapi mesin CNC, mesin potong laser, dan peralatan las presisi tinggi. Kami mengerjakan berbagai komponen struktural baja dari skala kecil hingga proyek besar.
                 </p>
               </div>
@@ -349,11 +349,11 @@ const Home = () => {
                   { num: '05', title: 'Scaffolding & Formwork', desc: 'Penyewaan dan fabrikasi perancah (scaffolding) serta bekisting (formwork) untuk proyek konstruksi.' },
                   { num: '06', title: 'Pemasangan & Erection', desc: 'Tim erection berpengalaman untuk pemasangan struktur baja di lapangan dengan standar K3 ketat.' },
                 ].map((item, idx) => (
-                  <div key={idx} className="flex gap-4 p-5 bg-white rounded-xl border border-outline-variant/20 shadow-sm hover:shadow-md hover:border-primary/30 transition-all duration-300 group">
-                    <span className="text-xs font-black text-primary tracking-widest mt-1 flex-shrink-0">{item.num}</span>
+                  <div key={idx} className="flex gap-4 p-5 bg-blue-900/30 rounded-xl border border-blue-800/40 shadow-sm hover:shadow-md hover:border-blue-400/50 transition-all duration-300 group">
+                    <span className="text-xs font-black text-blue-400 tracking-widest mt-1 flex-shrink-0">{item.num}</span>
                     <div>
-                      <h4 className="font-bold text-on-surface text-sm group-hover:text-primary transition-colors">{item.title}</h4>
-                      <p className="text-on-surface-variant text-xs mt-1 leading-relaxed">{item.desc}</p>
+                      <h4 className="font-bold text-white text-sm group-hover:text-blue-400 transition-colors">{item.title}</h4>
+                      <p className="text-blue-100/70 text-xs mt-1 leading-relaxed">{item.desc}</p>
                     </div>
                   </div>
                 ))}
