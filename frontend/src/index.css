@@ -4,15 +4,15 @@
   --color-primary: #1d4ed8;
   --color-primary-container: #2563eb;
   --color-on-primary: #ffffff;
-  --color-secondary: #0f172a;
-  --color-background: #f8fafc;
+  --color-secondary: #1e293b;
+  --color-background: #ffffff;
   --color-on-background: #0f172a;
   --color-surface: #ffffff;
   --color-on-surface: #0f172a;
-  --color-surface-variant: #f1f5f9;
+  --color-surface-variant: #f8fafc;
   --color-on-surface-variant: #334155;
-  --color-outline: #475569;
-  --color-outline-variant: #cbd5e1;
+  --color-outline: #64748b;
+  --color-outline-variant: #e2e8f0;
   --color-surface-container-lowest: #ffffff;
   --color-surface-container-low: #f8fafc;
   --color-surface-container: #f1f5f9;
@@ -42,12 +42,18 @@ body {
 .hover-lift {
   transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
 }
+
 .hover-lift:hover {
   transform: translateY(-8px);
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
 }
 
 @keyframes scroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
 }
