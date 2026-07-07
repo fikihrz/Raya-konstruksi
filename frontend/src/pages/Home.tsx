@@ -256,7 +256,6 @@ const Home = () => {
               ))}
             </div>
           </div>
-        </div>
       </section>
 
       {/* Client Logos Section */}
