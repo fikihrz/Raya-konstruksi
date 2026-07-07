@@ -257,7 +257,7 @@ const Home = () => {
       </section>
 
       {/* Client Logos Section */}
-      <section className="py-20 bg-secondary border-t border-outline-variant/20 border-b border-outline-variant/20 overflow-hidden">
+      <section className="py-20 bg-surface-container-low border-t border-outline-variant/20 border-b border-outline-variant/20 overflow-hidden">
         <div className="max-w-7xl mx-auto px-8 mb-12 text-center space-y-2">
           <span className="text-primary font-bold uppercase tracking-widest text-xs">Trusted By</span>
           <h2 className="text-3xl md:text-4xl font-black text-on-surface">Klien & Mitra Kami</h2>
@@ -306,7 +306,7 @@ const Home = () => {
       </section>
 
       {/* Fabrication Section */}
-      <section id="fabrication" className="py-24 px-8 bg-secondary">
+      <section id="fabrication" className="py-24 px-8 bg-surface-variant border-t border-b border-outline-variant/30">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
             
@@ -319,7 +319,7 @@ const Home = () => {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="absolute -bottom-4 -right-4 w-2/5 h-44 rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
+              <div className="absolute -bottom-4 -right-4 w-2/5 h-44 rounded-2xl overflow-hidden shadow-2xl border-4 border-surface">
                 <img
                   src="/galery/WhatsApp Image 2026-07-01 at 23.39.22 (2).jpeg"
                   alt="Workshop Fabrikasi"
