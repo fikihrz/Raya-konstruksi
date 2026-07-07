@@ -216,7 +216,7 @@ const Home = () => {
           </div>
 
           {/* Section 2: Services (Layanan) - Clean editorial stack layout */}
-          <div className="space-y-12">
+          <div id="services" className="space-y-12">
             <div className="border-t border-outline-variant/20 pt-12 flex flex-col space-y-4 max-w-3xl">
               <span className="text-primary font-bold uppercase tracking-widest text-xs">Services Overview</span>
               <h2 className="text-3xl md:text-5xl font-black text-on-surface leading-tight">Bidang Keahlian Kami</h2>
@@ -300,71 +300,6 @@ const Home = () => {
                   <span className="text-sm font-semibold text-on-surface whitespace-nowrap">{client.name}</span>
                 </div>
               ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Fabrication Section */}
-      <section id="fabrication" className="py-24 px-8 bg-blue-950 text-white border-t border-b border-blue-900">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-            
-            {/* Left: Image */}
-            <div className="lg:col-span-5 relative h-[480px]">
-              <div className="w-full h-full rounded-2xl overflow-hidden shadow-xl">
-                <img
-                  src="/galery/WhatsApp Image 2026-07-01 at 23.39.22 (3).jpeg"
-                  alt="Fabrikasi Baja"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="absolute -bottom-4 -right-4 w-2/5 h-44 rounded-2xl overflow-hidden shadow-2xl border-4 border-blue-950">
-                <img
-                  src="/galery/WhatsApp Image 2026-07-01 at 23.39.22 (2).jpeg"
-                  alt="Workshop Fabrikasi"
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            </div>
-
-            {/* Right: Content */}
-            <div className="lg:col-span-7 space-y-8">
-              <div className="space-y-3">
-                <span className="text-blue-400 font-bold uppercase tracking-widest text-xs">Bidang Unggulan</span>
-                <h2 className="text-4xl md:text-5xl font-black text-white leading-tight">
-                  Fabrikasi <span className="text-blue-400">Baja & Logam</span>
-                </h2>
-                <p className="text-blue-100/80 leading-relaxed">
-                  Workshop fabrikasi kami dilengkapi mesin CNC, mesin potong laser, dan peralatan las presisi tinggi. Kami mengerjakan berbagai komponen struktural baja dari skala kecil hingga proyek besar.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {[
-                  { num: '01', title: 'Rangka Atap Baja', desc: 'Kuda-kuda baja ringan dan heavy steel untuk bangunan industri, pabrik, dan gudang skala besar.' },
-                  { num: '02', title: 'Baja Struktural WF/H-Beam', desc: 'Fabrikasi balok WF, H-Beam, kolom baja, dan komponen frame struktur gedung bertingkat.' },
-                  { num: '03', title: 'Custom Metal Works', desc: 'Pengerjaan logam presisi untuk tangga baja, railing, canopy, dan ornamen arsitektur.' },
-                  { num: '04', title: 'Mezzanine & Platform', desc: 'Konstruksi mezzanine floor, catwalk industri, dan platform akses untuk fasilitas pergudangan.' },
-                  { num: '05', title: 'Scaffolding & Formwork', desc: 'Penyewaan dan fabrikasi perancah (scaffolding) serta bekisting (formwork) untuk proyek konstruksi.' },
-                  { num: '06', title: 'Pemasangan & Erection', desc: 'Tim erection berpengalaman untuk pemasangan struktur baja di lapangan dengan standar K3 ketat.' },
-                ].map((item, idx) => (
-                  <div key={idx} className="flex gap-4 p-5 bg-blue-900/30 rounded-xl border border-blue-800/40 shadow-sm hover:shadow-md hover:border-blue-400/50 transition-all duration-300 group">
-                    <span className="text-xs font-black text-blue-400 tracking-widest mt-1 flex-shrink-0">{item.num}</span>
-                    <div>
-                      <h4 className="font-bold text-white text-sm group-hover:text-blue-400 transition-colors">{item.title}</h4>
-                      <p className="text-blue-100/70 text-xs mt-1 leading-relaxed">{item.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <a
-                href="#contact"
-                className="inline-flex items-center gap-2 bg-primary text-white font-bold px-8 py-4 rounded-xl hover:opacity-90 transition-opacity shadow-md text-sm"
-              >
-                Konsultasikan Kebutuhan Fabrikasi <FiArrowRight />
-              </a>
             </div>
           </div>
         </div>
