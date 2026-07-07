@@ -257,7 +257,7 @@ const Home = () => {
       </section>
 
       {/* Client Logos Section */}
-      <section className="py-20 bg-white border-t border-outline-variant/20 border-b border-outline-variant/20 overflow-hidden">
+      <section className="py-20 bg-surface-variant border-t border-outline-variant/20 border-b border-outline-variant/20 overflow-hidden">
         <div className="max-w-7xl mx-auto px-8 mb-12 text-center space-y-2">
           <span className="text-primary font-bold uppercase tracking-widest text-xs">Trusted By</span>
           <h2 className="text-3xl md:text-4xl font-black text-on-surface">Klien & Mitra Kami</h2>
