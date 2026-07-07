@@ -192,27 +192,31 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Why Choose Us & Services Section */}
-      <section className="py-24 bg-blue-50 px-8 border-t border-b border-blue-100">
-        <div className="max-w-7xl mx-auto space-y-24">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
-            <div className="lg:col-span-5 space-y-4">
-              <span className="text-primary font-bold uppercase tracking-widest text-xs">Our Philosophy</span>
-              <h2 className="text-4xl font-black text-on-surface leading-tight">Architectural Integrity.</h2>
-              <p className="text-on-surface-variant text-sm leading-relaxed">
-                Kami tidak sekadar menyusun beton dan besi. Kami merancang ruang hidup dan bisnis yang mengutamakan keamanan tinggi, presisi struktural, serta keselarasan estetika.
-              </p>
-            </div>
+      {/* Kenapa Memilih Kami Section */}
+      <section className="py-24 bg-slate-900 px-8 relative overflow-hidden">
+        {/* Abstract background blobs for premium feel */}
+        <div className="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 rounded-full bg-blue-600/10 blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 -ml-32 -mb-32 w-96 h-96 rounded-full bg-blue-400/10 blur-3xl"></div>
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center space-y-4 mb-16">
+            <span className="inline-block py-1 px-3 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 font-bold uppercase tracking-widest text-[10px]">Why Choose Us</span>
+            <h2 className="text-4xl md:text-5xl font-black text-white leading-tight">Kenapa Memilih Kami?</h2>
+            <p className="text-slate-300 text-sm max-w-2xl mx-auto leading-relaxed">
+              Kami tidak sekadar menyusun beton dan besi. Kami merancang ruang hidup dan bisnis yang mengutamakan keamanan tinggi, presisi struktural, serta keselarasan estetika.
+            </p>
+          </div>
 
-            <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-3 gap-8">
-              {reasons.map((reason, i) => (
-                <div key={i} className="space-y-4 border-l border-primary/20 pl-6 py-2">
-                  <span className="text-xs font-black text-primary uppercase tracking-wider">{reason.number}</span>
-                  <h3 className="text-base font-bold text-on-surface">{reason.title}</h3>
-                  <p className="text-on-surface-variant text-xs leading-relaxed">{reason.desc}</p>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {reasons.map((reason, i) => (
+              <div key={i} className="group relative bg-slate-800/40 hover:bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 hover:border-blue-500/50 p-8 rounded-2xl transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-900/20 flex flex-col items-center md:items-start text-center md:text-left space-y-5">
+                <div className="w-14 h-14 flex-shrink-0 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/5 flex items-center justify-center border border-blue-500/20 group-hover:scale-110 transition-transform duration-500">
+                  <span className="text-xl font-black text-blue-400">{reason.number}</span>
                 </div>
-              ))}
-            </div>
+                <h3 className="text-xl font-bold text-white group-hover:text-blue-300 transition-colors">{reason.title}</h3>
+                <p className="text-slate-400 text-sm leading-relaxed">{reason.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
