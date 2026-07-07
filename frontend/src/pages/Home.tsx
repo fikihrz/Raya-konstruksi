@@ -214,10 +214,13 @@ const Home = () => {
               ))}
             </div>
           </div>
+        </div>
+      </section>
 
-          {/* Section 2: Services (Layanan) - Clean editorial stack layout */}
-          <div id="services" className="space-y-12">
-            <div className="border-t border-outline-variant/20 pt-12 flex flex-col space-y-4 max-w-3xl">
+      {/* Section 2: Services (Layanan) - Clean editorial stack layout */}
+      <section className="py-24 bg-white px-8">
+        <div id="services" className="max-w-7xl mx-auto space-y-12">
+          <div className="flex flex-col space-y-4 max-w-3xl">
               <span className="text-primary font-bold uppercase tracking-widest text-xs">Services Overview</span>
               <h2 className="text-3xl md:text-5xl font-black text-on-surface leading-tight">Bidang Keahlian Kami</h2>
               <p className="text-on-surface-variant text-base leading-relaxed">
