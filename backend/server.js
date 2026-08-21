@@ -195,6 +195,43 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     console.error('Forgot password email dispatch error:', err);
     return res.status(500).json({ error: 'Gagal mengirim email pemulihan: ' + err.message });
   }
+// RESET PASSWORD WITH PIN (Real DB Password Reset)
+app.post('/api/auth/reset-password', async (req, res) => {
+  const { email, pin, newPassword } = req.body;
+  if (!email || !pin || !newPassword) {
+    return res.status(400).json({ error: 'Email, kode PIN, dan kata sandi baru wajib diisi' });
+  }
+
+  if (newPassword.length < 6) {
+    return res.status(400).json({ error: 'Kata sandi baru minimal 6 karakter' });
+  }
+
+  try {
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    if (!user) {
+      return res.status(404).json({ error: 'Pengguna tidak ditemukan' });
+    }
+
+    // Verifikasi PIN
+    if (!user.resetToken || user.resetToken !== pin.trim()) {
+      return res.status(400).json({ error: 'Kode verifikasi 6-digit salah' });
+    }
+
+    if (user.resetTokenExpiry && new Date() > user.resetTokenExpiry) {
+      return res.status(400).json({ error: 'Kode verifikasi sudah kedaluwarsa' });
+    }
+
+    // Update password di database
+    user.password = await bcrypt.hash(newPassword, 10);
+    user.resetToken = null;
+    user.resetTokenExpiry = null;
+    await user.save();
+
+    res.json({ success: true, message: 'Kata sandi berhasil direset! Silakan login.' });
+  } catch (err) {
+    console.error('Reset password error:', err);
+    res.status(500).json({ error: 'Gagal mereset kata sandi: ' + err.message });
+  }
 });
 
 // CHANGE PASSWORD (Real DB update)
