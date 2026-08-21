@@ -211,7 +211,8 @@ const Settings = () => {
           <Field label="Nama Perusahaan" value={settings.companyName} onChange={(v: string) => set('companyName', v)} placeholder="Raya Konstruksi" />
           <Field label="Nomor WhatsApp (tanpa +)" value={settings.whatsappNumber} onChange={(v: string) => set('whatsappNumber', v)} placeholder="6281234567890" type="tel" />
           <Field label="Alamat Email" value={settings.emailAddress} onChange={(v: string) => set('emailAddress', v)} placeholder="contact@rayakonstruksi.com" type="email" />
-          <Field label="Alamat Kantor" value={settings.companyAddress} onChange={(v: string) => set('companyAddress', v)} placeholder="Jakarta, Indonesia" />
+          <Field label="Akun Instagram (misal: rayakonstruksi atau link)" value={settings.instagram} onChange={(v: string) => set('instagram', v)} placeholder="rayakonstruksi" />
+          <Field label="Alamat Kantor" value={settings.companyAddress} onChange={(v: string) => set('companyAddress', v)} placeholder="Surakarta, Indonesia" />
         </Section>
 
         {/* Save Button */}

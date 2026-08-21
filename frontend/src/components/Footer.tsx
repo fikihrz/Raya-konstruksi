@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FiMapPin, FiPhone, FiMail } from 'react-icons/fi';
+import { FaInstagram } from 'react-icons/fa';
 
 const API = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
 
@@ -16,6 +17,22 @@ const Footer = () => {
       })
       .catch(err => console.error('Failed to load footer settings:', err));
   }, []);
+
+  const getInstagramUrl = () => {
+    if (!settings.instagram) return 'https://instagram.com/rayakonstruksi';
+    if (settings.instagram.startsWith('http')) return settings.instagram;
+    const cleanHandle = settings.instagram.replace(/^@/, '');
+    return `https://instagram.com/${cleanHandle}`;
+  };
+
+  const getInstagramHandle = () => {
+    if (!settings.instagram) return '@rayakonstruksi';
+    if (settings.instagram.startsWith('http')) {
+      const parts = settings.instagram.split('/').filter(Boolean);
+      return '@' + parts[parts.length - 1];
+    }
+    return settings.instagram.startsWith('@') ? settings.instagram : `@${settings.instagram}`;
+  };
 
   return (
     <footer className="bg-slate-950 text-white py-16 border-t border-slate-900">
@@ -73,6 +90,12 @@ const Footer = () => {
                 <FiMail className="text-primary-container flex-shrink-0" />
                 <a href={`mailto:${settings.emailAddress || 'contact@rayakonstruksi.com'}`} className="hover:text-primary-container transition-colors">
                   {settings.emailAddress || 'contact@rayakonstruksi.com'}
+                </a>
+              </li>
+              <li className="flex items-center gap-3">
+                <FaInstagram className="text-primary-container flex-shrink-0 text-base" />
+                <a href={getInstagramUrl()} target="_blank" rel="noreferrer" className="hover:text-pink-400 transition-colors">
+                  {getInstagramHandle()}
                 </a>
               </li>
             </ul>
