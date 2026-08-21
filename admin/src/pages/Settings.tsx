@@ -61,15 +61,9 @@ const ImageField = ({ label, value, fieldKey, onChange }: { label: string; value
     setUploading(false);
   };
 
-  const FRONTEND_URL = window.location.hostname === 'localhost' 
-    ? 'http://localhost:5173' 
-    : 'https://rayakonstruksi.vercel.app';
-
-  const previewSrc = value?.startsWith('http') 
-    ? value 
-    : value 
-      ? `${FRONTEND_URL}${encodeURI(value.startsWith('/') ? value : '/' + value)}` 
-      : null;
+  const previewSrc = value 
+    ? (value.startsWith('http') ? value : encodeURI(value.startsWith('/') ? value : '/' + value))
+    : null;
 
   return (
     <div>

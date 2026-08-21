@@ -118,7 +118,7 @@ const Projects = () => {
               {formData.img && (
                 <div className="w-32 h-32 rounded-lg overflow-hidden border border-slate-200 bg-white flex-shrink-0 relative shadow-inner">
                   <img 
-                    src={formData.img.startsWith('http') ? formData.img : `https://rayakonstruksi.vercel.app${encodeURI(formData.img.startsWith('/') ? formData.img : '/' + formData.img)}`} 
+                    src={formData.img.startsWith('http') ? formData.img : encodeURI(formData.img.startsWith('/') ? formData.img : '/' + formData.img)} 
                     alt="Preview" 
                     className="w-full h-full object-cover" 
                   />
@@ -148,7 +148,7 @@ const Projects = () => {
           <tbody className="bg-white divide-y divide-gray-200">
             {projects.map((project) => {
               const imgSrc = project.img 
-                ? (project.img.startsWith('/') ? `https://rayakonstruksi.vercel.app${project.img}` : project.img) 
+                ? (project.img.startsWith('http') ? project.img : encodeURI(project.img.startsWith('/') ? project.img : '/' + project.img)) 
                 : 'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f6?w=200&q=80';
               return (
                 <tr key={project.id} className="hover:bg-gray-50">
