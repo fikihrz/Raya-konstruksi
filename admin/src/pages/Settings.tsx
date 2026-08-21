@@ -139,11 +139,33 @@ const Settings = () => {
 
       <form onSubmit={handleSave} className="space-y-4">
 
-        {/* Hero Section */}
-        <Section title="Hero Section (Halaman Utama)" defaultOpen>
-          <ImageField label="Gambar Background Hero" value={settings.heroImage} fieldKey="heroImage" onChange={set} />
-          <Field label="Judul Utama (Hero Title)" value={settings.heroTitle} onChange={(v: string) => set('heroTitle', v)} placeholder="Misal: Building Excellence for a Better Future" />
-          <Field label="Deskripsi Hero" value={settings.heroDesc} onChange={(v: string) => set('heroDesc', v)} placeholder="Deskripsi singkat perusahaan..." multiline />
+        {/* Hero Section Banners (Slider 3 Slide) */}
+        <Section title="Hero Banner Slider (Halaman Utama)" defaultOpen>
+          <div className="space-y-6">
+            {/* Slide 1 */}
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded">Banner Slide 1</span>
+              <ImageField label="Foto Background Slide 1" value={settings.heroImage} fieldKey="heroImage" onChange={set} />
+              <Field label="Judul Utama Slide 1" value={settings.heroTitle} onChange={(v: string) => set('heroTitle', v)} placeholder="Misal: Membangun Masa Depan Presisi & Berkualitas" />
+              <Field label="Deskripsi / Sub-judul Slide 1" value={settings.heroDesc} onChange={(v: string) => set('heroDesc', v)} placeholder="Deskripsi singkat slide 1..." multiline />
+            </div>
+
+            {/* Slide 2 */}
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded">Banner Slide 2</span>
+              <ImageField label="Foto Background Slide 2" value={settings.heroImage2} fieldKey="heroImage2" onChange={set} />
+              <Field label="Judul Utama Slide 2" value={settings.heroTitle2} onChange={(v: string) => set('heroTitle2', v)} placeholder="Misal: Konstruksi Megah Komersial & Perkantoran" />
+              <Field label="Deskripsi / Sub-judul Slide 2" value={settings.heroDesc2} onChange={(v: string) => set('heroDesc2', v)} placeholder="Deskripsi singkat slide 2..." multiline />
+            </div>
+
+            {/* Slide 3 */}
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+              <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2.5 py-1 rounded">Banner Slide 3</span>
+              <ImageField label="Foto Background Slide 3" value={settings.heroImage3} fieldKey="heroImage3" onChange={set} />
+              <Field label="Judul Utama Slide 3" value={settings.heroTitle3} onChange={(v: string) => set('heroTitle3', v)} placeholder="Misal: Infrastruktur Vital & Fabrikasi Industri" />
+              <Field label="Deskripsi / Sub-judul Slide 3" value={settings.heroDesc3} onChange={(v: string) => set('heroDesc3', v)} placeholder="Deskripsi singkat slide 3..." multiline />
+            </div>
+          </div>
         </Section>
 
         {/* About Section */}

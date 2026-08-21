@@ -63,7 +63,7 @@ const Home = () => {
               id: 1,
               tag: "ARCHITECTURE & DESIGN",
               title: settings.heroTitle || "Membangun Masa Depan Presisi & Berkualitas",
-              subtitle: "Solusi terintegrasi konstruksi arsitektur modern & residensial mewah",
+              subtitle: settings.heroDesc || "Solusi terintegrasi konstruksi arsitektur modern & residensial mewah",
               img: settings.heroImage || "/galery/WhatsApp Image 2026-07-01 at 23.38.36.jpeg",
               category: "Residensial & Arsitektur",
               highlight: "Desain Berkelanjutan"
@@ -71,18 +71,18 @@ const Home = () => {
             {
               id: 2,
               tag: "COMMERCIAL DEVELOPMENT",
-              title: "Konstruksi Megah Komersial & Perkantoran",
-              subtitle: "Pusat bisnis bernilai tinggi dengan standar keselamatan & mutu terbaik",
-              img: "/galery/WhatsApp Image 2026-07-01 at 23.38.36 (2).jpeg",
+              title: settings.heroTitle2 || "Konstruksi Megah Komersial & Perkantoran",
+              subtitle: settings.heroDesc2 || "Pusat bisnis bernilai tinggi dengan standar keselamatan & mutu terbaik",
+              img: settings.heroImage2 || "/galery/WhatsApp Image 2026-07-01 at 23.38.36 (2).jpeg",
               category: "Komersial & Ritel",
               highlight: "Struktur Baja Presisi"
             },
             {
               id: 3,
               tag: "INDUSTRIAL INFRASTRUCTURE",
-              title: "Infrastruktur Vital & Fabrikasi Industri",
-              subtitle: "Pabrik, pergudangan logistik, dan infrastruktur strategis nasional",
-              img: "/galery/WhatsApp Image 2026-07-01 at 23.38.37.jpeg",
+              title: settings.heroTitle3 || "Infrastruktur Vital & Fabrikasi Industri",
+              subtitle: settings.heroDesc3 || "Pabrik, pergudangan logistik, dan infrastruktur strategis nasional",
+              img: settings.heroImage3 || "/galery/WhatsApp Image 2026-07-01 at 23.38.37.jpeg",
               category: "Industri & Infrastruktur",
               highlight: "Pengerjaan Tepat Waktu"
             }
