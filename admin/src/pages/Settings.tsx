@@ -68,7 +68,7 @@ const ImageField = ({ label, value, fieldKey, onChange }: { label: string; value
   const previewSrc = value?.startsWith('http') 
     ? value 
     : value 
-      ? `${FRONTEND_URL}${value.startsWith('/') ? '' : '/'}${value}` 
+      ? `${FRONTEND_URL}${encodeURI(value.startsWith('/') ? value : '/' + value)}` 
       : null;
 
   return (

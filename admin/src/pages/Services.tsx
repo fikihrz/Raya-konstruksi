@@ -111,7 +111,7 @@ const Services = () => {
               {formData.img && (
                 <div className="w-32 h-32 rounded-lg overflow-hidden border border-slate-200 bg-white flex-shrink-0 relative shadow-inner">
                   <img 
-                    src={formData.img.startsWith('/') ? `https://rayakonstruksi.vercel.app${formData.img}` : formData.img} 
+                    src={formData.img.startsWith('http') ? formData.img : `https://rayakonstruksi.vercel.app${encodeURI(formData.img.startsWith('/') ? formData.img : '/' + formData.img)}`} 
                     alt="Preview" 
                     className="w-full h-full object-cover" 
                   />
