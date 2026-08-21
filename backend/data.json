@@ -1,0 +1,218 @@
+{
+  "services": [
+    {
+      "id": 1,
+      "title": "Residential Design",
+      "desc": "Pembangunan rumah tinggal eksklusif, vila modern, dan residensial premium dengan detail arsitektur tingkat tinggi.",
+      "img": "/galery/WhatsApp Image 2026-07-01 at 23.38.36 (1).jpeg"
+    },
+    {
+      "id": 2,
+      "title": "Commercial Spaces",
+      "desc": "Konstruksi gedung perkantoran mewah, pusat perbelanjaan, dan ruko modern yang fungsional dan estetis.",
+      "img": "/galery/WhatsApp Image 2026-07-01 at 23.38.36 (2).jpeg"
+    },
+    {
+      "id": 3,
+      "title": "Industrial Development",
+      "desc": "Pembangunan kawasan industri, gudang logistik skala besar, dan pabrik dengan spesifikasi standar tinggi.",
+      "img": "/galery/WhatsApp Image 2026-07-01 at 23.38.36.jpeg"
+    },
+    {
+      "id": 4,
+      "title": "Infrastructure Works",
+      "desc": "Pengerjaan infrastruktur vital seperti jalan raya modern, jembatan kokoh, dan fasilitas publik.",
+      "img": "/galery/WhatsApp Image 2026-07-01 at 23.38.37.jpeg"
+    },
+    {
+      "id": 5,
+      "title": "Fabrikasi & Workshop",
+      "desc": "Fabrikasi baja struktural, rangka atap baja ringan, dan komponen logam presisi untuk kebutuhan konstruksi sipil dan industri.",
+      "img": "/galery/WhatsApp Image 2026-07-01 at 23.39.22 (2).jpeg"
+    },
+    {
+      "id": 6,
+      "title": "Renovasi & Retrofit",
+      "desc": "Alih fungsi dan renovasi total bangunan eksisting, modernisasi fasad, dan perkuatan struktur gedung lama.",
+      "img": "/galery/WhatsApp Image 2026-07-01 at 23.39.23.jpeg"
+    }
+  ],
+  "reasons": [
+    {
+      "id": 1,
+      "number": "01",
+      "title": "Architectural Excellence",
+      "desc": "Kami mengutamakan keselarasan antara kekuatan struktur bangunan dan keindahan nilai estetika arsitektur modern."
+    },
+    {
+      "id": 2,
+      "number": "02",
+      "title": "Premium Material Selection",
+      "desc": "Setiap bahan bangunan dipilih secara ketat untuk menjamin ketahanan konstruksi yang andal melintasi generasi."
+    },
+    {
+      "id": 3,
+      "number": "03",
+      "title": "Seamless Workflow & Timeline",
+      "desc": "Manajemen proyek profesional yang transparan dengan penjadwalan presisi memastikan ketepatan waktu serah terima."
+    }
+  ],
+  "projects": [
+    {
+      "id": 1,
+      "title": "The Glass Horizon Villa",
+      "category": "Residential",
+      "location": "Jakarta",
+      "year": 2025,
+      "img": "/galery/WhatsApp Image 2026-07-01 at 23.39.21 (1).jpeg",
+      "gridClass": "md:col-span-2 md:row-span-2 h-[500px]",
+      "client": "Bapak Hermawan",
+      "budget": "Rp 4.5 Milyar",
+      "duration": "11 Bulan",
+      "fullDesc": "Vila hunian premium dengan fasad kaca penuh untuk memaksimalkan cahaya alami dan pemandangan luar, dilengkapi kolam renang infinity dan sistem smart home modern."
+    },
+    {
+      "id": 2,
+      "title": "Global Nexus Plaza",
+      "category": "Commercial",
+      "location": "Bandung",
+      "year": 2024,
+      "img": "/galery/WhatsApp Image 2026-07-01 at 23.39.21 (2).jpeg",
+      "gridClass": "md:col-span-1 md:row-span-1 h-[240px]",
+      "client": "PT Nexus Global",
+      "budget": "Rp 12.8 Milyar",
+      "duration": "18 Bulan",
+      "fullDesc": "Pusat bisnis terpadu modern 5 lantai di pusat kota Bandung dengan konsep ramah lingkungan dan tata ruang dinamis untuk menampung puluhan startup."
+    },
+    {
+      "id": 3,
+      "title": "Eco Industrial Complex",
+      "category": "Industrial",
+      "location": "Tangerang",
+      "year": 2024,
+      "img": "/galery/WhatsApp Image 2026-07-01 at 23.39.21.jpeg",
+      "gridClass": "md:col-span-1 md:row-span-1 h-[240px]",
+      "client": "PT Eco Logistics",
+      "budget": "Rp 8.2 Milyar",
+      "duration": "14 Bulan",
+      "fullDesc": "Kompleks pergudangan pintar dengan struktur atap berpanel surya, efisiensi sirkulasi udara alami, dan dermaga bongkar muat otomatis berkapasitas besar."
+    },
+    {
+      "id": 4,
+      "title": "Grand Valley Crossing",
+      "category": "Infrastructure",
+      "location": "Surabaya",
+      "year": 2025,
+      "img": "/galery/WhatsApp Image 2026-07-01 at 23.39.21 (3).jpeg",
+      "gridClass": "md:col-span-1 md:row-span-2 h-[500px]",
+      "client": "Kementerian PUPR",
+      "budget": "Rp 24.5 Milyar",
+      "duration": "24 Bulan",
+      "fullDesc": "Proyek strategis jembatan penghubung antar wilayah untuk memperlancar lalu lintas logistik regional dengan menggunakan teknik konstruksi beton prategang."
+    },
+    {
+      "id": 5,
+      "title": "Urban Warehouse Hub",
+      "category": "Infrastructure",
+      "location": "Bekasi",
+      "year": 2025,
+      "img": "/galery/WhatsApp Image 2026-07-01 at 23.39.22 (1).jpeg",
+      "gridClass": "md:col-span-2 md:row-span-1 h-[240px]",
+      "client": "Mitra Logistik Nusantara",
+      "budget": "Rp 6.1 Milyar",
+      "duration": "10 Bulan",
+      "fullDesc": "Pusat distribusi logistik modern yang strategis untuk melayani area perkotaan dengan sistem keamanan tinggi dan manajemen sirkulasi kendaraan terintegrasi."
+    }
+  ],
+  "settings": {
+    "heroTitle": "Building Excellence for a Better Future",
+    "heroDesc": "Kami adalah perusahaan konstruksi terpercaya dengan pengalaman lebih dari 15 tahun dalam menghadirkan mahakarya infrastruktur dan bangunan komersial bernilai tinggi.",
+    "heroImage": "/galery/WhatsApp Image 2026-07-01 at 23.38.36.jpeg",
+    "aboutTitle": "Raya Konstruksi",
+    "aboutBadge": "Behind The Blueprint",
+    "aboutImage1": "/galery/WhatsApp Image 2026-07-01 at 23.39.21.jpeg",
+    "aboutImage2": "/galery/WhatsApp Image 2026-07-01 at 23.38.36 (1).jpeg",
+    "aboutStory": "Lebih dari 15 tahun, Raya Konstruksi telah memimpin industri konstruksi tanah air. Kami mengombinasikan teknologi mutakhir, material pilihan, dan keahlian arsitektur kelas dunia untuk menciptakan bangunan kokoh yang bernilai estetika tinggi.",
+    "aboutStory2": "Didirikan dengan semangat integritas kerja yang tinggi, kami berkomitmen untuk mendampingi setiap tahap konstruksi mulai dari konsep sketsa hingga penyerahan kunci.",
+    "visionTitle": "Pioneering Sustainable Horizons",
+    "visionDesc": "Menjadi kontraktor terdepan yang inovatif, ramah lingkungan, dan dipercaya sebagai pilar utama pembangunan infrastruktur modern di Indonesia.",
+    "mission1": "Memberikan hasil karya terbaik dengan mengutamakan keselamatan kerja (K3) di setiap lokasi proyek.",
+    "mission2": "Menjaga presisi detail dan keselarasan arsitektur di setiap bangunan yang kami tangani.",
+    "mission3": "Menjamin transparansi anggaran dan ketepatan waktu serah terima proyek secara konsisten.",
+    "whyTitle": "Kenapa Memilih Kami?",
+    "whyDesc": "Kami tidak sekadar menyusun beton dan besi. Kami merancang ruang hidup dan bisnis yang mengutamakan keamanan tinggi, presisi struktural, serta keselarasan estetika.",
+    "servicesTitle": "Bidang Keahlian Kami",
+    "servicesDesc": "Menyediakan layanan penuh mulai dari konsep perencanaan arsitektur, pelaksanaan konstruksi sipil, hingga tahap finishing interior.",
+    "clientsTitle": "Klien & Mitra Kami",
+    "clientsDesc": "Dipercaya oleh perusahaan-perusahaan terkemuka di berbagai sektor industri di Indonesia.",
+    "contactTitle": "Siap Memulai Proyek Anda?",
+    "contactDesc": "Konsultasikan konsep rancang bangun secara gratis bersama tim estimator ahli kami langsung di WhatsApp.",
+    "contactImage": "/galery/WhatsApp Image 2026-07-01 at 23.38.37.jpeg",
+    "whatsappNumber": "6281234567890",
+    "emailAddress": "contact@rayakonstruksi.com",
+    "companyName": "Raya Konstruksi",
+    "companyAddress": "Jakarta, Indonesia"
+  },
+  "clients": [
+    {
+      "id": 1,
+      "name": "PT Waskita Karya",
+      "abbr": "WK"
+    },
+    {
+      "id": 2,
+      "name": "PT Adhi Karya",
+      "abbr": "AK"
+    },
+    {
+      "id": 3,
+      "name": "PT Hutama Karya",
+      "abbr": "HK"
+    },
+    {
+      "id": 4,
+      "name": "PT PP (Persero)",
+      "abbr": "PP"
+    },
+    {
+      "id": 5,
+      "name": "PT Total Bangun Persada",
+      "abbr": "TBP"
+    },
+    {
+      "id": 6,
+      "name": "PT Wijaya Karya",
+      "abbr": "WIKA"
+    },
+    {
+      "id": 7,
+      "name": "PT Nindya Karya",
+      "abbr": "NK"
+    },
+    {
+      "id": 8,
+      "name": "PT Brantas Abipraya",
+      "abbr": "BA"
+    },
+    {
+      "id": 9,
+      "name": "PT Semen Indonesia",
+      "abbr": "SI"
+    },
+    {
+      "id": 10,
+      "name": "PT Krakatau Steel",
+      "abbr": "KS"
+    },
+    {
+      "id": 11,
+      "name": "PT Pertamina",
+      "abbr": "PTM"
+    },
+    {
+      "id": 12,
+      "name": "PT PLN Persero",
+      "abbr": "PLN"
+    }
+  ]
+}

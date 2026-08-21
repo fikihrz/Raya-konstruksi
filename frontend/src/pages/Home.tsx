@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FiHome, FiArrowRight, FiPhoneCall, FiMail, FiMapPin, FiX, FiCalendar, FiMap } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 
@@ -8,32 +8,38 @@ const Home = () => {
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [activeAboutTab, setActiveAboutTab] = useState<'story' | 'vision' | 'mission'>('story');
 
-  const services = [
-    { title: 'Residential Design', desc: 'Pembangunan rumah tinggal eksklusif, vila modern, dan residensial premium dengan detail arsitektur tingkat tinggi.', img: '/galery/WhatsApp Image 2026-07-01 at 23.38.36 (1).jpeg' },
-    { title: 'Commercial Spaces', desc: 'Konstruksi gedung perkantoran mewah, pusat perbelanjaan, dan ruko modern yang fungsional dan estetis.', img: '/galery/WhatsApp Image 2026-07-01 at 23.38.36 (2).jpeg' },
-    { title: 'Industrial Development', desc: 'Pembangunan kawasan industri, gudang logistik skala besar, dan pabrik dengan spesifikasi standar tinggi.', img: '/galery/WhatsApp Image 2026-07-01 at 23.38.36.jpeg' },
-    { title: 'Infrastructure Works', desc: 'Pengerjaan infrastruktur vital seperti jalan raya modern, jembatan kokoh, dan fasilitas publik.', img: '/galery/WhatsApp Image 2026-07-01 at 23.38.37.jpeg' },
-    { title: 'Fabrikasi & Workshop', desc: 'Fabrikasi baja struktural, rangka atap baja ringan, dan komponen logam presisi untuk kebutuhan konstruksi sipil dan industri.', img: '/galery/WhatsApp Image 2026-07-01 at 23.39.22 (2).jpeg' },
-    { title: 'Renovasi & Retrofit', desc: 'Alih fungsi dan renovasi total bangunan eksisting, modernisasi fasad, dan perkuatan struktur gedung lama.', img: '/galery/WhatsApp Image 2026-07-01 at 23.39.23.jpeg' }
-  ];
+  const [services, setServices] = useState<any[]>([]);
+  const [reasons, setReasons] = useState<any[]>([]);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [clients, setClients] = useState<any[]>([]);
+  const [settings, setSettings] = useState<any>({});
+  const [loading, setLoading] = useState(true);
 
-  const reasons = [
-    { number: '01', title: 'Architectural Excellence', desc: 'Kami mengutamakan keselarasan antara kekuatan struktur bangunan dan keindahan nilai estetika arsitektur modern.' },
-    { number: '02', title: 'Premium Material Selection', desc: 'Setiap bahan bangunan dipilih secara ketat untuk menjamin ketahanan konstruksi yang andal melintasi generasi.' },
-    { number: '03', title: 'Seamless Workflow & Timeline', desc: 'Manajemen proyek profesional yang transparan dengan penjadwalan presisi memastikan ketepatan waktu serah terima.' }
-  ];
-
-  const projects = [
-    { title: 'The Glass Horizon Villa', category: 'Residential', location: 'Jakarta', year: 2025, img: '/galery/WhatsApp Image 2026-07-01 at 23.39.21 (1).jpeg', gridClass: 'md:col-span-2 md:row-span-2 h-[500px]', client: 'Bapak Hermawan', budget: 'Rp 4.5 Milyar', duration: '11 Bulan', fullDesc: 'Vila hunian premium dengan fasad kaca penuh untuk memaksimalkan cahaya alami dan pemandangan luar, dilengkapi kolam renang infinity dan sistem smart home modern.' },
-    { title: 'Global Nexus Plaza', category: 'Commercial', location: 'Bandung', year: 2024, img: '/galery/WhatsApp Image 2026-07-01 at 23.39.21 (2).jpeg', gridClass: 'md:col-span-1 md:row-span-1 h-[240px]', client: 'PT Nexus Global', budget: 'Rp 12.8 Milyar', duration: '18 Bulan', fullDesc: 'Pusat bisnis terpadu modern 5 lantai di pusat kota Bandung dengan konsep ramah lingkungan dan tata ruang dinamis untuk menampung puluhan startup.' },
-    { title: 'Eco Industrial Complex', category: 'Industrial', location: 'Tangerang', year: 2024, img: '/galery/WhatsApp Image 2026-07-01 at 23.39.21.jpeg', gridClass: 'md:col-span-1 md:row-span-1 h-[240px]', client: 'PT Eco Logistics', budget: 'Rp 8.2 Milyar', duration: '14 Bulan', fullDesc: 'Kompleks pergudangan pintar dengan struktur atap berpanel surya, efisiensi sirkulasi udara alami, dan dermaga bongkar muat otomatis berkapasitas besar.' },
-    { title: 'Grand Valley Crossing', category: 'Infrastructure', location: 'Surabaya', year: 2025, img: '/galery/WhatsApp Image 2026-07-01 at 23.39.21 (3).jpeg', gridClass: 'md:col-span-1 md:row-span-2 h-[500px]', client: 'Kementerian PUPR', budget: 'Rp 24.5 Milyar', duration: '24 Bulan', fullDesc: 'Proyek strategis jembatan penghubung antar wilayah untuk memperlancar lalu lintas logistik regional dengan menggunakan teknik konstruksi beton prategang.' },
-    { title: 'Urban Warehouse Hub', category: 'Infrastructure', location: 'Bekasi', year: 2025, img: '/galery/WhatsApp Image 2026-07-01 at 23.39.22 (1).jpeg', gridClass: 'md:col-span-2 md:row-span-1 h-[240px]', client: 'Mitra Logistik Nusantara', budget: 'Rp 6.1 Milyar', duration: '10 Bulan', fullDesc: 'Pusat distribusi logistik modern yang strategis untuk melayani area perkotaan dengan sistem keamanan tinggi dan manajemen sirkulasi kendaraan terintegrasi.' }
-  ];
+  useEffect(() => {
+    const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
+    fetch(`${API_BASE}/api/data`)
+      .then(res => res.json())
+      .then(data => {
+        setServices(data.services || []);
+        setReasons(data.reasons || []);
+        setProjects(data.projects || []);
+        setClients(data.clients || []);
+        setSettings(data.settings || {});
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to fetch data:", err);
+        setLoading(false);
+      });
+  }, []);
 
   const filteredProjects = activeCategory === 'All'
     ? projects
     : projects.filter(p => p.category === activeCategory);
+
+  if (loading) {
+    return <div className="h-screen w-full flex items-center justify-center bg-secondary text-white font-bold text-2xl">Loading...</div>;
+  }
 
   return (
     <div>
@@ -41,7 +47,7 @@ const Home = () => {
       <section className="relative h-screen flex items-center justify-center pt-20 overflow-hidden bg-secondary text-center">
         <div className="absolute inset-0 z-0">
           <img
-            src="/galery/WhatsApp Image 2026-07-01 at 23.38.36.jpeg"
+            src={settings.heroImage || '/galery/WhatsApp Image 2026-07-01 at 23.38.36.jpeg'}
             alt="Skyscraper Construction"
             className="w-full h-full object-cover opacity-35 scale-105"
           />
@@ -55,15 +61,15 @@ const Home = () => {
             transition={{ duration: 0.8 }}
             className="text-5xl md:text-7xl font-extrabold leading-tight text-white"
           >
-            Building Excellence for a <span className="text-primary-container">Better Future</span>
+            {settings.heroTitle}
           </motion.h1>
           <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-            className="text-lg md:text-xl text-white/80 max-w-2xl leading-relaxed"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="text-lg md:text-xl text-on-secondary opacity-90 max-w-2xl leading-relaxed font-light"
           >
-            Dari gedung pencakar langit hingga perumahan eksklusif, kami menghadirkan konstruksi presisi tinggi untuk masa depan Anda.
+            {settings.heroDesc}
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -88,14 +94,14 @@ const Home = () => {
             <div className="w-4/5 h-[400px] rounded-2xl overflow-hidden shadow-xl">
               <img
                 className="w-full h-full object-cover"
-                src="/galery/WhatsApp Image 2026-07-01 at 23.39.21.jpeg"
+                src={settings.aboutImage1 || '/galery/WhatsApp Image 2026-07-01 at 23.39.21.jpeg'}
                 alt="Architects working"
               />
             </div>
             <div className="absolute right-0 bottom-4 w-3/5 h-[260px] rounded-2xl overflow-hidden shadow-2xl border-4 border-blue-100">
               <img
                 className="w-full h-full object-cover"
-                src="/galery/WhatsApp Image 2026-07-01 at 23.38.36 (1).jpeg"
+                src={settings.aboutImage2 || '/galery/WhatsApp Image 2026-07-01 at 23.38.36 (1).jpeg'}
                 alt="Structural construction detail"
               />
             </div>
@@ -103,8 +109,8 @@ const Home = () => {
 
           <div className="lg:col-span-6 space-y-8">
             <div className="space-y-3">
-              <span className="text-primary font-bold uppercase tracking-widest text-xs">Behind The Blueprint</span>
-              <h2 className="text-4xl md:text-5xl font-black text-on-surface leading-tight">Raya Konstruksi</h2>
+              <span className="text-primary font-bold uppercase tracking-widest text-xs">{settings.aboutBadge || 'Behind The Blueprint'}</span>
+              <h2 className="text-4xl md:text-5xl font-black text-on-surface leading-tight">{settings.aboutTitle || 'Raya Konstruksi'}</h2>
             </div>
 
             <div className="flex border-b border-outline-variant/30 text-sm font-semibold">
@@ -141,10 +147,10 @@ const Home = () => {
                     className="space-y-4"
                   >
                     <p className="text-on-surface-variant leading-relaxed text-base">
-                      Lebih dari 15 tahun, Raya Konstruksi telah memimpin industri konstruksi tanah air. Kami mengombinasikan teknologi mutakhir, material pilihan, dan keahlian arsitektur kelas dunia untuk menciptakan bangunan kokoh yang bernilai estetika tinggi.
+                      {settings.aboutStory || ''}
                     </p>
                     <p className="text-on-surface-variant leading-relaxed text-sm">
-                      Didirikan dengan semangat integritas kerja yang tinggi, kami berkomitmen untuk mendampingi setiap tahap konstruksi mulai dari konsep sketsa hingga penyerahan kunci.
+                      {settings.aboutStory2 || ''}
                     </p>
                   </motion.div>
                 )}
@@ -158,9 +164,9 @@ const Home = () => {
                     transition={{ duration: 0.3 }}
                     className="border-l-2 border-primary pl-6 py-2"
                   >
-                    <h4 className="text-lg font-bold text-on-surface mb-2">Pioneering Sustainable Horizons</h4>
+                    <h4 className="text-lg font-bold text-on-surface mb-2">{settings.visionTitle || ''}</h4>
                     <p className="text-on-surface-variant leading-relaxed text-base italic">
-                      "Menjadi kontraktor terdepan yang inovatif, ramah lingkungan, dan dipercaya sebagai pilar utama pembangunan infrastruktur modern di Indonesia."
+                      "{settings.visionDesc || ''}"
                     </p>
                   </motion.div>
                 )}
@@ -175,9 +181,9 @@ const Home = () => {
                     className="space-y-3"
                   >
                     {[
-                      'Memberikan hasil karya terbaik dengan mengutamakan keselamatan kerja (K3) di setiap lokasi proyek.',
-                      'Menjaga presisi detail dan keselarasan arsitektur di setiap bangunan yang kami tangani.',
-                      'Menjamin transparansi anggaran dan ketepatan waktu serah terima proyek secara konsisten.'
+                      settings.mission1 || '',
+                      settings.mission2 || '',
+                      settings.mission3 || ''
                     ].map((item, idx) => (
                       <div key={idx} className="flex gap-3 items-start">
                         <span className="text-primary font-bold mt-0.5">•</span>
@@ -201,9 +207,9 @@ const Home = () => {
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center space-y-4 mb-16">
             <span className="inline-block py-1 px-3 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 font-bold uppercase tracking-widest text-[10px]">Why Choose Us</span>
-            <h2 className="text-4xl md:text-5xl font-black text-white leading-tight">Kenapa Memilih Kami?</h2>
+            <h2 className="text-4xl md:text-5xl font-black text-white leading-tight">{settings.whyTitle || 'Kenapa Memilih Kami?'}</h2>
             <p className="text-slate-300 text-sm max-w-2xl mx-auto leading-relaxed">
-              Kami tidak sekadar menyusun beton dan besi. Kami merancang ruang hidup dan bisnis yang mengutamakan keamanan tinggi, presisi struktural, serta keselarasan estetika.
+              {settings.whyDesc || ''}
             </p>
           </div>
 
@@ -226,9 +232,9 @@ const Home = () => {
         <div id="services" className="max-w-7xl mx-auto space-y-12">
           <div className="flex flex-col space-y-4 max-w-3xl">
               <span className="text-primary font-bold uppercase tracking-widest text-xs">Services Overview</span>
-              <h2 className="text-3xl md:text-5xl font-black text-on-surface leading-tight">Bidang Keahlian Kami</h2>
+              <h2 className="text-3xl md:text-5xl font-black text-on-surface leading-tight">{settings.servicesTitle || 'Bidang Keahlian Kami'}</h2>
               <p className="text-on-surface-variant text-base leading-relaxed">
-                Menyediakan layanan penuh mulai dari konsep perencanaan arsitektur, pelaksanaan konstruksi sipil, hingga tahap finishing interior.
+                {settings.servicesDesc || ''}
               </p>
             </div>
 
@@ -266,9 +272,9 @@ const Home = () => {
       <section className="py-20 bg-blue-950 overflow-hidden">
         <div className="max-w-7xl mx-auto px-8 mb-12 text-center space-y-2">
           <span className="text-blue-400 font-bold uppercase tracking-widest text-xs">Trusted By</span>
-          <h2 className="text-3xl md:text-4xl font-black text-white">Klien & Mitra Kami</h2>
+          <h2 className="text-3xl md:text-4xl font-black text-white">{settings.clientsTitle || 'Klien & Mitra Kami'}</h2>
           <p className="text-blue-200/70 text-sm max-w-xl mx-auto">
-            Dipercaya oleh perusahaan-perusahaan terkemuka di berbagai sektor industri di Indonesia.
+            {settings.clientsDesc || ''}
           </p>
         </div>
 
@@ -276,26 +282,7 @@ const Home = () => {
         <div className="relative">
           <div className="flex gap-8 overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_15%,white_85%,transparent)]">
             <div className="flex gap-8 animate-[scroll_30s_linear_infinite] min-w-max">
-              {[
-                { name: 'PT Waskita Karya', abbr: 'WK' },
-                { name: 'PT Adhi Karya', abbr: 'AK' },
-                { name: 'PT Hutama Karya', abbr: 'HK' },
-                { name: 'PT PP (Persero)', abbr: 'PP' },
-                { name: 'PT Total Bangun Persada', abbr: 'TBP' },
-                { name: 'PT Wijaya Karya', abbr: 'WIKA' },
-                { name: 'PT Nindya Karya', abbr: 'NK' },
-                { name: 'PT Brantas Abipraya', abbr: 'BA' },
-                { name: 'PT Semen Indonesia', abbr: 'SI' },
-                { name: 'PT Krakatau Steel', abbr: 'KS' },
-                { name: 'PT Pertamina', abbr: 'PTM' },
-                { name: 'PT PLN Persero', abbr: 'PLN' },
-                { name: 'PT Waskita Karya', abbr: 'WK' },
-                { name: 'PT Adhi Karya', abbr: 'AK' },
-                { name: 'PT Hutama Karya', abbr: 'HK' },
-                { name: 'PT PP (Persero)', abbr: 'PP' },
-                { name: 'PT Total Bangun Persada', abbr: 'TBP' },
-                { name: 'PT Wijaya Karya', abbr: 'WIKA' },
-              ].map((client, idx) => (
+              {[...clients, ...clients].map((client, idx) => (
                 <div
                   key={idx}
                   className="flex items-center gap-3 bg-blue-900/40 border border-blue-800/50 rounded-xl px-6 py-4 flex-shrink-0 hover:border-blue-400 hover:shadow-md transition-all duration-300 group"
@@ -455,7 +442,7 @@ const Home = () => {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img 
-            src="/galery/WhatsApp Image 2026-07-01 at 23.38.37.jpeg" 
+            src={settings.contactImage || '/galery/WhatsApp Image 2026-07-01 at 23.38.37.jpeg'} 
             alt="Construction site" 
             className="w-full h-full object-cover"
           />
@@ -467,16 +454,16 @@ const Home = () => {
           <div className="space-y-6">
             <span className="text-primary-container text-xs font-black uppercase tracking-[0.25em]">Get In Touch</span>
             <h2 className="text-4xl md:text-6xl font-black text-white leading-tight tracking-tight">
-              Siap Memulai Proyek Anda?
+              {settings.contactTitle || 'Siap Memulai Proyek Anda?'}
             </h2>
             <p className="text-white/60 max-w-xl mx-auto text-sm md:text-base leading-relaxed">
-              Konsultasikan konsep rancang bangun secara gratis bersama tim estimator ahli kami langsung di WhatsApp.
+              {settings.contactDesc || ''}
             </p>
 
             {/* Action Buttons */}
             <div className="flex flex-wrap justify-center gap-4 pt-6">
               <a 
-                href="https://wa.me/6281234567890?text=Halo%20Raya%20Konstruksi,%20saya%20tertarik%20untuk%20konsultasi%20proyek."
+                href={`https://wa.me/${settings.whatsappNumber || '6281234567890'}?text=Halo%20${encodeURIComponent(settings.companyName || 'Raya Konstruksi')},%20saya%20tertarik%20untuk%20konsultasi%20proyek.`}
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-3 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-green-500/50 text-white font-bold py-4.5 px-8 rounded-2xl transition-all duration-300 backdrop-blur-md hover:scale-[1.02] shadow-xl text-sm md:text-base"
@@ -485,7 +472,7 @@ const Home = () => {
                 <span>Mulai Konsultasi WhatsApp</span>
               </a>
               <a 
-                href="mailto:contact@rayakonstruksi.com?subject=Konsultasi Rencana Proyek Raya Konstruksi"
+                href={`mailto:${settings.emailAddress || 'contact@rayakonstruksi.com'}?subject=Konsultasi Rencana Proyek ${settings.companyName || 'Raya Konstruksi'}`}
                 className="inline-flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary-container/50 text-white font-bold py-4.5 px-8 rounded-2xl transition-all duration-300 backdrop-blur-md hover:scale-[1.02] shadow-xl text-sm md:text-base"
               >
                 <FiMail className="text-xl text-primary-container" />
