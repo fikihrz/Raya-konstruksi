@@ -61,7 +61,15 @@ const ImageField = ({ label, value, fieldKey, onChange }: { label: string; value
     setUploading(false);
   };
 
-  const previewSrc = value?.startsWith('http') ? value : value ? `http://localhost:5173${value}` : null;
+  const FRONTEND_URL = window.location.hostname === 'localhost' 
+    ? 'http://localhost:5173' 
+    : 'https://frontend-lilac-xi-27.vercel.app';
+
+  const previewSrc = value?.startsWith('http') 
+    ? value 
+    : value 
+      ? `${FRONTEND_URL}${value.startsWith('/') ? '' : '/'}${value}` 
+      : null;
 
   return (
     <div>

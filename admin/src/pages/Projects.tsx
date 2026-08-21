@@ -66,10 +66,10 @@ const Projects = () => {
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     const formDataObj = new FormData();
     formDataObj.append('image', file);
-    
+
     try {
       const res = await fetch(`${API}/api/upload`, {
         method: 'POST',
@@ -99,13 +99,13 @@ const Projects = () => {
         <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200 mb-8">
           <h3 className="text-xl font-bold mb-4">{editingId === 0 ? 'Tambah Project' : 'Edit Project'}</h3>
           <div className="grid grid-cols-2 gap-4">
-            <input type="text" placeholder="Title" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="border p-2 rounded" />
-            <input type="text" placeholder="Category" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} className="border p-2 rounded" />
-            <input type="text" placeholder="Location" value={formData.location} onChange={e => setFormData({...formData, location: e.target.value})} className="border p-2 rounded" />
-            <input type="number" placeholder="Year" value={formData.year} onChange={e => setFormData({...formData, year: e.target.value})} className="border p-2 rounded" />
-            <input type="text" placeholder="Client" value={formData.client} onChange={e => setFormData({...formData, client: e.target.value})} className="border p-2 rounded" />
-            <input type="text" placeholder="Budget" value={formData.budget} onChange={e => setFormData({...formData, budget: e.target.value})} className="border p-2 rounded" />
-            <input type="text" placeholder="Duration" value={formData.duration} onChange={e => setFormData({...formData, duration: e.target.value})} className="border p-2 rounded" />
+            <input type="text" placeholder="Title" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} className="border p-2 rounded" />
+            <input type="text" placeholder="Category" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} className="border p-2 rounded" />
+            <input type="text" placeholder="Location" value={formData.location} onChange={e => setFormData({ ...formData, location: e.target.value })} className="border p-2 rounded" />
+            <input type="number" placeholder="Year" value={formData.year} onChange={e => setFormData({ ...formData, year: e.target.value })} className="border p-2 rounded" />
+            <input type="text" placeholder="Client" value={formData.client} onChange={e => setFormData({ ...formData, client: e.target.value })} className="border p-2 rounded" />
+            <input type="text" placeholder="Budget" value={formData.budget} onChange={e => setFormData({ ...formData, budget: e.target.value })} className="border p-2 rounded" />
+            <input type="text" placeholder="Duration" value={formData.duration} onChange={e => setFormData({ ...formData, duration: e.target.value })} className="border p-2 rounded" />
             <div className="border p-4 rounded-xl col-span-2 flex items-center gap-6 bg-slate-50">
               <div className="flex-1">
                 <label className="text-sm font-bold text-slate-700 mb-2 block">Upload Gambar Project</label>
@@ -121,8 +121,8 @@ const Projects = () => {
                 </div>
               )}
             </div>
-            <textarea placeholder="Description" value={formData.fullDesc} onChange={e => setFormData({...formData, fullDesc: e.target.value})} className="border p-2 rounded col-span-2" rows={3}></textarea>
-            <input type="text" placeholder="Grid Class (e.g. md:col-span-2 md:row-span-2 h-[500px])" value={formData.gridClass} onChange={e => setFormData({...formData, gridClass: e.target.value})} className="border p-2 rounded col-span-2" />
+            <textarea placeholder="Description" value={formData.fullDesc} onChange={e => setFormData({ ...formData, fullDesc: e.target.value })} className="border p-2 rounded col-span-2" rows={3}></textarea>
+            <input type="text" placeholder="Grid Class (e.g. md:col-span-2 md:row-span-2 h-[500px])" value={formData.gridClass} onChange={e => setFormData({ ...formData, gridClass: e.target.value })} className="border p-2 rounded col-span-2" />
           </div>
           <div className="mt-4 flex space-x-3">
             <button onClick={handleSave} className="bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2"><FiSave /> Simpan</button>

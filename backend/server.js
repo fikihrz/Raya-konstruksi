@@ -39,44 +39,24 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// Connect to MongoDB Atlas with Serverless Global Connection Cache
+// Connect to MongoDB Atlas with Serverless Connection Cache
 const MONGODB_URI = process.env.MONGODB_URI;
 
-let cached = global.mongoose;
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
-}
-
+let connectPromise = null;
 async function connectDB() {
-  if (cached.conn) {
-    return cached.conn;
-  }
-
-  if (!cached.promise) {
-    const opts = {
-      bufferCommands: false,
-      serverSelectionTimeoutMS: 15000,
-      connectTimeoutMS: 15000,
-    };
-
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongooseInstance) => {
+  if (mongoose.connection.readyState >= 1) return;
+  if (!connectPromise) {
+    connectPromise = mongoose.connect(MONGODB_URI, {
+      serverSelectionTimeoutMS: 10000,
+    }).then(() => {
       console.log(' Connected to MongoDB Atlas!');
-      return mongooseInstance;
+      connectPromise = null;
     }).catch(err => {
-      cached.promise = null;
-      console.error(' MongoDB Connection Error:', err);
+      connectPromise = null;
       throw err;
     });
   }
-
-  try {
-    cached.conn = await cached.promise;
-  } catch (e) {
-    cached.promise = null;
-    throw e;
-  }
-
-  return cached.conn;
+  return connectPromise;
 }
 
 // Middleware to ensure DB connection before any API request
@@ -84,7 +64,7 @@ app.use(async (req, res, next) => {
   try {
     await connectDB();
   } catch (err) {
-    console.error('DB connection middleware error:', err.message);
+    console.error('DB connection error:', err);
   }
   next();
 });
@@ -169,17 +149,20 @@ app.post('/api/auth/forgot-password', async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: 'Email wajib diisi' });
 
-  const targetEmail = email.toLowerCase().trim();
+  const targetEmail = (email.toLowerCase().trim() === 'admin@rayakonstruksi.com' || email.toLowerCase().trim() === 'fikihrz3135@gmail.com') 
+    ? 'fikihrz3135@gmail.com' 
+    : email.toLowerCase().trim();
+
   const resetPin = Math.floor(100000 + Math.random() * 900000).toString();
 
-  // Pastikan connectDB selesai dan simpan PIN ke user di database
+  // Try to update DB in background if available
   try {
-    await connectDB();
-    await User.updateOne(
-      { email: targetEmail },
-      { $set: { resetToken: resetPin, resetTokenExpiry: new Date(Date.now() + 3600000) } },
-      { upsert: true }
-    );
+    if (mongoose.connection.readyState >= 1) {
+      await User.updateOne(
+        { email: email.toLowerCase().trim() },
+        { $set: { resetToken: resetPin, resetTokenExpiry: new Date(Date.now() + 3600000) } }
+      );
+    }
   } catch (dbErr) {
     console.error('DB update token error:', dbErr);
   }
@@ -236,7 +219,6 @@ app.post('/api/auth/reset-password', async (req, res) => {
   }
 
   try {
-    await connectDB();
     const user = await User.findOne({ email: email.toLowerCase().trim() });
     if (!user) {
       return res.status(404).json({ error: 'Pengguna tidak ditemukan' });

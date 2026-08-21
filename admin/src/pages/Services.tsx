@@ -64,10 +64,10 @@ const Services = () => {
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    
+
     const formDataObj = new FormData();
     formDataObj.append('image', file);
-    
+
     try {
       const res = await fetch(`${API}/api/upload`, {
         method: 'POST',
@@ -97,8 +97,8 @@ const Services = () => {
         <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200 mb-8">
           <h3 className="text-xl font-bold mb-4">{editingId === 0 ? 'Tambah Layanan' : 'Edit Layanan'}</h3>
           <div className="grid grid-cols-1 gap-4">
-            <input type="text" placeholder="Title" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} className="border p-2 rounded" />
-            <textarea placeholder="Description" value={formData.desc} onChange={e => setFormData({...formData, desc: e.target.value})} className="border p-2 rounded" rows={3}></textarea>
+            <input type="text" placeholder="Title" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} className="border p-2 rounded" />
+            <textarea placeholder="Description" value={formData.desc} onChange={e => setFormData({ ...formData, desc: e.target.value })} className="border p-2 rounded" rows={3}></textarea>
             <div className="border p-4 rounded-xl flex items-center gap-6 bg-slate-50">
               <div className="flex-1">
                 <label className="text-sm font-bold text-slate-700 mb-2 block">Upload Gambar Layanan</label>

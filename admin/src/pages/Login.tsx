@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiBox, FiLock, FiMail, FiCheck, FiArrowLeft, FiAlertCircle, FiKey, FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiBox, FiLock, FiMail, FiCheck, FiArrowLeft, FiAlertCircle, FiKey } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 
 const API = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
@@ -8,16 +8,14 @@ const Login = () => {
   const navigate = useNavigate();
   // State: 'login' | 'forgot' | 'verify_pin' | 'success'
   const [view, setView] = useState<'login' | 'forgot' | 'verify_pin' | 'success'>('login');
-  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  
+
   const [resetEmail, setResetEmail] = useState('');
   const [pin, setPin] = useState('');
   const [newPassword, setNewPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  
+
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
@@ -113,9 +111,9 @@ const Login = () => {
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl"></div>
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl"></div>
       </div>
-      
+
       <div className="max-w-md w-full relative z-10 bg-slate-800/80 backdrop-blur-xl p-8 sm:p-10 rounded-2xl shadow-2xl border border-slate-700/60">
-        
+
         {/* Header */}
         <div className="flex flex-col items-center mb-8">
           <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-900/50 mb-4">
@@ -146,13 +144,13 @@ const Login = () => {
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">Email Admin</label>
               <div className="relative">
                 <FiMail className="absolute left-3.5 top-3.5 text-slate-400" />
-                <input 
-                  type="email" 
-                  required 
+                <input
+                  type="email"
+                  required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-slate-900/60 border border-slate-700 rounded-lg pl-10 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all" 
-                  placeholder="admin@rayakonstruksi.com" 
+                  className="w-full bg-slate-900/60 border border-slate-700 rounded-lg pl-10 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all"
+                  placeholder="admin@rayakonstruksi.com"
                 />
               </div>
             </div>
@@ -161,27 +159,24 @@ const Login = () => {
               <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">Kata Sandi</label>
               <div className="relative">
                 <FiLock className="absolute left-3.5 top-3.5 text-slate-400" />
-                <input 
-                  type={showPassword ? 'text' : 'password'} 
-                  required 
+                <input
+                  type="password"
+                  required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-slate-900/60 border border-slate-700 rounded-lg pl-10 pr-12 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all" 
-                  placeholder="••••••••" 
+                  className="w-full bg-slate-900/60 border border-slate-700 rounded-lg pl-10 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all"
+                  placeholder="••••••••"
                 />
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-3.5 text-slate-400 hover:text-white transition-colors">
-                  {showPassword ? <FiEyeOff /> : <FiEye />}
-                </button>
               </div>
             </div>
-            
+
             <div className="flex items-center justify-between text-xs sm:text-sm pt-1">
               <label className="flex items-center text-slate-400 cursor-pointer select-none">
                 <input type="checkbox" defaultChecked className="mr-2 rounded border-slate-700 bg-slate-800 text-blue-500 focus:ring-blue-500" />
                 Ingat saya
               </label>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={() => { setView('forgot'); setError(''); }}
                 className="text-blue-400 hover:text-blue-300 font-medium transition-colors"
               >
@@ -189,8 +184,8 @@ const Login = () => {
               </button>
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               disabled={loading}
               className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-blue-900/30 hover:shadow-blue-900/50 transition-all duration-200 text-sm mt-2"
             >
@@ -210,19 +205,19 @@ const Login = () => {
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">Email Akun Admin</label>
                 <div className="relative">
                   <FiMail className="absolute left-3.5 top-3.5 text-slate-400" />
-                  <input 
-                    type="email" 
-                    required 
+                  <input
+                    type="email"
+                    required
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}
-                    className="w-full bg-slate-900/60 border border-slate-700 rounded-lg pl-10 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all" 
-                    placeholder="admin@rayakonstruksi.com" 
+                    className="w-full bg-slate-900/60 border border-slate-700 rounded-lg pl-10 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all"
+                    placeholder="admin@rayakonstruksi.com"
                   />
                 </div>
               </div>
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={loading}
                 className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-white font-bold py-3 px-4 rounded-xl transition-colors text-sm"
               >
@@ -230,8 +225,8 @@ const Login = () => {
               </button>
             </form>
 
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => { setView('login'); setError(''); }}
               className="w-full flex items-center justify-center gap-2 text-slate-400 hover:text-white text-sm py-2 transition-colors"
             >
@@ -252,14 +247,14 @@ const Login = () => {
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">Kode PIN 6-Digit</label>
                 <div className="relative">
                   <FiKey className="absolute left-3.5 top-3.5 text-slate-400" />
-                  <input 
-                    type="text" 
-                    required 
+                  <input
+                    type="text"
+                    required
                     maxLength={6}
                     value={pin}
                     onChange={(e) => setPin(e.target.value)}
-                    className="w-full bg-slate-900/60 border border-slate-700 rounded-lg pl-10 pr-4 py-3 text-white font-mono tracking-widest text-center text-lg placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500" 
-                    placeholder="123456" 
+                    className="w-full bg-slate-900/60 border border-slate-700 rounded-lg pl-10 pr-4 py-3 text-white font-mono tracking-widest text-center text-lg placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="123456"
                   />
                 </div>
               </div>
@@ -268,23 +263,20 @@ const Login = () => {
                 <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">Kata Sandi Baru</label>
                 <div className="relative">
                   <FiLock className="absolute left-3.5 top-3.5 text-slate-400" />
-                  <input 
-                    type={showNewPassword ? 'text' : 'password'} 
-                    required 
+                  <input
+                    type="password"
+                    required
                     minLength={6}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full bg-slate-900/60 border border-slate-700 rounded-lg pl-10 pr-12 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all" 
-                    placeholder="Minimal 6 karakter" 
+                    className="w-full bg-slate-900/60 border border-slate-700 rounded-lg pl-10 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all"
+                    placeholder="Minimal 6 karakter"
                   />
-                  <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-3.5 top-3.5 text-slate-400 hover:text-white transition-colors">
-                    {showNewPassword ? <FiEyeOff /> : <FiEye />}
-                  </button>
                 </div>
               </div>
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={loading}
                 className="w-full bg-green-600 hover:bg-green-500 disabled:bg-green-800 text-white font-bold py-3 px-4 rounded-xl transition-colors text-sm"
               >
@@ -292,8 +284,8 @@ const Login = () => {
               </button>
             </form>
 
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => { setView('forgot'); setError(''); }}
               className="w-full flex items-center justify-center gap-2 text-slate-400 hover:text-white text-sm py-2 transition-colors"
             >
@@ -314,8 +306,8 @@ const Login = () => {
                 {successMsg}
               </p>
             </div>
-            <button 
-              type="button" 
+            <button
+              type="button"
               onClick={() => { setView('login'); setError(''); }}
               className="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-4 rounded-xl transition-colors text-sm"
             >
