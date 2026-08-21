@@ -1,12 +1,14 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect } from 'react';
-import { FiHome, FiArrowRight, FiPhoneCall, FiMail, FiMapPin, FiX, FiCalendar, FiMap } from 'react-icons/fi';
+import { FiHome, FiArrowRight, FiPhoneCall, FiMail, FiMapPin, FiX, FiCalendar, FiMap, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { FaWhatsapp } from 'react-icons/fa';
 
 const Home = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [activeAboutTab, setActiveAboutTab] = useState<'story' | 'vision' | 'mission'>('story');
+
+  const [currentSlide, setCurrentSlide] = useState(0);
 
   const [services, setServices] = useState<any[]>([]);
   const [reasons, setReasons] = useState<any[]>([]);
@@ -33,6 +35,14 @@ const Home = () => {
       });
   }, []);
 
+  // Hero Carousel Auto-Play Timer
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide(prev => (prev + 1) % 3);
+    }, 5500);
+    return () => clearInterval(timer);
+  }, []);
+
   const filteredProjects = activeCategory === 'All'
     ? projects
     : projects.filter(p => p.category === activeCategory);
@@ -43,48 +53,139 @@ const Home = () => {
 
   return (
     <div>
-      {/* Hero Section */}
-      <section className="relative h-screen flex items-center justify-center pt-20 overflow-hidden bg-secondary text-center">
-        <div className="absolute inset-0 z-0">
-          <img
-            src={settings.heroImage || '/galery/WhatsApp Image 2026-07-01 at 23.38.36.jpeg'}
-            alt="Skyscraper Construction"
-            className="w-full h-full object-cover opacity-35 scale-105"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/80 to-secondary"></div>
-        </div>
+      {/* Visual-First Full-Screen Banner Carousel (Pertamina / Corporate Style) */}
+      <section className="relative min-h-[85vh] md:min-h-screen flex items-center justify-center pt-16 pb-16 overflow-hidden bg-slate-950">
+        
+        {/* Slides Definition */}
+        {(() => {
+          const slides = [
+            {
+              id: 1,
+              tag: "ARCHITECTURE & DESIGN",
+              title: settings.heroTitle || "Membangun Masa Depan Presisi & Berkualitas",
+              subtitle: "Solusi terintegrasi konstruksi arsitektur modern & residensial mewah",
+              img: settings.heroImage || "/galery/WhatsApp Image 2026-07-01 at 23.38.36.jpeg",
+              category: "Residensial & Arsitektur",
+              highlight: "Desain Berkelanjutan"
+            },
+            {
+              id: 2,
+              tag: "COMMERCIAL DEVELOPMENT",
+              title: "Konstruksi Megah Komersial & Perkantoran",
+              subtitle: "Pusat bisnis bernilai tinggi dengan standar keselamatan & mutu terbaik",
+              img: "/galery/WhatsApp Image 2026-07-01 at 23.38.36 (2).jpeg",
+              category: "Komersial & Ritel",
+              highlight: "Struktur Baja Presisi"
+            },
+            {
+              id: 3,
+              tag: "INDUSTRIAL INFRASTRUCTURE",
+              title: "Infrastruktur Vital & Fabrikasi Industri",
+              subtitle: "Pabrik, pergudangan logistik, dan infrastruktur strategis nasional",
+              img: "/galery/WhatsApp Image 2026-07-01 at 23.38.37.jpeg",
+              category: "Industri & Infrastruktur",
+              highlight: "Pengerjaan Tepat Waktu"
+            }
+          ];
 
-        <div className="relative z-10 px-8 max-w-4xl mx-auto w-full flex flex-col items-center space-y-8">
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="text-5xl md:text-7xl font-extrabold leading-tight text-white"
-          >
-            {settings.heroTitle}
-          </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-lg md:text-xl text-slate-200 max-w-2xl leading-relaxed font-normal drop-shadow-md"
-          >
-            {settings.heroDesc || 'Kontraktor terpercaya dengan pengalaman lebih dari 15 tahun menghadirkan mahakarya infrastruktur dan bangunan komersial bernilai tinggi.'}
-          </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="flex flex-wrap justify-center gap-4 pt-4"
-          >
-            <a href="#contact" className="bg-primary-container text-on-primary-container font-semibold px-8 py-4 rounded-lg hover:scale-105 transition-transform shadow-lg">
-              Mulai Konsultasi
-            </a>
-            <a href="#projects" className="border border-white/30 backdrop-blur-md text-white font-semibold px-8 py-4 rounded-lg hover:bg-white/10 transition-colors">
-              Lihat Project
-            </a>
-          </motion.div>
-        </div>
+          const current = slides[currentSlide];
+
+          return (
+            <>
+              {/* Sliding Full-Screen Background Images */}
+              <div className="absolute inset-0 z-0 overflow-hidden">
+                <AnimatePresence initial={false} mode="wait">
+                  <motion.div
+                    key={currentSlide}
+                    initial={{ opacity: 0, scale: 1.08 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.03 }}
+                    transition={{ duration: 0.9, ease: "easeInOut" }}
+                    className="absolute inset-0"
+                  >
+                    <img
+                      src={current.img}
+                      alt={current.title}
+                      className="w-full h-full object-cover filter brightness-[0.7] contrast-115"
+                    />
+                    {/* Atmospheric Lighting & Gradient Overlays */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-black/60"></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/50 to-transparent"></div>
+                    {/* Subtle 3D Blueprint Mesh */}
+                    <div className="absolute inset-0 hero-3d-grid opacity-25 pointer-events-none"></div>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              {/* Main Content Layout (Vertically Centered and Balanced) */}
+              <div className="relative z-10 w-full max-w-7xl mx-auto px-6 sm:px-10 lg:px-12 flex items-center">
+                
+                {/* Left-Aligned Clean Headline */}
+                <div className="max-w-2xl text-left my-auto">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={`content-${currentSlide}`}
+                      initial={{ opacity: 0, y: 25 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.5 }}
+                      className="space-y-4"
+                    >
+                      <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white leading-[1.15] tracking-tight drop-shadow-lg">
+                        {current.title}
+                      </h1>
+
+                      <p className="text-base sm:text-lg text-slate-200 font-normal leading-relaxed drop-shadow-md max-w-lg">
+                        {current.subtitle}
+                      </p>
+
+                      <div className="pt-3">
+                        <a
+                          href="#contact"
+                          className="inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm shadow-xl shadow-blue-600/30 hover:scale-105 active:scale-95 transition-all"
+                        >
+                          <span>Hubungi Kami</span>
+                          <span>→</span>
+                        </a>
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+              </div>
+
+              {/* Clean Edge-to-Edge Navigation Arrows (Pertamina Style) */}
+              <button
+                onClick={() => setCurrentSlide(prev => (prev === 0 ? 2 : prev - 1))}
+                className="absolute left-0 top-1/2 -translate-y-1/2 w-12 sm:w-16 h-20 sm:h-24 bg-blue-600/90 hover:bg-blue-600 text-white flex items-center justify-center transition-all z-20 shadow-2xl rounded-r-xl group focus:outline-none"
+                aria-label="Previous Banner"
+              >
+                <FiChevronLeft size={32} className="group-hover:-translate-x-1 transition-transform" />
+              </button>
+
+              <button
+                onClick={() => setCurrentSlide(prev => (prev + 1) % 3)}
+                className="absolute right-0 top-1/2 -translate-y-1/2 w-12 sm:w-16 h-20 sm:h-24 bg-blue-600/90 hover:bg-blue-600 text-white flex items-center justify-center transition-all z-20 shadow-2xl rounded-l-xl group focus:outline-none"
+                aria-label="Next Banner"
+              >
+                <FiChevronRight size={32} className="group-hover:translate-x-1 transition-transform" />
+              </button>
+
+              {/* Clean Bottom Pagination Dots */}
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-2.5 z-20">
+                {slides.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentSlide(idx)}
+                    className={`h-2.5 rounded-full transition-all duration-300 ${
+                      currentSlide === idx ? 'w-8 bg-blue-500' : 'w-2.5 bg-white/40 hover:bg-white/70'
+                    }`}
+                    aria-label={`Go to slide ${idx + 1}`}
+                  />
+                ))}
+              </div>
+            </>
+          );
+        })()}
       </section>
 
       {/* About Section */}
