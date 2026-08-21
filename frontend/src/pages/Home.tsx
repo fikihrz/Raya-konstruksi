@@ -67,9 +67,9 @@ const Home = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-lg md:text-xl text-on-secondary opacity-90 max-w-2xl leading-relaxed font-light"
+            className="text-lg md:text-xl text-slate-200 max-w-2xl leading-relaxed font-normal drop-shadow-md"
           >
-            {settings.heroDesc}
+            {settings.heroDesc || 'Kontraktor terpercaya dengan pengalaman lebih dari 15 tahun menghadirkan mahakarya infrastruktur dan bangunan komersial bernilai tinggi.'}
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 20 }}

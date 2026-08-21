@@ -116,17 +116,20 @@ const Projects = () => {
                 </label>
               </div>
               {formData.img && (
-                <div className="w-32 h-32 rounded-lg overflow-hidden border border-slate-200 bg-white flex-shrink-0 relative">
-                  <img src={formData.img.startsWith('/') ? `http://localhost:5173${formData.img}` : formData.img} alt="Preview" className="w-full h-full object-cover" />
+                <div className="w-32 h-32 rounded-lg overflow-hidden border border-slate-200 bg-white flex-shrink-0 relative shadow-inner">
+                  <img 
+                    src={formData.img.startsWith('/') ? `https://frontend-lilac-xi-27.vercel.app${formData.img}` : formData.img} 
+                    alt="Preview" 
+                    className="w-full h-full object-cover" 
+                  />
                 </div>
               )}
             </div>
             <textarea placeholder="Description" value={formData.fullDesc} onChange={e => setFormData({ ...formData, fullDesc: e.target.value })} className="border p-2 rounded col-span-2" rows={3}></textarea>
-            <input type="text" placeholder="Grid Class (e.g. md:col-span-2 md:row-span-2 h-[500px])" value={formData.gridClass} onChange={e => setFormData({ ...formData, gridClass: e.target.value })} className="border p-2 rounded col-span-2" />
           </div>
           <div className="mt-4 flex space-x-3">
-            <button onClick={handleSave} className="bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2"><FiSave /> Simpan</button>
-            <button onClick={() => setEditingId(null)} className="bg-gray-400 text-white px-4 py-2 rounded flex items-center gap-2"><FiX /> Batal</button>
+            <button onClick={handleSave} className="bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2 font-medium"><FiSave /> Simpan</button>
+            <button onClick={() => setEditingId(null)} className="bg-gray-400 text-white px-4 py-2 rounded flex items-center gap-2 font-medium"><FiX /> Batal</button>
           </div>
         </div>
       )}
@@ -135,6 +138,7 @@ const Projects = () => {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gambar</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Project</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kategori</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lokasi</th>
@@ -142,17 +146,29 @@ const Projects = () => {
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {projects.map((project) => (
-              <tr key={project.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{project.title}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.category}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.location}</td>
-                <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <button onClick={() => { setEditingId(project.id); setFormData(project); }} className="text-indigo-600 hover:text-indigo-900 mr-4"><FiEdit2 size={18} /></button>
-                  <button onClick={() => handleDelete(project.id)} className="text-red-600 hover:text-red-900"><FiTrash2 size={18} /></button>
-                </td>
-              </tr>
-            ))}
+            {projects.map((project) => {
+              const imgSrc = project.img 
+                ? (project.img.startsWith('/') ? `https://frontend-lilac-xi-27.vercel.app${project.img}` : project.img) 
+                : 'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f6?w=200&q=80';
+              return (
+                <tr key={project.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <img 
+                      src={imgSrc} 
+                      alt={project.title} 
+                      className="w-16 h-12 rounded-lg object-cover border border-slate-200 shadow-sm" 
+                    />
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{project.title}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.category}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.location}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <button onClick={() => { setEditingId(project.id); setFormData(project); }} className="text-indigo-600 hover:text-indigo-900 mr-4"><FiEdit2 size={18} /></button>
+                    <button onClick={() => handleDelete(project.id)} className="text-red-600 hover:text-red-900"><FiTrash2 size={18} /></button>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

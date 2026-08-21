@@ -109,33 +109,44 @@ const Services = () => {
                 </label>
               </div>
               {formData.img && (
-                <div className="w-32 h-32 rounded-lg overflow-hidden border border-slate-200 bg-white flex-shrink-0 relative">
-                  <img src={formData.img.startsWith('/') ? `http://localhost:5173${formData.img}` : formData.img} alt="Preview" className="w-full h-full object-cover" />
+                <div className="w-32 h-32 rounded-lg overflow-hidden border border-slate-200 bg-white flex-shrink-0 relative shadow-inner">
+                  <img 
+                    src={formData.img.startsWith('/') ? `https://frontend-lilac-xi-27.vercel.app${formData.img}` : formData.img} 
+                    alt="Preview" 
+                    className="w-full h-full object-cover" 
+                  />
                 </div>
               )}
             </div>
           </div>
           <div className="mt-4 flex space-x-3">
-            <button onClick={handleSave} className="bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2"><FiSave /> Simpan</button>
-            <button onClick={() => setEditingId(null)} className="bg-gray-400 text-white px-4 py-2 rounded flex items-center gap-2"><FiX /> Batal</button>
+            <button onClick={handleSave} className="bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2 font-medium"><FiSave /> Simpan</button>
+            <button onClick={() => setEditingId(null)} className="bg-gray-400 text-white px-4 py-2 rounded flex items-center gap-2 font-medium"><FiX /> Batal</button>
           </div>
         </div>
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {services.map((service) => (
-          <div key={service.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-            <img src={service.img} alt={service.title} className="w-full h-40 object-cover" />
-            <div className="p-4">
-              <h3 className="font-bold text-lg mb-2">{service.title}</h3>
-              <p className="text-sm text-gray-600 mb-4 line-clamp-3">{service.desc}</p>
-              <div className="flex space-x-3">
-                <button onClick={() => { setEditingId(service.id); setFormData(service); }} className="text-indigo-600 hover:text-indigo-900 flex items-center gap-1"><FiEdit2 /> Edit</button>
-                <button onClick={() => handleDelete(service.id)} className="text-red-600 hover:text-red-900 flex items-center gap-1"><FiTrash2 /> Hapus</button>
+        {services.map((service) => {
+          const imgSrc = service.img 
+            ? (service.img.startsWith('/') ? `https://frontend-lilac-xi-27.vercel.app${service.img}` : service.img) 
+            : 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&q=80';
+          return (
+            <div key={service.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between">
+              <div>
+                <img src={imgSrc} alt={service.title} className="w-full h-44 object-cover" />
+                <div className="p-4">
+                  <h3 className="font-bold text-lg mb-2 text-slate-800">{service.title}</h3>
+                  <p className="text-sm text-gray-600 mb-4 line-clamp-3 leading-relaxed">{service.desc}</p>
+                </div>
+              </div>
+              <div className="p-4 border-t border-gray-100 flex space-x-3 bg-gray-50/50">
+                <button onClick={() => { setEditingId(service.id); setFormData(service); }} className="text-indigo-600 hover:text-indigo-900 flex items-center gap-1 font-medium text-sm"><FiEdit2 /> Edit</button>
+                <button onClick={() => handleDelete(service.id)} className="text-red-600 hover:text-red-900 flex items-center gap-1 font-medium text-sm"><FiTrash2 /> Hapus</button>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
