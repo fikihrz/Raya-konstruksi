@@ -1,6 +1,22 @@
+import { useState, useEffect } from 'react';
 import { FiMapPin, FiPhone, FiMail } from 'react-icons/fi';
 
+const API = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
+
 const Footer = () => {
+  const [settings, setSettings] = useState<any>({});
+
+  useEffect(() => {
+    fetch(`${API}/api/data`)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.settings) {
+          setSettings(data.settings);
+        }
+      })
+      .catch(err => console.error('Failed to load footer settings:', err));
+  }, []);
+
   return (
     <footer className="bg-slate-950 text-white py-16 border-t border-slate-900">
       <div className="container mx-auto px-6 max-w-7xl">
@@ -17,7 +33,9 @@ const Footer = () => {
                 />
               </div>
               <div>
-                <h3 className="text-lg font-black tracking-wider uppercase leading-none">Raya Konstruksi</h3>
+                <h3 className="text-lg font-black tracking-wider uppercase leading-none">
+                  {settings.companyName || 'Raya Konstruksi'}
+                </h3>
                 <span className="text-[10px] text-primary-container font-semibold tracking-[0.2em] uppercase">Building Excellence</span>
               </div>
             </div>
@@ -43,15 +61,19 @@ const Footer = () => {
             <ul className="space-y-3 text-sm text-white/55">
               <li className="flex items-start gap-3">
                 <FiMapPin className="text-primary-container mt-0.5 flex-shrink-0" />
-                <span>Jl. Pembangunan Raya No. 123, Skyline District, Jakarta</span>
+                <span>{settings.companyAddress || 'Surakarta, Indonesia'}</span>
               </li>
               <li className="flex items-center gap-3">
                 <FiPhone className="text-primary-container flex-shrink-0" />
-                <span>+62 21 5550 8888</span>
+                <a href={`https://wa.me/${settings.whatsappNumber || '6281234567890'}`} target="_blank" rel="noreferrer" className="hover:text-primary-container transition-colors">
+                  +{settings.whatsappNumber || '6281234567890'}
+                </a>
               </li>
               <li className="flex items-center gap-3">
                 <FiMail className="text-primary-container flex-shrink-0" />
-                <span>contact@rayakonstruksi.com</span>
+                <a href={`mailto:${settings.emailAddress || 'contact@rayakonstruksi.com'}`} className="hover:text-primary-container transition-colors">
+                  {settings.emailAddress || 'contact@rayakonstruksi.com'}
+                </a>
               </li>
             </ul>
           </div>
@@ -60,8 +82,8 @@ const Footer = () => {
 
         {/* Copyright Row */}
         <div className="border-t border-white/[0.08] pt-8 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-white/40">
-          <span>&copy; {new Date().getFullYear()} Raya Konstruksi. All rights reserved.</span>
-          <span className="uppercase tracking-widest text-[9px]">Jakarta, Indonesia</span>
+          <span>&copy; {new Date().getFullYear()} {settings.companyName || 'Raya Konstruksi'}. All rights reserved.</span>
+          <span className="uppercase tracking-widest text-[9px]">{settings.companyAddress || 'Surakarta, Indonesia'}</span>
         </div>
       </div>
     </footer>
