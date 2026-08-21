@@ -39,25 +39,44 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-// Connect to MongoDB Atlas with Serverless Connection Cache
+// Connect to MongoDB Atlas with Serverless Global Connection Cache
 const MONGODB_URI = process.env.MONGODB_URI;
 
-let isConnected = false;
+let cached = global.mongoose;
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
 async function connectDB() {
-  if (mongoose.connection.readyState === 1) return;
-  if (!isConnected) {
-    try {
-      await mongoose.connect(MONGODB_URI, {
-        serverSelectionTimeoutMS: 10000,
-      });
-      isConnected = true;
+  if (cached.conn) {
+    return cached.conn;
+  }
+
+  if (!cached.promise) {
+    const opts = {
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 15000,
+      connectTimeoutMS: 15000,
+    };
+
+    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongooseInstance) => {
       console.log(' Connected to MongoDB Atlas!');
-    } catch (err) {
-      isConnected = false;
+      return mongooseInstance;
+    }).catch(err => {
+      cached.promise = null;
       console.error(' MongoDB Connection Error:', err);
       throw err;
-    }
+    });
   }
+
+  try {
+    cached.conn = await cached.promise;
+  } catch (e) {
+    cached.promise = null;
+    throw e;
+  }
+
+  return cached.conn;
 }
 
 // Middleware to ensure DB connection before any API request
@@ -65,7 +84,7 @@ app.use(async (req, res, next) => {
   try {
     await connectDB();
   } catch (err) {
-    console.error('DB connection error:', err);
+    console.error('DB connection middleware error:', err.message);
   }
   next();
 });
