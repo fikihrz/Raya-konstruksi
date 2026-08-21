@@ -42,21 +42,22 @@ const upload = multer({ storage: storage });
 // Connect to MongoDB Atlas with Serverless Connection Cache
 const MONGODB_URI = process.env.MONGODB_URI;
 
-let connectPromise = null;
+let isConnected = false;
 async function connectDB() {
-  if (mongoose.connection.readyState >= 1) return;
-  if (!connectPromise) {
-    connectPromise = mongoose.connect(MONGODB_URI, {
-      serverSelectionTimeoutMS: 10000,
-    }).then(() => {
+  if (mongoose.connection.readyState === 1) return;
+  if (!isConnected) {
+    try {
+      await mongoose.connect(MONGODB_URI, {
+        serverSelectionTimeoutMS: 10000,
+      });
+      isConnected = true;
       console.log(' Connected to MongoDB Atlas!');
-      connectPromise = null;
-    }).catch(err => {
-      connectPromise = null;
+    } catch (err) {
+      isConnected = false;
+      console.error(' MongoDB Connection Error:', err);
       throw err;
-    });
+    }
   }
-  return connectPromise;
 }
 
 // Middleware to ensure DB connection before any API request
@@ -149,20 +150,17 @@ app.post('/api/auth/forgot-password', async (req, res) => {
   const { email } = req.body;
   if (!email) return res.status(400).json({ error: 'Email wajib diisi' });
 
-  const targetEmail = (email.toLowerCase().trim() === 'admin@rayakonstruksi.com' || email.toLowerCase().trim() === 'fikihrz3135@gmail.com') 
-    ? 'fikihrz3135@gmail.com' 
-    : email.toLowerCase().trim();
-
+  const targetEmail = email.toLowerCase().trim();
   const resetPin = Math.floor(100000 + Math.random() * 900000).toString();
 
-  // Try to update DB in background if available
+  // Pastikan connectDB selesai dan simpan PIN ke user di database
   try {
-    if (mongoose.connection.readyState >= 1) {
-      await User.updateOne(
-        { email: email.toLowerCase().trim() },
-        { $set: { resetToken: resetPin, resetTokenExpiry: new Date(Date.now() + 3600000) } }
-      );
-    }
+    await connectDB();
+    await User.updateOne(
+      { email: targetEmail },
+      { $set: { resetToken: resetPin, resetTokenExpiry: new Date(Date.now() + 3600000) } },
+      { upsert: true }
+    );
   } catch (dbErr) {
     console.error('DB update token error:', dbErr);
   }
@@ -219,6 +217,7 @@ app.post('/api/auth/reset-password', async (req, res) => {
   }
 
   try {
+    await connectDB();
     const user = await User.findOne({ email: email.toLowerCase().trim() });
     if (!user) {
       return res.status(404).json({ error: 'Pengguna tidak ditemukan' });
