@@ -111,7 +111,7 @@ const Services = () => {
               {formData.img && (
                 <div className="w-32 h-32 rounded-lg overflow-hidden border border-slate-200 bg-white flex-shrink-0 relative shadow-inner">
                   <img 
-                    src={formData.img.startsWith('/') ? `https://frontend-lilac-xi-27.vercel.app${formData.img}` : formData.img} 
+                    src={formData.img.startsWith('/') ? `https://rayakonstruksi.vercel.app${formData.img}` : formData.img} 
                     alt="Preview" 
                     className="w-full h-full object-cover" 
                   />
@@ -129,7 +129,7 @@ const Services = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {services.map((service) => {
           const imgSrc = service.img 
-            ? (service.img.startsWith('/') ? `https://frontend-lilac-xi-27.vercel.app${service.img}` : service.img) 
+            ? (service.img.startsWith('/') ? `https://rayakonstruksi.vercel.app${service.img}` : service.img) 
             : 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&q=80';
           return (
             <div key={service.id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between">

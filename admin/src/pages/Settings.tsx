@@ -63,7 +63,7 @@ const ImageField = ({ label, value, fieldKey, onChange }: { label: string; value
 
   const FRONTEND_URL = window.location.hostname === 'localhost' 
     ? 'http://localhost:5173' 
-    : 'https://frontend-lilac-xi-27.vercel.app';
+    : 'https://rayakonstruksi.vercel.app';
 
   const previewSrc = value?.startsWith('http') 
     ? value 
