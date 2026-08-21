@@ -102,18 +102,22 @@ const Settings = () => {
 
   const set = (key: string, value: string) => setSettings((prev: any) => ({ ...prev, [key]: value }));
 
+  const [savedSuccess, setSavedSuccess] = useState(false);
+
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
+    setSavedSuccess(false);
     try {
       await fetch(`${API}/api/update/settings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings)
       });
-      alert('✅ Pengaturan berhasil disimpan! Refresh website untuk melihat perubahan.');
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 3000);
     } catch {
-      alert('❌ Gagal menyimpan pengaturan');
+      alert('Gagal menyimpan pengaturan');
     }
     setSaving(false);
   };
@@ -127,17 +131,23 @@ const Settings = () => {
         <p className="text-slate-500 mt-1 text-sm">Ubah semua teks, gambar, dan informasi kontak di seluruh website. Klik "Simpan Semua" setelah selesai mengedit.</p>
       </div>
 
+      {savedSuccess && (
+        <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-lg text-sm font-medium transition-all">
+          Pengaturan berhasil disimpan.
+        </div>
+      )}
+
       <form onSubmit={handleSave} className="space-y-4">
 
         {/* Hero Section */}
-        <Section title="🖼  Hero Section (Halaman Utama)" defaultOpen>
+        <Section title="Hero Section (Halaman Utama)" defaultOpen>
           <ImageField label="Gambar Background Hero" value={settings.heroImage} fieldKey="heroImage" onChange={set} />
           <Field label="Judul Utama (Hero Title)" value={settings.heroTitle} onChange={(v: string) => set('heroTitle', v)} placeholder="Misal: Building Excellence for a Better Future" />
           <Field label="Deskripsi Hero" value={settings.heroDesc} onChange={(v: string) => set('heroDesc', v)} placeholder="Deskripsi singkat perusahaan..." multiline />
         </Section>
 
         {/* About Section */}
-        <Section title="ℹ️  Tentang Kami (About Section)">
+        <Section title="Tentang Kami (About Section)">
           <div className="grid grid-cols-2 gap-4">
             <ImageField label="Foto Kiri (Besar)" value={settings.aboutImage1} fieldKey="aboutImage1" onChange={set} />
             <ImageField label="Foto Kanan (Kecil)" value={settings.aboutImage2} fieldKey="aboutImage2" onChange={set} />
@@ -154,34 +164,34 @@ const Settings = () => {
         </Section>
 
         {/* Why Choose Us */}
-        <Section title="⭐  Kenapa Memilih Kami (Why Choose Us)">
+        <Section title="Kenapa Memilih Kami (Why Choose Us)">
           <Field label="Judul Section" value={settings.whyTitle} onChange={(v: string) => set('whyTitle', v)} placeholder="Kenapa Memilih Kami?" />
           <Field label="Deskripsi Section" value={settings.whyDesc} onChange={(v: string) => set('whyDesc', v)} multiline />
-          <p className="text-xs text-slate-400 bg-slate-50 rounded p-2">💡 Untuk mengedit kartu alasan (nomor, judul, isi), pergi ke menu <strong>Reasons</strong> di sidebar.</p>
+          <p className="text-xs text-slate-400 bg-slate-50 rounded p-2">Untuk mengedit kartu alasan (nomor, judul, isi), pergi ke menu <strong>Reasons</strong> di sidebar.</p>
         </Section>
 
         {/* Services Section */}
-        <Section title="🛠  Layanan (Services Section)">
+        <Section title="Layanan (Services Section)">
           <Field label="Judul Section Layanan" value={settings.servicesTitle} onChange={(v: string) => set('servicesTitle', v)} placeholder="Bidang Keahlian Kami" />
           <Field label="Deskripsi Section Layanan" value={settings.servicesDesc} onChange={(v: string) => set('servicesDesc', v)} multiline />
-          <p className="text-xs text-slate-400 bg-slate-50 rounded p-2">💡 Untuk mengedit kartu layanan (gambar, judul, deskripsi), pergi ke menu <strong>Services</strong> di sidebar.</p>
+          <p className="text-xs text-slate-400 bg-slate-50 rounded p-2">Untuk mengedit kartu layanan (gambar, judul, deskripsi), pergi ke menu <strong>Services</strong> di sidebar.</p>
         </Section>
 
         {/* Clients Section */}
-        <Section title="🤝  Klien & Mitra (Clients Section)">
+        <Section title="Klien & Mitra (Clients Section)">
           <Field label="Judul Section Klien" value={settings.clientsTitle} onChange={(v: string) => set('clientsTitle', v)} placeholder="Klien & Mitra Kami" />
           <Field label="Deskripsi Section Klien" value={settings.clientsDesc} onChange={(v: string) => set('clientsDesc', v)} multiline />
         </Section>
 
         {/* Contact Section */}
-        <Section title="📞  Kontak (Contact Section)">
+        <Section title="Kontak (Contact Section)">
           <ImageField label="Gambar Background Kontak" value={settings.contactImage} fieldKey="contactImage" onChange={set} />
           <Field label="Judul Kontak" value={settings.contactTitle} onChange={(v: string) => set('contactTitle', v)} placeholder="Siap Memulai Proyek Anda?" />
           <Field label="Deskripsi Kontak" value={settings.contactDesc} onChange={(v: string) => set('contactDesc', v)} multiline />
         </Section>
 
         {/* Company Info */}
-        <Section title="🏢  Informasi Perusahaan">
+        <Section title="Informasi Perusahaan">
           <Field label="Nama Perusahaan" value={settings.companyName} onChange={(v: string) => set('companyName', v)} placeholder="Raya Konstruksi" />
           <Field label="Nomor WhatsApp (tanpa +)" value={settings.whatsappNumber} onChange={(v: string) => set('whatsappNumber', v)} placeholder="6281234567890" type="tel" />
           <Field label="Alamat Email" value={settings.emailAddress} onChange={(v: string) => set('emailAddress', v)} placeholder="contact@rayakonstruksi.com" type="email" />
