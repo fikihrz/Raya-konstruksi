@@ -206,6 +206,8 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     console.error('Forgot password email dispatch error:', err);
     return res.status(500).json({ error: 'Gagal mengirim email pemulihan: ' + err.message });
   }
+});
+
 // RESET PASSWORD WITH PIN (Real DB Password Reset)
 app.post('/api/auth/reset-password', async (req, res) => {
   const { email, pin, newPassword } = req.body;
