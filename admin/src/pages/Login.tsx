@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiBox, FiLock, FiMail, FiCheck, FiArrowLeft, FiAlertCircle, FiKey } from 'react-icons/fi';
+import { FiBox, FiLock, FiMail, FiCheck, FiArrowLeft, FiAlertCircle, FiKey, FiEye, FiEyeOff } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 
 const API = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
@@ -15,6 +15,8 @@ const Login = () => {
   const [resetEmail, setResetEmail] = useState('');
   const [pin, setPin] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
   
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -160,13 +162,16 @@ const Login = () => {
               <div className="relative">
                 <FiLock className="absolute left-3.5 top-3.5 text-slate-400" />
                 <input 
-                  type="password" 
+                  type={showPassword ? 'text' : 'password'} 
                   required 
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-slate-900/60 border border-slate-700 rounded-lg pl-10 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all" 
+                  className="w-full bg-slate-900/60 border border-slate-700 rounded-lg pl-10 pr-12 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all" 
                   placeholder="••••••••" 
                 />
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3.5 top-3.5 text-slate-400 hover:text-white transition-colors">
+                  {showPassword ? <FiEyeOff /> : <FiEye />}
+                </button>
               </div>
             </div>
             
@@ -264,14 +269,17 @@ const Login = () => {
                 <div className="relative">
                   <FiLock className="absolute left-3.5 top-3.5 text-slate-400" />
                   <input 
-                    type="password" 
+                    type={showNewPassword ? 'text' : 'password'} 
                     required 
                     minLength={6}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="w-full bg-slate-900/60 border border-slate-700 rounded-lg pl-10 pr-4 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all" 
+                    className="w-full bg-slate-900/60 border border-slate-700 rounded-lg pl-10 pr-12 py-3 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm transition-all" 
                     placeholder="Minimal 6 karakter" 
                   />
+                  <button type="button" onClick={() => setShowNewPassword(!showNewPassword)} className="absolute right-3.5 top-3.5 text-slate-400 hover:text-white transition-colors">
+                    {showNewPassword ? <FiEyeOff /> : <FiEye />}
+                  </button>
                 </div>
               </div>
 

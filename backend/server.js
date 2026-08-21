@@ -42,22 +42,21 @@ const upload = multer({ storage: storage });
 // Connect to MongoDB Atlas with Serverless Connection Cache
 const MONGODB_URI = process.env.MONGODB_URI;
 
-let isConnecting = false;
+let connectPromise = null;
 async function connectDB() {
-  if (mongoose.connection.readyState >= 1) {
-    return;
-  }
-  if (!isConnecting) {
-    isConnecting = true;
-    try {
-      await mongoose.connect(MONGODB_URI, {
-        serverSelectionTimeoutMS: 8000,
-      });
+  if (mongoose.connection.readyState >= 1) return;
+  if (!connectPromise) {
+    connectPromise = mongoose.connect(MONGODB_URI, {
+      serverSelectionTimeoutMS: 10000,
+    }).then(() => {
       console.log(' Connected to MongoDB Atlas!');
-    } finally {
-      isConnecting = false;
-    }
+      connectPromise = null;
+    }).catch(err => {
+      connectPromise = null;
+      throw err;
+    });
   }
+  return connectPromise;
 }
 
 // Middleware to ensure DB connection before any API request
