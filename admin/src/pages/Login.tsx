@@ -116,8 +116,8 @@ const Login = () => {
 
         {/* Header */}
         <div className="flex flex-col items-center mb-8">
-          <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-900/50 mb-4">
-            <FiBox size={32} />
+          <div className="w-16 h-16 bg-blue-600 rounded-2xl overflow-hidden flex items-center justify-center p-1.5 text-white shadow-xl shadow-blue-900/50 mb-4 border border-blue-400/30">
+            <img src="/Profil.png" alt="Raya Konstruksi Logo" className="w-full h-full object-contain" />
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             Raya<span className="text-blue-400">.</span> Workspace
