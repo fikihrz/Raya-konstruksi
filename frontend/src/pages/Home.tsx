@@ -276,6 +276,8 @@ const Home = () => {
                     <img
                       src={current.img}
                       alt={current.title}
+                      fetchPriority="high"
+                      decoding="sync"
                       className="w-full h-full object-cover filter brightness-[0.72] contrast-[1.12]"
                     />
                     {/* Deep gradient overlays matching Kiewit's bottom-left focus */}
@@ -432,6 +434,7 @@ const Home = () => {
                 <video
                   ref={videoRef}
                   src={settings.aboutVideo || '/construction-video.mp4'}
+                  preload="metadata"
                   autoPlay
                   loop
                   muted={isVideoMuted}
@@ -863,6 +866,8 @@ const Home = () => {
                           <img
                             src={client.logo || client.image}
                             alt={client.name}
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-cover"
                             onError={(e) => {
                               (e.currentTarget as HTMLElement).style.display = 'none';
@@ -958,6 +963,8 @@ const Home = () => {
                         className="absolute inset-0 w-full h-full object-cover opacity-85 group-hover:scale-105 group-hover:opacity-70 transition-all duration-700"
                         src={p.img}
                         alt={p.title}
+                        loading="lazy"
+                        decoding="async"
                       />
                       <div className="relative z-10 p-7 bg-gradient-to-t from-black/95 via-black/50 to-transparent flex flex-col justify-end text-white">
                         <span className="text-blue-400 font-extrabold text-[11px] uppercase tracking-wider mb-1">

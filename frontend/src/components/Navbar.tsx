@@ -321,10 +321,10 @@ const Navbar = () => {
                   autoFocus
                   className="bg-transparent text-white text-xs w-28 sm:w-36 focus:outline-none placeholder-slate-400"
                 />
-                <button type="submit" className="text-blue-400 hover:text-white p-1 cursor-pointer">
+                <button type="submit" aria-label="Submit pencarian" className="text-blue-400 hover:text-white p-1 cursor-pointer">
                   <FiSearch size={14} />
                 </button>
-                <button type="button" onClick={() => setSearchActive(false)} className="text-slate-400 hover:text-white p-1 cursor-pointer">
+                <button type="button" onClick={() => setSearchActive(false)} aria-label="Tutup pencarian" className="text-slate-400 hover:text-white p-1 cursor-pointer">
                   <FiX size={14} />
                 </button>
               </form>

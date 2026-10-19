@@ -64,6 +64,7 @@ const ContactFloatingWidget = () => {
                 href={waUrl}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Chat WhatsApp Resmi"
                 className="h-12 w-12 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white flex items-center justify-center shadow-xl shadow-emerald-600/40 hover:scale-110 active:scale-95 transition-all"
                 title={t('widget.wa')}
               >
@@ -80,6 +81,7 @@ const ContactFloatingWidget = () => {
                 href={getInstagramUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Instagram Resmi"
                 className="h-12 w-12 rounded-full bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] text-white flex items-center justify-center shadow-xl shadow-pink-600/40 hover:scale-110 active:scale-95 transition-all"
                 title={t('widget.instagram')}
               >
@@ -96,6 +98,7 @@ const ContactFloatingWidget = () => {
                 href={getTelegramUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Telegram Resmi"
                 className="h-12 w-12 rounded-full bg-[#229ED9] hover:bg-[#1d8fc4] text-white flex items-center justify-center shadow-xl shadow-[#229ED9]/40 hover:scale-110 active:scale-95 transition-all"
                 title={t('widget.telegram')}
               >

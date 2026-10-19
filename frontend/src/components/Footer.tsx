@@ -65,7 +65,8 @@ const Footer = () => {
               <a
                 href={`https://wa.me/${(settings.whatsappNumber || '6281234567890').replace(/\D/g, '')}`}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
+                aria-label="WhatsApp Resmi"
                 className="h-9 w-9 rounded-xl bg-slate-900 border border-slate-800 hover:border-emerald-500/50 hover:bg-emerald-500/10 text-slate-400 hover:text-emerald-400 flex items-center justify-center transition-all shadow-sm"
                 title="WhatsApp Resmi"
               >
@@ -74,7 +75,8 @@ const Footer = () => {
               <a
                 href={getInstagramUrl()}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
+                aria-label="Instagram Resmi"
                 className="h-9 w-9 rounded-xl bg-slate-900 border border-slate-800 hover:border-pink-500/50 hover:bg-pink-500/10 text-slate-400 hover:text-pink-400 flex items-center justify-center transition-all shadow-sm"
                 title="Instagram Resmi"
               >
@@ -83,7 +85,8 @@ const Footer = () => {
               <a
                 href="https://t.me/rayakonstruksijaya"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
+                aria-label="Telegram Resmi"
                 className="h-9 w-9 rounded-xl bg-slate-900 border border-slate-800 hover:border-sky-500/50 hover:bg-sky-500/10 text-slate-400 hover:text-sky-400 flex items-center justify-center transition-all shadow-sm"
                 title="Telegram Resmi"
               >
@@ -91,6 +94,7 @@ const Footer = () => {
               </a>
               <a
                 href={`mailto:${settings.emailAddress || 'contact@rayakonstruksi.com'}`}
+                aria-label="Email Resmi"
                 className="h-9 w-9 rounded-xl bg-slate-900 border border-slate-800 hover:border-blue-500/50 hover:bg-blue-500/10 text-slate-400 hover:text-blue-400 flex items-center justify-center transition-all shadow-sm"
                 title="Email Resmi"
               >
@@ -150,7 +154,7 @@ const Footer = () => {
               <a
                 href="https://maps.google.com/?q=Surakarta,+Indonesia"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="absolute bottom-2 right-2 bg-slate-950/90 hover:bg-blue-600 text-[10px] font-bold text-white px-2.5 py-1 rounded-md border border-slate-700 transition-colors shadow"
               >
                 {t('footer.openMaps')}
