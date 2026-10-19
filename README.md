@@ -1,6 +1,6 @@
-# Raya Konstruksi - Enterprise Construction Platform
+# Raya Konstruksi Jaya - Enterprise Construction Platform
 
-Selamat datang di repository sistem perusahaan jasa konstruksi "Raya Konstruksi". 
+Selamat datang di repository sistem perusahaan jasa konstruksi "Raya Konstruksi Jaya". 
 Proyek ini dibangun menggunakan **Clean Architecture** dan standar profesional yang terdiri dari 3 service utama:
 
 1. \`frontend/\` : Landing Page website menggunakan React, Vite, Tailwind CSS, Framer Motion.

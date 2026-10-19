@@ -27,5 +27,15 @@ desktop.ini
 .vscode/
 .idea/
 
-# Cache
+# Cache & Vercel
 .vite/
+.vercel/
+*.tsbuildinfo
+
+# Temporary & Test Scripts
+*-test.js
+*-sync.js
+sync-*.js
+verify-*.js
+disable-*.js
+scratch/

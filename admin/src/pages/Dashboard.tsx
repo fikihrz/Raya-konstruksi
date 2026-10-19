@@ -61,10 +61,10 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-end">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">Company Overview</h2>
-          <p className="text-slate-500 text-sm mt-1">Status dan ringkasan data Content Management System PT Raya Konstruksi.</p>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-800">Company Overview</h2>
+          <p className="text-slate-500 text-sm mt-1">Status dan ringkasan data Content Management System PT Raya Konstruksi Jaya.</p>
         </div>
         <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg text-xs font-semibold">
           <FiActivity className="animate-pulse" /> Database Atlas Connected
@@ -163,7 +163,7 @@ const Dashboard = () => {
 
           <div className="mt-6 p-4 bg-slate-50 rounded-xl border border-slate-100 text-xs text-slate-500 flex items-center justify-between">
             <span>Versi CMS: v2.4 Enterprise</span>
-            <span className="text-slate-400">© 2026 PT Raya Konstruksi</span>
+            <span className="text-slate-400">© 2026 PT Raya Konstruksi Jaya</span>
           </div>
         </div>
       </div>

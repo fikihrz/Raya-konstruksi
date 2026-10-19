@@ -87,36 +87,68 @@ const Projects = () => {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold text-gray-800">Manajemen Project</h2>
-        <button onClick={() => { setEditingId(0); setFormData({ title: '', location: '', year: 2026, category: 'Residential', budget: '', duration: '', fullDesc: '', img: '' }); }} className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
-          <FiPlus /> <span>Tambah Project</span>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-800">Manajemen Proyek Portofolio</h2>
+          <p className="text-slate-500 text-xs sm:text-sm mt-1">Tambah, edit foto, lokasi, anggaran, dan deskripsi proyek mahakarya konstruksi.</p>
+        </div>
+        <button 
+          onClick={() => { setEditingId(0); setFormData({ title: '', location: '', year: 2026, category: 'Residential', budget: '', duration: '', fullDesc: '', img: '' }); }} 
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-md shadow-blue-600/20 text-sm font-semibold whitespace-nowrap"
+        >
+          <FiPlus /> <span>Tambah Proyek</span>
         </button>
       </div>
 
       {editingId !== null && (
-        <div className="bg-white p-6 rounded-xl shadow-md border border-gray-200 mb-8">
-          <h3 className="text-xl font-bold mb-4">{editingId === 0 ? 'Tambah Project' : 'Edit Project'}</h3>
-          <div className="grid grid-cols-2 gap-4">
-            <input type="text" placeholder="Title" value={formData.title} onChange={e => setFormData({ ...formData, title: e.target.value })} className="border p-2 rounded" />
-            <input type="text" placeholder="Category" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} className="border p-2 rounded" />
-            <input type="text" placeholder="Location" value={formData.location} onChange={e => setFormData({ ...formData, location: e.target.value })} className="border p-2 rounded" />
-            <input type="number" placeholder="Year" value={formData.year} onChange={e => setFormData({ ...formData, year: e.target.value })} className="border p-2 rounded" />
-            <input type="text" placeholder="Client" value={formData.client} onChange={e => setFormData({ ...formData, client: e.target.value })} className="border p-2 rounded" />
-            <input type="text" placeholder="Budget" value={formData.budget} onChange={e => setFormData({ ...formData, budget: e.target.value })} className="border p-2 rounded" />
-            <input type="text" placeholder="Duration" value={formData.duration} onChange={e => setFormData({ ...formData, duration: e.target.value })} className="border p-2 rounded" />
-            <div className="border p-4 rounded-xl col-span-2 flex items-center gap-6 bg-slate-50">
-              <div className="flex-1">
-                <label className="text-sm font-bold text-slate-700 mb-2 block">Upload Gambar Project</label>
-                <label className="cursor-pointer bg-white border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-lg p-4 flex flex-col items-center justify-center transition-colors">
-                  <FiPlus className="text-slate-400 text-2xl mb-2" />
-                  <span className="text-sm text-slate-500 font-medium">Klik untuk pilih gambar</span>
+        <div className="bg-white p-5 sm:p-6 rounded-2xl shadow-lg border border-slate-200">
+          <h3 className="text-lg font-bold text-slate-800 mb-4">{editingId === 0 ? 'Tambah Proyek Baru' : 'Edit Proyek'}</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Judul Proyek *</label>
+              <input type="text" placeholder="Misal: The Glass Horizon Villa" value={formData.title || ''} onChange={e => setFormData({ ...formData, title: e.target.value })} className="w-full border border-slate-300 p-2.5 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Kategori Proyek</label>
+              <select value={formData.category || 'Residential'} onChange={e => setFormData({ ...formData, category: e.target.value })} className="w-full border border-slate-300 p-2.5 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+                <option value="Residential">Residential</option>
+                <option value="Commercial">Commercial</option>
+                <option value="Infrastructure">Infrastructure</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Lokasi Proyek</label>
+              <input type="text" placeholder="Misal: Jakarta / Surakarta" value={formData.location || ''} onChange={e => setFormData({ ...formData, location: e.target.value })} className="w-full border border-slate-300 p-2.5 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Tahun Selesai</label>
+              <input type="number" placeholder="2026" value={formData.year || 2026} onChange={e => setFormData({ ...formData, year: e.target.value })} className="w-full border border-slate-300 p-2.5 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Nama Klien</label>
+              <input type="text" placeholder="Misal: PT Total Bangun Persada" value={formData.client || ''} onChange={e => setFormData({ ...formData, client: e.target.value })} className="w-full border border-slate-300 p-2.5 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Nilai Anggaran (Budget)</label>
+              <input type="text" placeholder="Misal: Rp 18,5 Miliar" value={formData.budget || ''} onChange={e => setFormData({ ...formData, budget: e.target.value })} className="w-full border border-slate-300 p-2.5 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Durasi Pengerjaan</label>
+              <input type="text" placeholder="Misal: 14 Bulan" value={formData.duration || ''} onChange={e => setFormData({ ...formData, duration: e.target.value })} className="w-full border border-slate-300 p-2.5 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500" />
+            </div>
+
+            <div className="border border-slate-200 p-4 rounded-xl sm:col-span-2 flex flex-col sm:flex-row items-center gap-4 bg-slate-50">
+              <div className="flex-1 w-full">
+                <label className="text-xs font-bold text-slate-700 mb-2 block">Upload Gambar Proyek</label>
+                <label className="cursor-pointer bg-white border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-xl p-4 flex flex-col items-center justify-center transition-colors">
+                  <FiPlus className="text-slate-400 text-xl mb-1" />
+                  <span className="text-xs text-slate-500 font-medium">Klik untuk pilih gambar foto proyek</span>
                   <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
                 </label>
               </div>
               {formData.img && (
-                <div className="w-32 h-32 rounded-lg overflow-hidden border border-slate-200 bg-white flex-shrink-0 relative shadow-inner">
+                <div className="w-28 h-24 rounded-xl overflow-hidden border border-slate-200 bg-white flex-shrink-0 relative shadow-sm">
                   <img 
                     src={formData.img.startsWith('http') ? formData.img : encodeURI(formData.img.startsWith('/') ? formData.img : '/' + formData.img)} 
                     alt="Preview" 
@@ -125,52 +157,60 @@ const Projects = () => {
                 </div>
               )}
             </div>
-            <textarea placeholder="Description" value={formData.fullDesc} onChange={e => setFormData({ ...formData, fullDesc: e.target.value })} className="border p-2 rounded col-span-2" rows={3}></textarea>
+
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Deskripsi Lengkap Proyek</label>
+              <textarea placeholder="Tulis rincian pekerjaan dan spesifikasi struktur proyek..." value={formData.fullDesc || ''} onChange={e => setFormData({ ...formData, fullDesc: e.target.value })} className="w-full border border-slate-300 p-3 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500" rows={3}></textarea>
+            </div>
           </div>
           <div className="mt-4 flex space-x-3">
-            <button onClick={handleSave} className="bg-green-600 text-white px-4 py-2 rounded flex items-center gap-2 font-medium"><FiSave /> Simpan</button>
-            <button onClick={() => setEditingId(null)} className="bg-gray-400 text-white px-4 py-2 rounded flex items-center gap-2 font-medium"><FiX /> Batal</button>
+            <button onClick={handleSave} className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl flex items-center gap-2 font-bold text-xs uppercase tracking-wider shadow-md transition-all"><FiSave /> Simpan</button>
+            <button onClick={() => setEditingId(null)} className="bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2.5 rounded-xl flex items-center gap-2 font-semibold text-xs transition-colors"><FiX /> Batal</button>
           </div>
         </div>
       )}
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Gambar</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nama Project</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Kategori</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Lokasi</th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Aksi</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {projects.map((project) => {
-              const imgSrc = project.img 
-                ? (project.img.startsWith('http') ? project.img : encodeURI(project.img.startsWith('/') ? project.img : '/' + project.img)) 
-                : 'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f6?w=200&q=80';
-              return (
-                <tr key={project.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <img 
-                      src={imgSrc} 
-                      alt={project.title} 
-                      className="w-16 h-12 rounded-lg object-cover border border-slate-200 shadow-sm" 
-                    />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{project.title}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.category}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{project.location}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button onClick={() => { setEditingId(project.id); setFormData(project); }} className="text-indigo-600 hover:text-indigo-900 mr-4"><FiEdit2 size={18} /></button>
-                    <button onClick={() => handleDelete(project.id)} className="text-red-600 hover:text-red-900"><FiTrash2 size={18} /></button>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-slate-200">
+            <thead className="bg-slate-50/80">
+              <tr>
+                <th className="px-5 py-3.5 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Gambar</th>
+                <th className="px-5 py-3.5 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Nama Project</th>
+                <th className="px-5 py-3.5 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Kategori</th>
+                <th className="px-5 py-3.5 text-left text-xs font-bold text-slate-600 uppercase tracking-wider">Lokasi</th>
+                <th className="px-5 py-3.5 text-right text-xs font-bold text-slate-600 uppercase tracking-wider">Aksi</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-slate-100">
+              {projects.map((project) => {
+                const imgSrc = project.img 
+                  ? (project.img.startsWith('http') ? project.img : encodeURI(project.img.startsWith('/') ? project.img : '/' + project.img)) 
+                  : 'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f6?w=200&q=80';
+                return (
+                  <tr key={project.id} className="hover:bg-slate-50/70 transition-colors">
+                    <td className="px-5 py-3.5 whitespace-nowrap">
+                      <img 
+                        src={imgSrc} 
+                        alt={project.title} 
+                        className="w-16 h-12 rounded-lg object-cover border border-slate-200 shadow-sm" 
+                      />
+                    </td>
+                    <td className="px-5 py-3.5 whitespace-nowrap text-sm font-semibold text-slate-800">{project.title}</td>
+                    <td className="px-5 py-3.5 whitespace-nowrap text-xs text-slate-500 font-medium">
+                      <span className="px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">{project.category}</span>
+                    </td>
+                    <td className="px-5 py-3.5 whitespace-nowrap text-sm text-slate-500">{project.location}</td>
+                    <td className="px-5 py-3.5 whitespace-nowrap text-right text-sm font-medium">
+                      <button onClick={() => { setEditingId(project.id); setFormData(project); }} className="text-blue-600 hover:text-blue-800 mr-3 p-1"><FiEdit2 size={16} /></button>
+                      <button onClick={() => handleDelete(project.id)} className="text-red-500 hover:text-red-700 p-1"><FiTrash2 size={16} /></button>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

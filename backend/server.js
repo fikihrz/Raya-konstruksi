@@ -188,7 +188,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
           </div>
           <p style="color: #94a3b8; font-size: 13px;">Kode verifikasi ini berlaku selama <strong>60 menit</strong>. Jika Anda tidak meminta reset sandi ini, abaikan email ini.</p>
           <hr style="border: 0; border-top: 1px solid #334155; margin: 25px 0;" />
-          <p style="color: #64748b; font-size: 11px; margin: 0;">PT Raya Konstruksi • Sistem Manajemen Keamanan Akun</p>
+          <p style="color: #64748b; font-size: 11px; margin: 0;">PT Raya Konstruksi Jaya • Sistem Manajemen Keamanan Akun</p>
         </div>
       `
     });
@@ -299,6 +299,50 @@ app.post('/api/update/:category', async (req, res) => {
   } catch (err) {
     console.error(`Failed to update ${category}:`, err);
     res.status(500).json({ error: `Failed to update ${category}` });
+  }
+});
+
+// SUBMIT CLIENT REVIEW (Public API)
+app.post('/api/reviews', async (req, res) => {
+  const { name, company, role, review, rating, projectType } = req.body;
+  if (!name || !review) {
+    return res.status(400).json({ error: 'Nama dan ulasan wajib diisi' });
+  }
+
+  try {
+    const newReview = {
+      id: Date.now(),
+      name: name.trim(),
+      company: company ? company.trim() : 'Klien Privat',
+      role: role ? role.trim() : 'Owner Proyek',
+      projectType: projectType || 'Konstruksi',
+      rating: Number(rating) || 5,
+      review: review.trim(),
+      date: new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' }),
+      createdAt: new Date()
+    };
+
+    const doc = await Content.findById('main_content');
+    if (doc) {
+      if (!Array.isArray(doc.reviews)) {
+        doc.reviews = [];
+      }
+      doc.reviews.unshift(newReview);
+      await doc.save();
+    }
+
+    try {
+      const DB_FILE = path.join(__dirname, 'data.json');
+      const localData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+      if (!Array.isArray(localData.reviews)) localData.reviews = [];
+      localData.reviews.unshift(newReview);
+      fs.writeFileSync(DB_FILE, JSON.stringify(localData, null, 2));
+    } catch (e) {}
+
+    res.json({ success: true, review: newReview, message: 'Ulasan berhasil dikirim. Terima kasih!' });
+  } catch (err) {
+    console.error('Failed to submit review:', err);
+    res.status(500).json({ error: 'Gagal mengirim ulasan' });
   }
 });
 

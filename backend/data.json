@@ -1,60 +1,77 @@
 {
-  "services": [
+  "_id": "main_content",
+  "clients": [
     {
       "id": 1,
-      "title": "Residential Design",
-      "desc": "Pembangunan rumah tinggal eksklusif, vila modern, dan residensial premium dengan detail arsitektur tingkat tinggi.",
-      "img": "/galery/WhatsApp Image 2026-07-01 at 23.38.36 (1).jpeg"
+      "name": "PT Waskita Karya",
+      "abbr": "WK",
+      "logo": "https://images.unsplash.com/photo-1541888946425-d0fbb18615f3?w=150&auto=format&fit=crop&q=80"
     },
     {
       "id": 2,
-      "title": "Commercial Spaces",
-      "desc": "Konstruksi gedung perkantoran mewah, pusat perbelanjaan, dan ruko modern yang fungsional dan estetis.",
-      "img": "/galery/WhatsApp Image 2026-07-01 at 23.38.36 (2).jpeg"
+      "name": "PT Adhi Karya",
+      "abbr": "AK",
+      "logo": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=150&auto=format&fit=crop&q=80"
     },
     {
       "id": 3,
-      "title": "Industrial Development",
-      "desc": "Pembangunan kawasan industri, gudang logistik skala besar, dan pabrik dengan spesifikasi standar tinggi.",
-      "img": "/galery/WhatsApp Image 2026-07-01 at 23.38.36.jpeg"
+      "name": "PT Hutama Karya",
+      "abbr": "HK",
+      "logo": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=150&auto=format&fit=crop&q=80"
     },
     {
       "id": 4,
-      "title": "Infrastructure Works",
-      "desc": "Pengerjaan infrastruktur vital seperti jalan raya modern, jembatan kokoh, dan fasilitas publik.",
-      "img": "/galery/WhatsApp Image 2026-07-01 at 23.38.37.jpeg"
+      "name": "PT PP (Persero)",
+      "abbr": "PP",
+      "logo": "https://images.unsplash.com/photo-1577495508048-b635879837f1?w=150&auto=format&fit=crop&q=80"
     },
     {
       "id": 5,
-      "title": "Fabrikasi & Workshop",
-      "desc": "Fabrikasi baja struktural, rangka atap baja ringan, dan komponen logam presisi untuk kebutuhan konstruksi sipil dan industri.",
-      "img": "/galery/WhatsApp Image 2026-07-01 at 23.39.22 (2).jpeg"
+      "name": "PT Total Bangun Persada",
+      "abbr": "TBP",
+      "logo": "https://images.unsplash.com/photo-1517581177682-a085bb7ffb15?w=150&auto=format&fit=crop&q=80"
     },
     {
       "id": 6,
-      "title": "Renovasi & Retrofit",
-      "desc": "Alih fungsi dan renovasi total bangunan eksisting, modernisasi fasad, dan perkuatan struktur gedung lama.",
-      "img": "/galery/WhatsApp Image 2026-07-01 at 23.39.23.jpeg"
-    }
-  ],
-  "reasons": [
-    {
-      "id": 1,
-      "number": "01",
-      "title": "Architectural Excellence",
-      "desc": "Kami mengutamakan keselarasan antara kekuatan struktur bangunan dan keindahan nilai estetika arsitektur modern."
+      "name": "PT Wijaya Karya",
+      "abbr": "WIKA",
+      "logo": "https://images.unsplash.com/photo-1497366216548-37526070297c?w=150&auto=format&fit=crop&q=80"
     },
     {
-      "id": 2,
-      "number": "02",
-      "title": "Premium Material Selection",
-      "desc": "Setiap bahan bangunan dipilih secara ketat untuk menjamin ketahanan konstruksi yang andal melintasi generasi."
+      "id": 7,
+      "name": "PT Nindya Karya",
+      "abbr": "NK",
+      "logo": "https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?w=150&auto=format&fit=crop&q=80"
     },
     {
-      "id": 3,
-      "number": "03",
-      "title": "Seamless Workflow & Timeline",
-      "desc": "Manajemen proyek profesional yang transparan dengan penjadwalan presisi memastikan ketepatan waktu serah terima."
+      "id": 8,
+      "name": "PT Brantas Abipraya",
+      "abbr": "BA",
+      "logo": "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=150&auto=format&fit=crop&q=80"
+    },
+    {
+      "id": 9,
+      "name": "PT Semen Indonesia",
+      "abbr": "SI",
+      "logo": "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=150&auto=format&fit=crop&q=80"
+    },
+    {
+      "id": 10,
+      "name": "PT Krakatau Steel",
+      "abbr": "KS",
+      "logo": "https://images.unsplash.com/photo-1504917599217-d4dc5ebe6122?w=150&auto=format&fit=crop&q=80"
+    },
+    {
+      "id": 11,
+      "name": "PT Pertamina",
+      "abbr": "PTM",
+      "logo": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=150&auto=format&fit=crop&q=80"
+    },
+    {
+      "id": 12,
+      "name": "PT PLN Persero",
+      "abbr": "PLN",
+      "logo": "https://images.unsplash.com/photo-1497215728101-856f4ea42174?w=150&auto=format&fit=crop&q=80"
     }
   ],
   "projects": [
@@ -124,6 +141,64 @@
       "fullDesc": "Pusat distribusi logistik modern yang strategis untuk melayani area perkotaan dengan sistem keamanan tinggi dan manajemen sirkulasi kendaraan terintegrasi."
     }
   ],
+  "reasons": [
+    {
+      "id": 1,
+      "number": "01",
+      "title": "Architectural Excellence",
+      "desc": "Kami mengutamakan keselarasan antara kekuatan struktur bangunan dan keindahan nilai estetika arsitektur modern."
+    },
+    {
+      "id": 2,
+      "number": "02",
+      "title": "Premium Material Selection",
+      "desc": "Setiap bahan bangunan dipilih secara ketat untuk menjamin ketahanan konstruksi yang andal melintasi generasi."
+    },
+    {
+      "id": 3,
+      "number": "03",
+      "title": "Seamless Workflow & Timeline",
+      "desc": "Manajemen proyek profesional yang transparan dengan penjadwalan presisi memastikan ketepatan waktu serah terima."
+    }
+  ],
+  "services": [
+    {
+      "id": 1,
+      "title": "Residential Design",
+      "desc": "Pembangunan rumah tinggal eksklusif, vila modern, dan residensial premium dengan detail arsitektur tingkat tinggi.",
+      "img": "/galery/WhatsApp Image 2026-07-01 at 23.38.36 (1).jpeg"
+    },
+    {
+      "id": 2,
+      "title": "Commercial Spaces",
+      "desc": "Konstruksi gedung perkantoran mewah, pusat perbelanjaan, dan ruko modern yang fungsional dan estetis.",
+      "img": "/galery/WhatsApp Image 2026-07-01 at 23.38.36 (2).jpeg"
+    },
+    {
+      "id": 3,
+      "title": "Industrial Development",
+      "desc": "Pembangunan kawasan industri, gudang logistik skala besar, dan pabrik dengan spesifikasi standar tinggi.",
+      "img": "/galery/WhatsApp Image 2026-07-01 at 23.38.36.jpeg"
+    },
+    {
+      "id": 4,
+      "title": "Infrastructure Works",
+      "desc": "Pengerjaan infrastruktur vital seperti jalan raya modern, jembatan kokoh, dan fasilitas publik.",
+      "img": "/galery/WhatsApp Image 2026-07-01 at 23.38.37.jpeg"
+    },
+    {
+      "id": 5,
+      "title": "Fabrikasi & Workshop",
+      "desc": "Fabrikasi baja struktural, rangka atap baja ringan, dan komponen logam presisi untuk kebutuhan konstruksi sipil dan industri.",
+      "img": "/galery/WhatsApp Image 2026-07-01 at 23.39.22 (2).jpeg"
+    },
+    {
+      "id": 6,
+      "title": "Renovasi & Retrofit",
+      "desc": "Alih fungsi dan renovasi total bangunan eksisting, modernisasi fasad, dan perkuatan struktur gedung lama.",
+      "img": "/galery/WhatsApp Image 2026-07-01 at 23.39.23.jpeg"
+    }
+  ],
   "settings": {
     "heroTitle": "Membangun Masa Depan Presisi & Berkualitas",
     "heroDesc": "Solusi terintegrasi konstruksi arsitektur modern & residensial mewah.",
@@ -156,69 +231,40 @@
     "contactImage": "/galery/WhatsApp Image 2026-07-01 at 23.38.37.jpeg",
     "whatsappNumber": "6281234567890",
     "emailAddress": "contact@rayakonstruksi.com",
-    "companyName": "Raya Konstruksi",
+    "companyName": "Raya Konstruksi Jaya",
     "companyAddress": "Jakarta, Indonesia"
   },
-  "clients": [
+  "updatedAt": "2026-10-19T07:34:21.772Z",
+  "reviews": [
     {
       "id": 1,
-      "name": "PT Waskita Karya",
-      "abbr": "WK"
+      "name": "Ir. Budi Santoso",
+      "company": "PT Waskita Karya (Persero)",
+      "role": "Project Manager",
+      "projectType": "Infrastruktur",
+      "rating": 5,
+      "review": "Kerja sama yang sangat memuaskan dengan tim Raya Konstruksi Jaya. Presisi pekerjaan struktur beton prategang sangat detail dan serah terima dilakukan tepat waktu.",
+      "date": "12 Okt 2026"
     },
     {
       "id": 2,
-      "name": "PT Adhi Karya",
-      "abbr": "AK"
+      "name": "Jessica Tanuwidjaja",
+      "company": "Urban Living Residence",
+      "role": "Owner & Developer",
+      "projectType": "Residensial",
+      "rating": 5,
+      "review": "Hasil pengerjaan vila dan hunian mewah melebihi ekspektasi kami. Estetika arsitektur modern berpadu sempurna dengan kualitas finishing yang sangat rapi.",
+      "date": "28 Sep 2026"
     },
     {
       "id": 3,
-      "name": "PT Hutama Karya",
-      "abbr": "HK"
-    },
-    {
-      "id": 4,
-      "name": "PT PP (Persero)",
-      "abbr": "PP"
-    },
-    {
-      "id": 5,
-      "name": "PT Total Bangun Persada",
-      "abbr": "TBP"
-    },
-    {
-      "id": 6,
-      "name": "PT Wijaya Karya",
-      "abbr": "WIKA"
-    },
-    {
-      "id": 7,
-      "name": "PT Nindya Karya",
-      "abbr": "NK"
-    },
-    {
-      "id": 8,
-      "name": "PT Brantas Abipraya",
-      "abbr": "BA"
-    },
-    {
-      "id": 9,
-      "name": "PT Semen Indonesia",
-      "abbr": "SI"
-    },
-    {
-      "id": 10,
-      "name": "PT Krakatau Steel",
-      "abbr": "KS"
-    },
-    {
-      "id": 11,
-      "name": "PT Pertamina",
-      "abbr": "PTM"
-    },
-    {
-      "id": 12,
-      "name": "PT PLN Persero",
-      "abbr": "PLN"
+      "name": "Hendrawan Pratama",
+      "company": "PT Mitra Logistik Nusantara",
+      "role": "Operational Director",
+      "projectType": "Industri",
+      "rating": 5,
+      "review": "Pembangunan pergudangan logistik 12.000 m2 selesai 2 minggu lebih cepat dari target. K3 terlaksana dengan disiplin tinggi tanpa insiden sama sekali.",
+      "date": "15 Agu 2026"
     }
   ]
 }
