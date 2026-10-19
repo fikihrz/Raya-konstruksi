@@ -527,6 +527,7 @@ const Home = () => {
                         onClick={toggleVideoPlay}
                         className="p-1 hover:text-red-500 transition-colors"
                         title={isVideoPlaying ? 'Pause' : 'Play'}
+                        aria-label={isVideoPlaying ? 'Pause video' : 'Play video'}
                       >
                         {isVideoPlaying ? <FiPause size={16} /> : <FiPlay size={16} />}
                       </button>
@@ -544,6 +545,7 @@ const Home = () => {
                         onClick={() => setIsVideoMini(true)}
                         className="hidden sm:flex items-center gap-1 px-2.5 py-1 rounded bg-white/10 hover:bg-white/20 text-white/90 text-[11px] font-medium transition-colors"
                         title={lang === 'EN' ? 'Mini Player' : 'Mode Kecil Melayang'}
+                        aria-label="Mode Mini Player"
                       >
                         <FiMinimize size={12} />
                         <span>{lang === 'EN' ? 'Mini' : 'Kecil'}</span>
@@ -555,6 +557,7 @@ const Home = () => {
                         onClick={toggleFullscreen}
                         className="p-1.5 hover:text-red-500 rounded transition-all hover:scale-110 text-white"
                         title={isVideoFullscreen ? (lang === 'EN' ? 'Exit Full Screen' : 'Perkecil (Keluar Layar Penuh)') : (lang === 'EN' ? 'Full Screen' : 'Layar Penuh')}
+                        aria-label={isVideoFullscreen ? 'Keluar layar penuh' : 'Layar penuh'}
                       >
                         {isVideoFullscreen ? (
                           <FiMinimize size={18} className="text-white hover:text-red-400" />
