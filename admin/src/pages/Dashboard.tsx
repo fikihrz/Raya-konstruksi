@@ -154,8 +154,8 @@ const Dashboard = () => {
               </div>
               <div className="flex justify-between items-center py-2 border-b border-slate-50">
                 <span className="text-slate-500 text-sm">Domain Frontend</span>
-                <a href="https://rayakonstruksi.vercel.app" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-sm font-medium">
-                  rayakonstruksi.vercel.app ↗
+                <a href="https://rayakonstruksijaya.vercel.app" target="_blank" rel="noreferrer" className="text-blue-600 hover:underline text-sm font-medium">
+                  rayakonstruksijaya.vercel.app ↗
                 </a>
               </div>
             </div>
