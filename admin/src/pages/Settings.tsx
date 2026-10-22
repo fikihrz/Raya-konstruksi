@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { FiSave, FiChevronDown, FiChevronUp, FiUpload, FiLock, FiCheckCircle, FiAlertCircle, FiVideo } from 'react-icons/fi';
+import { FiSave, FiChevronDown, FiChevronUp, FiUpload, FiLock, FiCheckCircle, FiAlertCircle, FiVideo, FiTrash2 } from 'react-icons/fi';
+import { useToast } from '../context/ToastContext';
+import { processImageFile } from '../utils/imageUpload';
 
 const API = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
 
@@ -44,38 +46,67 @@ const Field = ({ label, value, onChange, placeholder = '', multiline = false, ty
 );
 
 const ImageField = ({ label, value, fieldKey, onChange }: { label: string; value: string; fieldKey: string; onChange: (key: string, url: string) => void }) => {
+  const { showSuccess, showError } = useToast();
   const [uploading, setUploading] = useState(false);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const fd = new FormData();
-    fd.append('image', file);
+
     try {
-      const res = await fetch(`${API}/api/upload`, { method: 'POST', body: fd });
-      const data = await res.json();
-      if (data.url) onChange(fieldKey, data.url);
-    } catch {
-      alert('Gagal mengunggah gambar');
+      const result = await processImageFile(file, {
+        maxSizeMB: 10,
+        maxWidth: 1920,
+        maxHeight: 1280,
+        quality: 0.85
+      });
+
+      if (!result.success || !result.dataUrl) {
+        showError('Gagal Memproses Gambar', result.error || 'Gambar tidak valid.');
+        return;
+      }
+
+      onChange(fieldKey, result.dataUrl);
+      showSuccess(
+        'Gambar Berhasil Diunggah!',
+        `Foto "${label}" berhasil diupload (${result.width}x${result.height}px, ${result.compressedSizeKB} KB).`
+      );
+    } catch (err: any) {
+      showError('Gagal Upload', err?.message || 'Terjadi kesalahan saat memproses gambar.');
+    } finally {
+      setUploading(false);
+      e.target.value = '';
     }
-    setUploading(false);
   };
 
   const previewSrc = value 
-    ? (value.startsWith('http') ? value : encodeURI(value.startsWith('/') ? value : '/' + value))
+    ? (value.startsWith('http') || value.startsWith('data:') ? value : encodeURI(value.startsWith('/') ? value : '/' + value))
     : null;
 
   return (
     <div>
-      <label className="block text-xs sm:text-sm font-semibold text-slate-700 mb-1.5">{label}</label>
+      <div className="flex justify-between items-center mb-1.5">
+        <label className="block text-xs sm:text-sm font-semibold text-slate-700">{label}</label>
+        <span className="text-[11px] text-slate-400">JPG, PNG, WEBP (Maks 10MB)</span>
+      </div>
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         {previewSrc && (
-          <img src={previewSrc} alt="Preview" className="w-24 h-16 object-cover rounded-xl border border-slate-200 flex-shrink-0 shadow-sm" />
+          <div className="relative group flex-shrink-0">
+            <img src={previewSrc} alt="Preview" className="w-24 h-16 object-cover rounded-xl border border-slate-200 shadow-sm" />
+            <button
+              type="button"
+              onClick={() => onChange(fieldKey, '')}
+              className="absolute -top-1.5 -right-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-full p-1 shadow transition-colors"
+              title="Hapus gambar"
+            >
+              <FiTrash2 size={11} />
+            </button>
+          </div>
         )}
         <label className="cursor-pointer flex items-center justify-center gap-2 bg-slate-50 hover:bg-blue-50 border-2 border-dashed border-slate-300 hover:border-blue-400 text-slate-600 hover:text-blue-600 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-semibold transition-all">
           <FiUpload />
-          {uploading ? 'Mengupload...' : 'Pilih Gambar Baru'}
+          {uploading ? 'Memproses Gambar...' : 'Pilih Gambar Baru'}
           <input type="file" accept="image/*" onChange={handleUpload} className="hidden" disabled={uploading} />
         </label>
       </div>
@@ -84,6 +115,7 @@ const ImageField = ({ label, value, fieldKey, onChange }: { label: string; value
 };
 
 const Settings = () => {
+  const { showSuccess, showError } = useToast();
   const [settings, setSettings] = useState<any>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -110,15 +142,17 @@ const Settings = () => {
     setSaving(true);
     setSavedSuccess(false);
     try {
-      await fetch(`${API}/api/update/settings`, {
+      const res = await fetch(`${API}/api/update/settings`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings)
       });
+      if (!res.ok) throw new Error('Gagal menyimpan ke server');
       setSavedSuccess(true);
+      showSuccess('Pengaturan Tersimpan', 'Semua perubahan pengaturan & gambar berhasil disimpan ke database!');
       setTimeout(() => setSavedSuccess(false), 4000);
     } catch {
-      alert('Gagal menyimpan pengaturan');
+      showError('Gagal Menyimpan', 'Terjadi kesalahan saat menyimpan pengaturan ke server.');
     }
     setSaving(false);
   };

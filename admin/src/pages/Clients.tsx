@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { FiEdit2, FiTrash2, FiPlus, FiSave, FiX, FiImage, FiUploadCloud } from 'react-icons/fi';
+import { useToast } from '../context/ToastContext';
+import { processImageFile } from '../utils/imageUpload';
 
 const API = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
 
 const Clients = () => {
+  const { showSuccess, showError } = useToast();
   const [clients, setClients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
@@ -29,29 +32,36 @@ const Clients = () => {
     const file = e.target.files?.[0];
     if (!file) return;
     setUploading(true);
-    const data = new FormData();
-    data.append('image', file);
+
     try {
-      const res = await fetch(`${API}/api/upload`, {
-        method: 'POST',
-        body: data
+      const result = await processImageFile(file, {
+        maxSizeMB: 10,
+        maxWidth: 800,
+        maxHeight: 800,
+        quality: 0.85
       });
-      const resData = await res.json();
-      if (resData.url) {
-        setFormData((prev: any) => ({ ...prev, logo: resData.url }));
-      } else {
-        alert('Gagal mengupload foto');
+
+      if (!result.success || !result.dataUrl) {
+        showError('Gagal Memproses Foto', result.error || 'Gambar tidak valid.');
+        return;
       }
-    } catch {
-      alert('Terjadi kesalahan saat upload');
+
+      setFormData((prev: any) => ({ ...prev, logo: result.dataUrl }));
+      showSuccess(
+        'Foto Profil Klien Berhasil Diupload!',
+        `Foto logo/profil "${file.name}" berhasil diunggah (${result.width}x${result.height}px, ${result.compressedSizeKB} KB).`
+      );
+    } catch (err: any) {
+      showError('Gagal Upload', err?.message || 'Terjadi kesalahan saat memproses foto.');
     } finally {
       setUploading(false);
+      e.target.value = '';
     }
   };
 
   const handleSave = async () => {
     if (!formData.name?.trim()) {
-      alert('Nama klien wajib diisi');
+      showError('Validasi Gagal', 'Nama klien / perusahaan wajib diisi.');
       return;
     }
     const updated = editingId === 0
@@ -61,8 +71,9 @@ const Clients = () => {
       await save(updated); 
       setClients(updated); 
       setEditingId(null); 
+      showSuccess('Berhasil Disimpan', `Data klien "${formData.name}" berhasil diperbarui ke database!`);
     } catch { 
-      alert("Gagal menyimpan"); 
+      showError('Gagal Menyimpan', 'Terjadi kesalahan saat menyimpan data klien.'); 
     }
   };
 

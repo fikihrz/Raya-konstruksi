@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { FiEdit2, FiTrash2, FiPlus, FiSave, FiX } from 'react-icons/fi';
+import { FiEdit2, FiTrash2, FiPlus, FiSave, FiX, FiUploadCloud } from 'react-icons/fi';
+import { useToast } from '../context/ToastContext';
+import { processImageFile } from '../utils/imageUpload';
 
 const API = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
 
 const Services = () => {
+  const { showSuccess, showError } = useToast();
   const [services, setServices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState<any>({});
 
@@ -26,6 +30,11 @@ const Services = () => {
   }, []);
 
   const handleSave = async () => {
+    if (!formData.title?.trim()) {
+      showError('Gagal Menyimpan', 'Nama layanan keahlian wajib diisi.');
+      return;
+    }
+
     let updated;
     if (editingId === 0) {
       updated = [...services, { ...formData, id: Date.now() }];
@@ -34,20 +43,22 @@ const Services = () => {
     }
 
     try {
-      await fetch(`${API}/api/update/services`, {
+      const res = await fetch(`${API}/api/update/services`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated)
       });
+      if (!res.ok) throw new Error('Gagal menyimpan ke server');
       setServices(updated);
       setEditingId(null);
-    } catch (err) {
-      alert("Failed to save");
+      showSuccess('Berhasil Disimpan', `Layanan "${formData.title}" berhasil diperbarui ke database!`);
+    } catch (err: any) {
+      showError('Gagal Menyimpan', err?.message || 'Terjadi kesalahan saat menyimpan data.');
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Are you sure?")) return;
+    if (!confirm("Apakah Anda yakin ingin menghapus layanan ini?")) return;
     const updated = services.filter(s => s.id !== id);
     try {
       await fetch(`${API}/api/update/services`, {
@@ -56,8 +67,9 @@ const Services = () => {
         body: JSON.stringify(updated)
       });
       setServices(updated);
+      showSuccess('Layanan Dihapus', 'Data layanan berhasil dihapus.');
     } catch (err) {
-      alert("Failed to delete");
+      showError('Gagal Menghapus', 'Terjadi kesalahan saat menghapus layanan.');
     }
   };
 
@@ -65,20 +77,31 @@ const Services = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const formDataObj = new FormData();
-    formDataObj.append('image', file);
+    setUploadingImage(true);
 
     try {
-      const res = await fetch(`${API}/api/upload`, {
-        method: 'POST',
-        body: formDataObj
+      const result = await processImageFile(file, {
+        maxSizeMB: 10,
+        maxWidth: 1600,
+        maxHeight: 1200,
+        quality: 0.85
       });
-      const data = await res.json();
-      if (data.url) {
-        setFormData({ ...formData, img: data.url });
+
+      if (!result.success || !result.dataUrl) {
+        showError('Gagal Memproses Gambar', result.error || 'Gambar tidak valid.');
+        return;
       }
-    } catch (err) {
-      alert("Failed to upload image");
+
+      setFormData((prev: any) => ({ ...prev, img: result.dataUrl }));
+      showSuccess(
+        'Gambar Berhasil Diupload!',
+        `Foto layanan "${file.name}" siap digunakan (${result.width}x${result.height}px, dioptimasi ke ${result.compressedSizeKB} KB).`
+      );
+    } catch (err: any) {
+      showError('Error Upload', err?.message || 'Terjadi kesalahan tidak terduga saat memproses gambar.');
+    } finally {
+      setUploadingImage(false);
+      e.target.value = '';
     }
   };
 
@@ -113,20 +136,42 @@ const Services = () => {
             </div>
             <div className="border border-slate-200 p-4 rounded-xl flex flex-col sm:flex-row items-center gap-4 bg-slate-50">
               <div className="flex-1 w-full">
-                <label className="text-xs font-bold text-slate-700 mb-2 block">Upload Gambar Layanan</label>
-                <label className="cursor-pointer bg-white border-2 border-dashed border-slate-300 hover:border-blue-500 rounded-xl p-4 flex flex-col items-center justify-center transition-colors">
-                  <FiPlus className="text-slate-400 text-xl mb-1" />
-                  <span className="text-xs text-slate-500 font-medium">Klik untuk pilih gambar layanan</span>
-                  <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+                <div className="flex justify-between items-center mb-2">
+                  <label className="text-xs font-bold text-slate-700">Upload Gambar Layanan</label>
+                  <span className="text-[11px] text-slate-400">JPG, PNG, WEBP (Maks 10MB)</span>
+                </div>
+                <label className={`cursor-pointer bg-white border-2 border-dashed ${uploadingImage ? 'border-blue-400 bg-blue-50/50' : 'border-slate-300 hover:border-blue-500'} rounded-xl p-4 flex flex-col items-center justify-center transition-all`}>
+                  {uploadingImage ? (
+                    <div className="flex flex-col items-center py-1">
+                      <div className="w-5 h-5 border-2 border-blue-600 border-t-transparent rounded-full animate-spin mb-1.5" />
+                      <span className="text-xs text-blue-600 font-semibold">Memproses & mengompres gambar...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <FiUploadCloud className="text-slate-400 text-2xl mb-1 text-blue-500" />
+                      <span className="text-xs text-slate-600 font-semibold">Klik untuk pilih gambar layanan</span>
+                      <span className="text-[11px] text-slate-400 mt-0.5">Otomatis dioptimasi & dikompresi beresolusi tajam</span>
+                    </>
+                  )}
+                  <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" disabled={uploadingImage} />
                 </label>
               </div>
               {formData.img && (
-                <div className="w-28 h-24 rounded-xl overflow-hidden border border-slate-200 bg-white flex-shrink-0 relative shadow-sm">
-                  <img 
-                    src={formData.img.startsWith('http') ? formData.img : encodeURI(formData.img.startsWith('/') ? formData.img : '/' + formData.img)} 
-                    alt="Preview" 
-                    className="w-full h-full object-cover" 
-                  />
+                <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+                  <div className="w-28 h-24 rounded-xl overflow-hidden border border-slate-200 bg-white relative shadow-sm">
+                    <img 
+                      src={formData.img.startsWith('http') || formData.img.startsWith('data:') ? formData.img : encodeURI(formData.img.startsWith('/') ? formData.img : '/' + formData.img)} 
+                      alt="Preview" 
+                      className="w-full h-full object-cover" 
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, img: '' })}
+                    className="text-[11px] text-rose-600 hover:text-rose-700 font-medium hover:underline flex items-center gap-1"
+                  >
+                    <FiTrash2 className="text-xs" /> Hapus Foto
+                  </button>
                 </div>
               )}
             </div>

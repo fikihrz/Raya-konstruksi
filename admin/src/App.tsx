@@ -10,27 +10,31 @@ import Reviews from './pages/Reviews';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 
+import { ToastProvider } from './context/ToastContext';
+
 function App() {
   return (
-    <Routes>
-      <Route path="/login" element={<Login />} />
-      <Route 
-        path="/" 
-        element={
-          <ProtectedRoute>
-            <AdminLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<Dashboard />} />
-        <Route path="projects" element={<Projects />} />
-        <Route path="services" element={<Services />} />
-        <Route path="reasons" element={<Reasons />} />
-        <Route path="clients" element={<Clients />} />
-        <Route path="reviews" element={<Reviews />} />
-        <Route path="settings" element={<Settings />} />
-      </Route>
-    </Routes>
+    <ToastProvider>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route 
+          path="/" 
+          element={
+            <ProtectedRoute>
+              <AdminLayout />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Dashboard />} />
+          <Route path="projects" element={<Projects />} />
+          <Route path="services" element={<Services />} />
+          <Route path="reasons" element={<Reasons />} />
+          <Route path="clients" element={<Clients />} />
+          <Route path="reviews" element={<Reviews />} />
+          <Route path="settings" element={<Settings />} />
+        </Route>
+      </Routes>
+    </ToastProvider>
   );
 }
 
