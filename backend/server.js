@@ -156,6 +156,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
 
   const resetPin = Math.floor(100000 + Math.random() * 900000).toString();
 
+  // Try to update DB in background if available
   try {
     if (mongoose.connection.readyState >= 1) {
       await User.updateOne(
@@ -167,6 +168,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     console.error('DB update token error:', dbErr);
   }
 
+  // Kirim email resmi menggunakan Resend
   try {
     const resendApiKey = process.env.RESEND_API_KEY;
     const { Resend } = require('resend');
@@ -175,8 +177,9 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     const emailResult = await resend.emails.send({
       from: 'Raya Workspace <onboarding@resend.dev>',
       to: [targetEmail],
-      subject: 'Kode Pemulihan Kata Sandi - Raya Workspace',
-      html: `<div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0f172a; color: #ffffff; padding: 30px; border-radius: 12px;">
+      subject: '\uD83D\uDD10 Kode Pemulihan Kata Sandi - Raya Workspace',
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background: #0f172a; color: #ffffff; padding: 30px; border-radius: 12px;">
           <h2 style="color: #38bdf8; margin-top: 0;">Raya. Workspace</h2>
           <p style="color: #cbd5e1; font-size: 15px;">Halo Administrator,</p>
           <p style="color: #cbd5e1; font-size: 14px;">Kami menerima permintaan pemulihan kata sandi untuk akun <strong>${email}</strong>.</p>
@@ -186,8 +189,9 @@ app.post('/api/auth/forgot-password', async (req, res) => {
           </div>
           <p style="color: #94a3b8; font-size: 13px;">Kode verifikasi ini berlaku selama <strong>60 menit</strong>. Jika Anda tidak meminta reset sandi ini, abaikan email ini.</p>
           <hr style="border: 0; border-top: 1px solid #334155; margin: 25px 0;" />
-          <p style="color: #64748b; font-size: 11px; margin: 0;">PT Raya Konstruksi Jaya - Sistem Manajemen Keamanan Akun</p>
-        </div>`
+          <p style="color: #64748b; font-size: 11px; margin: 0;">PT Raya Konstruksi Jaya &bull; Sistem Manajemen Keamanan Akun</p>
+        </div>
+      `
     });
 
     if (emailResult.error) {
@@ -221,6 +225,7 @@ app.post('/api/auth/reset-password', async (req, res) => {
       return res.status(404).json({ error: 'Pengguna tidak ditemukan' });
     }
 
+    // Verifikasi PIN
     if (!user.resetToken || user.resetToken !== pin.trim()) {
       return res.status(400).json({ error: 'Kode verifikasi 6-digit salah' });
     }
@@ -229,6 +234,7 @@ app.post('/api/auth/reset-password', async (req, res) => {
       return res.status(400).json({ error: 'Kode verifikasi sudah kedaluwarsa' });
     }
 
+    // Update password di database
     user.password = await bcrypt.hash(newPassword, 10);
     user.resetToken = null;
     user.resetTokenExpiry = null;
@@ -302,3 +308,57 @@ app.post('/api/reviews', async (req, res) => {
   const { name, company, role, review, rating, projectType } = req.body;
   if (!name || !review) {
     return res.status(400).json({ error: 'Nama dan ulasan wajib diisi' });
+  }
+
+  try {
+    const newReview = {
+      id: Date.now(),
+      name: name.trim(),
+      company: company ? company.trim() : 'Klien Privat',
+      role: role ? role.trim() : 'Owner Proyek',
+      projectType: projectType || 'Konstruksi',
+      rating: Number(rating) || 5,
+      review: review.trim(),
+      date: new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' }),
+      createdAt: new Date()
+    };
+
+    const doc = await Content.findById('main_content');
+    if (doc) {
+      if (!Array.isArray(doc.reviews)) {
+        doc.reviews = [];
+      }
+      doc.reviews.unshift(newReview);
+      await doc.save();
+    }
+
+    try {
+      const DB_FILE = path.join(__dirname, 'data.json');
+      const localData = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+      if (!Array.isArray(localData.reviews)) localData.reviews = [];
+      localData.reviews.unshift(newReview);
+      fs.writeFileSync(DB_FILE, JSON.stringify(localData, null, 2));
+    } catch (e) {}
+
+    res.json({ success: true, review: newReview, message: 'Ulasan berhasil dikirim. Terima kasih!' });
+  } catch (err) {
+    console.error('Failed to submit review:', err);
+    res.status(500).json({ error: 'Gagal mengirim ulasan' });
+  }
+});
+
+// UPLOAD image file
+app.post('/api/upload', upload.single('image'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No image provided' });
+  const imageUrl = `https://backend-three-beta-90.vercel.app/uploads/${req.file.filename}`;
+  res.json({ url: imageUrl });
+});
+
+const PORT = process.env.PORT || 3000;
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(PORT, () => {
+    console.log(` Backend server running on port ${PORT}`);
+  });
+}
+
+module.exports = app;
