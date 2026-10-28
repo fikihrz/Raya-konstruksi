@@ -209,10 +209,12 @@ const Home = () => {
         setReviews(data.reviews || []);
         setSettings(data.settings || {});
         setLoading(false);
+        window.dispatchEvent(new CustomEvent('app-data-ready'));
       })
       .catch(err => {
         console.error("Failed to fetch data:", err);
         setLoading(false);
+        window.dispatchEvent(new CustomEvent('app-data-ready'));
       });
   }, []);
 
