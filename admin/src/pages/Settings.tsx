@@ -337,6 +337,8 @@ const Settings = () => {
               <Field label="Akun Telegram (tanpa @)" value={settings.telegram} onChange={(v: string) => set('telegram', v)} placeholder="rayakonstruksijaya" />
               <Field label="Slogan / Brand Tagline" value={settings.brandTagline} onChange={(v: string) => set('brandTagline', v)} placeholder="Membangun Keunggulan Mutu" />
               <Field label="Alamat Kantor Pusat" value={settings.companyAddress} onChange={(v: string) => set('companyAddress', v)} placeholder="Surakarta, Jawa Tengah, Indonesia" />
+              <Field label="Link Google Maps (Buka Peta)" value={settings.mapsUrl} onChange={(v: string) => set('mapsUrl', v)} placeholder="https://maps.app.goo.gl/RZbeLE6SmbqKgyN78" />
+              <Field label="Link Embed Google Maps (Iframe)" value={settings.mapsEmbedUrl} onChange={(v: string) => set('mapsEmbedUrl', v)} placeholder="https://maps.google.com/maps?q=-7.5017637,111.0782002+(Raya+Konstruksi)&t=&z=16&ie=UTF8&iwloc=&output=embed" />
             </div>
           </div>
         </Section>

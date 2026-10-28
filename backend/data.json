@@ -232,7 +232,9 @@
     "whatsappNumber": "6281234567890",
     "emailAddress": "contact@rayakonstruksi.com",
     "companyName": "Raya Konstruksi Jaya",
-    "companyAddress": "Jakarta, Indonesia"
+    "companyAddress": "Jakarta, Indonesia",
+    "mapsUrl": "https://maps.app.goo.gl/RZbeLE6SmbqKgyN78",
+    "mapsEmbedUrl": "https://maps.google.com/maps?q=-7.5017637,111.0782002+(Raya+Konstruksi)&t=&z=16&ie=UTF8&iwloc=&output=embed"
   },
   "updatedAt": "2026-10-19T07:34:21.772Z",
   "reviews": [

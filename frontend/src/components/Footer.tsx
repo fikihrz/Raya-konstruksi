@@ -147,12 +147,12 @@ const Footer = () => {
             <div className="w-full h-44 rounded-xl overflow-hidden border border-slate-800 shadow-lg relative bg-slate-900 group">
               <iframe
                 title="Office Location Map"
-                src="https://maps.google.com/maps?q=Surakarta,+Jawa+Tengah,+Indonesia&t=&z=13&ie=UTF8&iwloc=&output=embed"
+                src={settings.mapsEmbedUrl || "https://maps.google.com/maps?q=-7.5017637,111.0782002+(Raya+Konstruksi)&t=&z=16&ie=UTF8&iwloc=&output=embed"}
                 className="w-full h-full border-0 filter contrast-[1.05] opacity-90 group-hover:opacity-100 transition-opacity"
                 loading="lazy"
               ></iframe>
               <a
-                href="https://maps.google.com/?q=Surakarta,+Indonesia"
+                href={settings.mapsUrl || "https://maps.app.goo.gl/RZbeLE6SmbqKgyN78"}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="absolute bottom-2 right-2 bg-slate-950/90 hover:bg-blue-600 text-[10px] font-bold text-white px-2.5 py-1 rounded-md border border-slate-700 transition-colors shadow"
