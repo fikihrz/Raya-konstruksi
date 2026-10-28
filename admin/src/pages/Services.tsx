@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { FiEdit2, FiTrash2, FiPlus, FiSave, FiX, FiUploadCloud } from 'react-icons/fi';
 import { useToast } from '../context/ToastContext';
 import { processImageFile } from '../utils/imageUpload';
-
-const API = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
+import { apiFetch } from '../utils/api';
+import { resolveImageUrl, DEFAULT_FALLBACK_IMAGE } from '../utils/imageUrl';
 
 const Services = () => {
   const { showSuccess, showError } = useToast();
@@ -15,7 +15,7 @@ const Services = () => {
 
   const fetchData = async () => {
     try {
-      const res = await fetch(`${API}/api/data`);
+      const res = await apiFetch('/api/data');
       const data = await res.json();
       setServices(data.services || []);
       setLoading(false);
@@ -43,9 +43,8 @@ const Services = () => {
     }
 
     try {
-      const res = await fetch(`${API}/api/update/services`, {
+      const res = await apiFetch('/api/update/services', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated)
       });
       if (!res.ok) throw new Error('Gagal menyimpan ke server');
@@ -61,9 +60,8 @@ const Services = () => {
     if (!confirm("Apakah Anda yakin ingin menghapus layanan ini?")) return;
     const updated = services.filter(s => s.id !== id);
     try {
-      await fetch(`${API}/api/update/services`, {
+      await apiFetch('/api/update/services', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated)
       });
       setServices(updated);
@@ -160,9 +158,12 @@ const Services = () => {
                 <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
                   <div className="w-28 h-24 rounded-xl overflow-hidden border border-slate-200 bg-white relative shadow-sm">
                     <img 
-                      src={formData.img.startsWith('http') || formData.img.startsWith('data:') ? formData.img : encodeURI(formData.img.startsWith('/') ? formData.img : '/' + formData.img)} 
+                      src={resolveImageUrl(formData.img)} 
                       alt="Preview" 
                       className="w-full h-full object-cover" 
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = DEFAULT_FALLBACK_IMAGE;
+                      }}
                     />
                   </div>
                   <button
@@ -185,13 +186,17 @@ const Services = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {services.map((service) => {
-          const imgSrc = service.img 
-            ? (service.img.startsWith('http') ? service.img : encodeURI(service.img.startsWith('/') ? service.img : '/' + service.img)) 
-            : 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&q=80';
           return (
             <div key={service.id} className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col justify-between hover:shadow-md transition-shadow">
               <div>
-                <img src={imgSrc} alt={service.title} className="w-full h-44 object-cover" />
+                <img 
+                  src={resolveImageUrl(service.img)} 
+                  alt={service.title} 
+                  className="w-full h-44 object-cover bg-slate-100" 
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = DEFAULT_FALLBACK_IMAGE;
+                  }}
+                />
                 <div className="p-4 sm:p-5">
                   <h3 className="font-bold text-base sm:text-lg mb-2 text-slate-800">{service.title}</h3>
                   <p className="text-xs sm:text-sm text-slate-600 mb-2 line-clamp-3 leading-relaxed">{service.desc}</p>

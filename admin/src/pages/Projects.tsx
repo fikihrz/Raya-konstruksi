@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { FiEdit2, FiTrash2, FiPlus, FiSave, FiX, FiUploadCloud } from 'react-icons/fi';
 import { useToast } from '../context/ToastContext';
 import { processImageFile } from '../utils/imageUpload';
-
-const API = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
+import { apiFetch } from '../utils/api';
+import { resolveImageUrl, DEFAULT_FALLBACK_IMAGE } from '../utils/imageUrl';
 
 const Projects = () => {
   const { showSuccess, showError } = useToast();
@@ -15,7 +15,7 @@ const Projects = () => {
 
   const fetchData = async () => {
     try {
-      const res = await fetch(`${API}/api/data`);
+      const res = await apiFetch('/api/data');
       const data = await res.json();
       setProjects(data.projects || []);
       setLoading(false);
@@ -45,9 +45,8 @@ const Projects = () => {
     }
 
     try {
-      const res = await fetch(`${API}/api/update/projects`, {
+      const res = await apiFetch('/api/update/projects', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated)
       });
       if (!res.ok) {
@@ -73,9 +72,8 @@ const Projects = () => {
     if (!confirm("Apakah Anda yakin ingin menghapus proyek ini?")) return;
     const updated = projects.filter(p => p.id !== id);
     try {
-      await fetch(`${API}/api/update/projects`, {
+      await apiFetch('/api/update/projects', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated)
       });
       setProjects(updated);
@@ -198,9 +196,12 @@ const Projects = () => {
                 <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
                   <div className="w-28 h-24 rounded-xl overflow-hidden border border-slate-200 bg-white relative shadow-sm group">
                     <img 
-                      src={formData.img.startsWith('http') || formData.img.startsWith('data:') ? formData.img : encodeURI(formData.img.startsWith('/') ? formData.img : '/' + formData.img)} 
+                      src={resolveImageUrl(formData.img)} 
                       alt="Preview" 
                       className="w-full h-full object-cover" 
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = DEFAULT_FALLBACK_IMAGE;
+                      }}
                     />
                   </div>
                   <button
@@ -240,16 +241,16 @@ const Projects = () => {
             </thead>
             <tbody className="bg-white divide-y divide-slate-100">
               {projects.map((project) => {
-                const imgSrc = project.img 
-                  ? (project.img.startsWith('http') ? project.img : encodeURI(project.img.startsWith('/') ? project.img : '/' + project.img)) 
-                  : 'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f6?w=200&q=80';
                 return (
                   <tr key={project.id} className="hover:bg-slate-50/70 transition-colors">
                     <td className="px-5 py-3.5 whitespace-nowrap">
                       <img 
-                        src={imgSrc} 
+                        src={resolveImageUrl(project.img)} 
                         alt={project.title} 
-                        className="w-16 h-12 rounded-lg object-cover border border-slate-200 shadow-sm" 
+                        className="w-16 h-12 rounded-lg object-cover border border-slate-200 shadow-sm bg-slate-100" 
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = DEFAULT_FALLBACK_IMAGE;
+                        }}
                       />
                     </td>
                     <td className="px-5 py-3.5 whitespace-nowrap text-sm font-semibold text-slate-800">{project.title}</td>

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FiEdit2, FiTrash2, FiPlus, FiSave, FiX } from 'react-icons/fi';
-
-const API = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
+import { apiFetch } from '../utils/api';
 
 const Reasons = () => {
   const [reasons, setReasons] = useState<any[]>([]);
@@ -10,16 +9,15 @@ const Reasons = () => {
   const [formData, setFormData] = useState<any>({});
 
   useEffect(() => {
-    fetch(`${API}/api/data`)
+    apiFetch('/api/data')
       .then(res => res.json())
       .then(data => { setReasons(data.reasons || []); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
 
   const save = async (updated: any[]) => {
-    await fetch(`${API}/api/update/reasons`, {
+    await apiFetch('/api/update/reasons', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updated)
     });
   };

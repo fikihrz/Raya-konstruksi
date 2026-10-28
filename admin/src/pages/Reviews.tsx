@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { FiEdit2, FiTrash2, FiPlus, FiSave, FiX, FiStar, FiMessageSquare } from 'react-icons/fi';
 import { FaStar } from 'react-icons/fa';
-
-const API = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
+import { apiFetch } from '../utils/api';
+import { useToast } from '../context/ToastContext';
 
 interface ReviewItem {
   id: number;
@@ -16,6 +16,7 @@ interface ReviewItem {
 }
 
 const Reviews = () => {
+  const { showSuccess, showError } = useToast();
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -24,7 +25,7 @@ const Reviews = () => {
 
   const fetchReviews = async () => {
     try {
-      const res = await fetch(`${API}/api/data`);
+      const res = await apiFetch('/api/data');
       const data = await res.json();
       setReviews(data.reviews || []);
       setLoading(false);
@@ -40,6 +41,11 @@ const Reviews = () => {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.name?.trim() || !formData.review?.trim()) {
+      showError('Gagal Menyimpan', 'Nama dan ulasan wajib diisi.');
+      return;
+    }
+
     setSaving(true);
     let updated: ReviewItem[];
 
@@ -47,12 +53,12 @@ const Reviews = () => {
       // Add new
       const newReview: ReviewItem = {
         id: Date.now(),
-        name: formData.name || '',
-        company: formData.company || '',
-        role: formData.role || '',
+        name: formData.name.trim(),
+        company: formData.company?.trim() || 'Klien Privat',
+        role: formData.role?.trim() || 'Owner Proyek',
         projectType: formData.projectType || 'Residensial',
         rating: Number(formData.rating) || 5,
-        review: formData.review || '',
+        review: formData.review.trim(),
         date: new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' })
       };
       updated = [newReview, ...reviews];
@@ -62,15 +68,19 @@ const Reviews = () => {
     }
 
     try {
-      await fetch(`${API}/api/update/reviews`, {
+      const res = await apiFetch('/api/update/reviews', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated)
       });
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(errorText || 'Gagal menyimpan ulasan ke database');
+      }
       setReviews(updated);
       setEditingId(null);
-    } catch (err) {
-      alert('Gagal menyimpan ulasan');
+      showSuccess('Berhasil Disimpan', 'Ulasan klien berhasil diperbarui ke database!');
+    } catch (err: any) {
+      showError('Gagal Menyimpan', err?.message || 'Terjadi kesalahan saat menyimpan ulasan.');
     }
     setSaving(false);
   };
@@ -79,14 +89,17 @@ const Reviews = () => {
     if (!confirm('Apakah Anda yakin ingin menghapus ulasan ini?')) return;
     const updated = reviews.filter(r => r.id !== id);
     try {
-      await fetch(`${API}/api/update/reviews`, {
+      const res = await apiFetch('/api/update/reviews', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updated)
       });
+      if (!res.ok) {
+        throw new Error('Gagal menghapus ulasan dari database');
+      }
       setReviews(updated);
-    } catch (err) {
-      alert('Gagal menghapus ulasan');
+      showSuccess('Ulasan Dihapus', 'Data ulasan berhasil dihapus.');
+    } catch (err: any) {
+      showError('Gagal Menghapus', err?.message || 'Terjadi kesalahan saat menghapus ulasan.');
     }
   };
 

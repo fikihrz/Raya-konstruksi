@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { FiEdit2, FiTrash2, FiPlus, FiSave, FiX, FiImage, FiUploadCloud } from 'react-icons/fi';
 import { useToast } from '../context/ToastContext';
 import { processImageFile } from '../utils/imageUpload';
-
-const API = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
+import { apiFetch } from '../utils/api';
+import { resolveImageUrl } from '../utils/imageUrl';
 
 const Clients = () => {
   const { showSuccess, showError } = useToast();
@@ -14,16 +14,15 @@ const Clients = () => {
   const [formData, setFormData] = useState<any>({});
 
   useEffect(() => {
-    fetch(`${API}/api/data`)
+    apiFetch('/api/data')
       .then(res => res.json())
       .then(data => { setClients(data.clients || []); setLoading(false); })
       .catch(() => setLoading(false));
   }, []);
 
   const save = async (updated: any[]) => {
-    await fetch(`${API}/api/update/clients`, {
+    await apiFetch('/api/update/clients', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(updated)
     });
   };
@@ -120,7 +119,7 @@ const Clients = () => {
               <label className="block text-xs font-bold text-slate-600 uppercase mb-3">Foto Profil (PP Preview)</label>
               <div className="relative w-24 h-24 rounded-full overflow-hidden bg-slate-200 border-2 border-blue-500 shadow-md flex items-center justify-center mb-3">
                 {formData.logo ? (
-                  <img src={formData.logo} alt="Preview PP" className="w-full h-full object-cover" />
+                  <img src={resolveImageUrl(formData.logo)} alt="Preview PP" className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center text-2xl font-bold">
                     {formData.abbr || (formData.name ? formData.name.charAt(0).toUpperCase() : '?')}
@@ -206,7 +205,7 @@ const Clients = () => {
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-100 border border-slate-300 flex items-center justify-center flex-shrink-0 shadow-sm">
                         {client.logo ? (
-                          <img src={client.logo} alt={client.name} className="w-full h-full object-cover" />
+                          <img src={resolveImageUrl(client.logo)} alt={client.name} className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white flex items-center justify-center text-xs font-bold">
                             {client.abbr || (client.name ? client.name.charAt(0).toUpperCase() : 'K')}

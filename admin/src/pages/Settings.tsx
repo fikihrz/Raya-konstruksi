@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { FiSave, FiChevronDown, FiChevronUp, FiUpload, FiLock, FiCheckCircle, FiAlertCircle, FiVideo, FiTrash2 } from 'react-icons/fi';
 import { useToast } from '../context/ToastContext';
 import { processImageFile } from '../utils/imageUpload';
-
-const API = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
+import { apiFetch } from '../utils/api';
+import { resolveImageUrl, DEFAULT_FALLBACK_IMAGE } from '../utils/imageUrl';
 
 const Section = ({ title, children, defaultOpen = false }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) => {
   const [open, setOpen] = useState(defaultOpen);
@@ -80,9 +80,7 @@ const ImageField = ({ label, value, fieldKey, onChange }: { label: string; value
     }
   };
 
-  const previewSrc = value 
-    ? (value.startsWith('http') || value.startsWith('data:') ? value : encodeURI(value.startsWith('/') ? value : '/' + value))
-    : null;
+  const previewSrc = value ? resolveImageUrl(value) : null;
 
   return (
     <div>
@@ -93,7 +91,14 @@ const ImageField = ({ label, value, fieldKey, onChange }: { label: string; value
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         {previewSrc && (
           <div className="relative group flex-shrink-0">
-            <img src={previewSrc} alt="Preview" className="w-24 h-16 object-cover rounded-xl border border-slate-200 shadow-sm" />
+            <img 
+              src={previewSrc} 
+              alt="Preview" 
+              className="w-24 h-16 object-cover rounded-xl border border-slate-200 shadow-sm bg-slate-100" 
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).src = DEFAULT_FALLBACK_IMAGE;
+              }}
+            />
             <button
               type="button"
               onClick={() => onChange(fieldKey, '')}
@@ -129,7 +134,7 @@ const Settings = () => {
   const [pwdMsg, setPwdMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
-    fetch(`${API}/api/data`)
+    apiFetch('/api/data')
       .then(res => res.json())
       .then(data => { setSettings(data.settings || {}); setLoading(false); })
       .catch(() => setLoading(false));
@@ -142,9 +147,8 @@ const Settings = () => {
     setSaving(true);
     setSavedSuccess(false);
     try {
-      const res = await fetch(`${API}/api/update/settings`, {
+      const res = await apiFetch('/api/update/settings', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(settings)
       });
       if (!res.ok) throw new Error('Gagal menyimpan ke server');
@@ -177,9 +181,8 @@ const Settings = () => {
       const storedUser = localStorage.getItem('admin_user');
       const email = storedUser ? JSON.parse(storedUser).email : 'admin@rayakonstruksi.com';
 
-      const res = await fetch(`${API}/api/auth/change-password`, {
+      const res = await apiFetch('/api/auth/change-password', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email,
           currentPassword,

@@ -7,6 +7,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
 const app = express();
 
@@ -70,13 +71,14 @@ app.use(async (req, res, next) => {
   next();
 });
 
-// MongoDB Schema for Users (Real Auth)
+// MongoDB Schema for Users (Real Auth) - includes sessionToken for single-session enforcement
 const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   name: { type: String, default: 'Admin' },
   resetToken: { type: String },
-  resetTokenExpiry: { type: Date }
+  resetTokenExpiry: { type: Date },
+  sessionToken: { type: String, default: null } // Active session token - invalidated on new login
 }, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);
@@ -88,6 +90,7 @@ const contentSchema = new mongoose.Schema({
   reasons: { type: Array, default: [] },
   projects: { type: Array, default: [] },
   clients: { type: Array, default: [] },
+  reviews: { type: Array, default: [] },
   settings: { type: Object, default: {} }
 }, { strict: false, timestamps: true });
 
@@ -97,20 +100,66 @@ const Content = mongoose.model('Content', contentSchema, 'content');
 async function getDbData() {
   try {
     const doc = await Content.findById('main_content').lean();
-    if (doc) return doc;
+    if (doc) {
+      if (!Array.isArray(doc.reviews)) doc.reviews = [];
+      return doc;
+    }
   } catch (e) {
     console.error('Error reading from MongoDB, fallback to local data.json:', e);
   }
   const DB_FILE = path.join(__dirname, 'data.json');
   if (fs.existsSync(DB_FILE)) {
-    return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+    try {
+      const parsed = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+      if (!Array.isArray(parsed.reviews)) parsed.reviews = [];
+      return parsed;
+    } catch (e) {}
   }
-  return { services: [], reasons: [], projects: [], clients: [], settings: {} };
+  return { services: [], reasons: [], projects: [], clients: [], reviews: [], settings: {} };
 }
+
+// ========================================================
+// AUTH MIDDLEWARE - Validates JWT + Session Token in DB
+// If a new login occurred elsewhere, this will return 401
+// ========================================================
+const requireAuth = async (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Tidak terautentikasi. Silakan login kembali.', code: 'NO_TOKEN' });
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+
+    // Check if sessionToken in JWT matches the one stored in DB
+    // If not, this means a new login occurred elsewhere → kick this session out
+    const user = await User.findById(decoded.userId).select('sessionToken email name');
+    if (!user) {
+      return res.status(401).json({ error: 'Akun tidak ditemukan.', code: 'USER_NOT_FOUND' });
+    }
+
+    if (!decoded.sessionToken || user.sessionToken !== decoded.sessionToken) {
+      return res.status(401).json({
+        error: 'Sesi Anda telah diakhiri karena akun ini masuk dari perangkat lain.',
+        code: 'SESSION_INVALIDATED'
+      });
+    }
+
+    req.user = { userId: decoded.userId, email: decoded.email, name: decoded.name };
+    next();
+  } catch (err) {
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({ error: 'Sesi telah berakhir. Silakan login kembali.', code: 'TOKEN_EXPIRED' });
+    }
+    return res.status(401).json({ error: 'Token tidak valid.', code: 'INVALID_TOKEN' });
+  }
+};
 
 // --- AUTH API ROUTES ---
 
-// LOGIN (Real DB verification)
+// LOGIN (Real DB verification + Single Session enforcement)
 app.post('/api/auth/login', async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
@@ -128,8 +177,18 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(401).json({ error: 'Email atau kata sandi salah' });
     }
 
+    // Generate new unique session token → invalidates any existing session
+    const newSessionToken = crypto.randomBytes(32).toString('hex');
+    user.sessionToken = newSessionToken;
+    await user.save();
+
     const token = jwt.sign(
-      { userId: user._id, email: user.email, name: user.name },
+      {
+        userId: user._id,
+        email: user.email,
+        name: user.name,
+        sessionToken: newSessionToken // Embed session token in JWT
+      },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -145,6 +204,11 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
+// VERIFY SESSION - Called by frontend to check if session is still valid
+app.get('/api/auth/verify', requireAuth, (req, res) => {
+  res.json({ valid: true, user: req.user });
+});
+
 // FORGOT PASSWORD (Real Email Dispatch via Resend)
 app.post('/api/auth/forgot-password', async (req, res) => {
   const { email } = req.body;
@@ -156,7 +220,6 @@ app.post('/api/auth/forgot-password', async (req, res) => {
 
   const resetPin = Math.floor(100000 + Math.random() * 900000).toString();
 
-  // Try to update DB in background if available
   try {
     if (mongoose.connection.readyState >= 1) {
       await User.updateOne(
@@ -168,7 +231,6 @@ app.post('/api/auth/forgot-password', async (req, res) => {
     console.error('DB update token error:', dbErr);
   }
 
-  // Kirim email resmi menggunakan Resend
   try {
     const resendApiKey = process.env.RESEND_API_KEY;
     const { Resend } = require('resend');
@@ -208,7 +270,7 @@ app.post('/api/auth/forgot-password', async (req, res) => {
   }
 });
 
-// RESET PASSWORD WITH PIN (Real DB Password Reset)
+// RESET PASSWORD WITH PIN
 app.post('/api/auth/reset-password', async (req, res) => {
   const { email, pin, newPassword } = req.body;
   if (!email || !pin || !newPassword) {
@@ -225,7 +287,6 @@ app.post('/api/auth/reset-password', async (req, res) => {
       return res.status(404).json({ error: 'Pengguna tidak ditemukan' });
     }
 
-    // Verifikasi PIN
     if (!user.resetToken || user.resetToken !== pin.trim()) {
       return res.status(400).json({ error: 'Kode verifikasi 6-digit salah' });
     }
@@ -234,7 +295,6 @@ app.post('/api/auth/reset-password', async (req, res) => {
       return res.status(400).json({ error: 'Kode verifikasi sudah kedaluwarsa' });
     }
 
-    // Update password di database
     user.password = await bcrypt.hash(newPassword, 10);
     user.resetToken = null;
     user.resetTokenExpiry = null;
@@ -247,15 +307,15 @@ app.post('/api/auth/reset-password', async (req, res) => {
   }
 });
 
-// CHANGE PASSWORD (Real DB update)
-app.post('/api/auth/change-password', async (req, res) => {
-  const { email, currentPassword, newPassword } = req.body;
-  if (!email || !currentPassword || !newPassword) {
+// CHANGE PASSWORD
+app.post('/api/auth/change-password', requireAuth, async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  if (!currentPassword || !newPassword) {
     return res.status(400).json({ error: 'Semua field wajib diisi' });
   }
 
   try {
-    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    const user = await User.findById(req.user.userId);
     if (!user) return res.status(404).json({ error: 'User tidak ditemukan' });
 
     const isMatch = await bcrypt.compare(currentPassword, user.password);
@@ -273,14 +333,14 @@ app.post('/api/auth/change-password', async (req, res) => {
 
 // --- CONTENT API ROUTES ---
 
-// GET full website data from MongoDB Atlas
+// GET full website data (public - for frontend display)
 app.get('/api/data', async (req, res) => {
   const data = await getDbData();
   res.json(data);
 });
 
-// UPDATE category in MongoDB Atlas
-app.post('/api/update/:category', async (req, res) => {
+// UPDATE category in MongoDB Atlas (PROTECTED - requires valid session)
+app.post('/api/update/:category', requireAuth, async (req, res) => {
   const category = req.params.category;
   const updateData = req.body;
 
@@ -303,7 +363,7 @@ app.post('/api/update/:category', async (req, res) => {
   }
 });
 
-// SUBMIT CLIENT REVIEW (Public API)
+// SUBMIT CLIENT REVIEW (Public API - from main website)
 app.post('/api/reviews', async (req, res) => {
   const { name, company, role, review, rating, projectType } = req.body;
   if (!name || !review) {
@@ -323,14 +383,11 @@ app.post('/api/reviews', async (req, res) => {
       createdAt: new Date()
     };
 
-    const doc = await Content.findById('main_content');
-    if (doc) {
-      if (!Array.isArray(doc.reviews)) {
-        doc.reviews = [];
-      }
-      doc.reviews.unshift(newReview);
-      await doc.save();
-    }
+    await Content.findByIdAndUpdate(
+      'main_content',
+      { $push: { reviews: { $each: [newReview], $position: 0 } } },
+      { upsert: true, new: true }
+    );
 
     try {
       const DB_FILE = path.join(__dirname, 'data.json');

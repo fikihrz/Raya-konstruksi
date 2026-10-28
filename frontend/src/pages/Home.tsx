@@ -25,6 +25,21 @@ const Home = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const projectsPerPage = 6;
 
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    const el = document.getElementById('projects');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
+
+  const getProjectImg = (src?: string) => {
+    if (!src) return 'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f6?w=800&q=80';
+    if (src.startsWith('http') || src.startsWith('data:')) return src;
+    if (src.startsWith('/uploads')) return `${API_BASE}${src}`;
+    return src;
+  };
+
   // Review Form & Modal State
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
@@ -433,7 +448,18 @@ const Home = () => {
                 {/* HTML5 Loop Video */}
                 <video
                   ref={videoRef}
-                  src={settings.aboutVideo || '/construction-video.mp4'}
+                  src={
+                    (settings.aboutVideo && (/\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(settings.aboutVideo.trim()) || settings.aboutVideo.trim().startsWith('/')))
+                      ? settings.aboutVideo.trim()
+                      : '/construction-video.mp4'
+                  }
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (!target.src.endsWith('/construction-video.mp4')) {
+                      target.src = '/construction-video.mp4';
+                      target.play().catch(() => {});
+                    }
+                  }}
                   preload="metadata"
                   autoPlay
                   loop
@@ -783,7 +809,150 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Client Logos & Real Testimonials Section */}
+      {/* Projects Section with Pagination (Placed right after Services) */}
+      <section id="projects" className="py-24 px-6 sm:px-8 bg-slate-50 scroll-mt-24">
+        <div className="max-w-7xl mx-auto space-y-12">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 border-b border-slate-200 pb-8">
+            <div className="space-y-3">
+              <span className="text-primary font-bold uppercase tracking-widest text-sm">{t('projects.badge')}</span>
+              <h2 className="text-3xl md:text-5xl font-black text-on-surface">{t('projects.title')}</h2>
+              <p className="text-on-surface-variant text-sm max-w-xl">
+                {t('projects.desc')}
+              </p>
+              {searchQuery && (
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
+                  <span>{lang === 'EN' ? `Search: "${searchQuery}"` : `Pencarian: "${searchQuery}"`}</span>
+                  <button
+                    onClick={() => {
+                      setSearchQuery('');
+                      window.dispatchEvent(new CustomEvent('site-search', { detail: '' }));
+                    }}
+                    className="hover:text-red-600 font-bold ml-1 cursor-pointer"
+                    title="Hapus filter pencarian"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-2 md:self-end">
+              {[
+                { key: 'All', label: t('projects.filterAll') },
+                { key: 'Residential', label: t('projects.filterResidential') },
+                { key: 'Commercial', label: t('projects.filterCommercial') },
+                { key: 'Infrastructure', label: t('projects.filterInfrastructure') }
+              ].map((cat) => (
+                <button
+                  key={cat.key}
+                  onClick={() => {
+                    setActiveCategory(cat.key);
+                    handlePageChange(1);
+                  }}
+                  className={`px-5 py-2 rounded-full border transition-all text-xs font-bold cursor-pointer ${activeCategory === cat.key ? 'bg-primary border-primary text-white shadow-sm' : 'border-outline/50 hover:border-primary text-on-surface bg-white'}`}
+                >
+                  {cat.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Clean Grid Display */}
+          {(() => {
+            const totalPages = Math.ceil(filteredProjects.length / projectsPerPage) || 1;
+            const startIndex = (currentPage - 1) * projectsPerPage;
+            const currentProjects = filteredProjects.slice(startIndex, startIndex + projectsPerPage);
+
+            return (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 min-h-[460px] sm:min-h-[400px]">
+                  {currentProjects.map((p, i) => (
+                    <div
+                      key={i}
+                      onClick={() => setSelectedProject(p)}
+                      className="group relative overflow-hidden rounded-2xl bg-slate-900 shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer h-[380px] flex flex-col justify-end"
+                    >
+                      <img
+                        className="absolute inset-0 w-full h-full object-cover opacity-85 group-hover:scale-105 group-hover:opacity-70 transition-all duration-700 bg-slate-800"
+                        src={getProjectImg(p.img)}
+                        alt={p.title}
+                        loading="lazy"
+                        decoding="async"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f6?w=800&q=80';
+                        }}
+                      />
+                      <div className="relative z-10 p-7 bg-gradient-to-t from-black/95 via-black/50 to-transparent flex flex-col justify-end text-white">
+                        <span className="text-blue-400 font-extrabold text-[11px] uppercase tracking-wider mb-1">
+                          {(() => {
+                            if (p.category === 'Residential') return lang === 'EN' ? 'Residential' : 'Residensial';
+                            if (p.category === 'Commercial') return lang === 'EN' ? 'Commercial' : 'Komersial';
+                            if (p.category === 'Infrastructure') return lang === 'EN' ? 'Infrastructure' : 'Infrastruktur';
+                            return p.category;
+                          })()}
+                        </span>
+                        <h3 className="text-xl font-black leading-tight text-white mb-2 group-hover:text-blue-200 transition-colors">
+                          {translateText(p.title)}
+                        </h3>
+                        <p className="text-xs text-slate-300 line-clamp-2 mb-3 leading-relaxed">
+                          {translateText(p.desc || p.fullDesc || (lang === 'EN' ? 'High-precision construction built to the highest architectural standards.' : 'Pembangunan konstruksi dengan spesifikasi dan standar presisi terbaik.'))}
+                        </p>
+                        <div className="flex justify-between items-center text-[11px] text-white/70 border-t border-white/15 pt-3">
+                          <span>{translateText(p.location)}</span>
+                          <span>{p.year}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Portfolio Pagination Controls with Auto Scroll */}
+                {totalPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 pt-8">
+                    <button
+                      onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
+                      disabled={currentPage === 1}
+                      className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-sm flex items-center gap-1.5"
+                    >
+                      <FiChevronLeft size={16} />
+                      <span>{t('projects.prev')}</span>
+                    </button>
+
+                    <div className="flex items-center gap-1.5 px-2">
+                      {[...Array(totalPages)].map((_, pageIdx) => {
+                        const pageNum = pageIdx + 1;
+                        return (
+                          <button
+                            key={pageNum}
+                            onClick={() => handlePageChange(pageNum)}
+                            className={`w-10 h-10 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm ${
+                              currentPage === pageNum
+                                ? 'bg-primary text-white scale-105 shadow-md shadow-blue-600/30'
+                                : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
+                            }`}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <button
+                      onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                      className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-sm flex items-center gap-1.5"
+                    >
+                      <span>{t('projects.next')}</span>
+                      <FiChevronRight size={16} />
+                    </button>
+                  </div>
+                )}
+              </>
+            );
+          })()}
+        </div>
+      </section>
+
+      {/* Client Logos & Real Testimonials Section (Moved below Portofolio) */}
       <section id="clients" className="py-24 bg-gradient-to-b from-blue-950 via-slate-950 to-blue-950 text-white overflow-hidden scroll-mt-20">
         <div className="max-w-7xl mx-auto px-6 sm:px-8 space-y-16">
           
@@ -897,146 +1066,6 @@ const Home = () => {
               </div>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Projects Section with Pagination */}
-      <section id="projects" className="py-24 px-6 sm:px-8 bg-slate-50 scroll-mt-24">
-        <div className="max-w-7xl mx-auto space-y-12">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 border-b border-slate-200 pb-8">
-            <div className="space-y-3">
-              <span className="text-primary font-bold uppercase tracking-widest text-sm">{t('projects.badge')}</span>
-              <h2 className="text-3xl md:text-5xl font-black text-on-surface">{t('projects.title')}</h2>
-              <p className="text-on-surface-variant text-sm max-w-xl">
-                {t('projects.desc')}
-              </p>
-              {searchQuery && (
-                <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
-                  <span>{lang === 'EN' ? `Search: "${searchQuery}"` : `Pencarian: "${searchQuery}"`}</span>
-                  <button
-                    onClick={() => {
-                      setSearchQuery('');
-                      window.dispatchEvent(new CustomEvent('site-search', { detail: '' }));
-                    }}
-                    className="hover:text-red-600 font-bold ml-1 cursor-pointer"
-                    title="Hapus filter pencarian"
-                  >
-                    ✕
-                  </button>
-                </div>
-              )}
-            </div>
-            <div className="flex flex-wrap gap-2 md:self-end">
-              {[
-                { key: 'All', label: t('projects.filterAll') },
-                { key: 'Residential', label: t('projects.filterResidential') },
-                { key: 'Commercial', label: t('projects.filterCommercial') },
-                { key: 'Infrastructure', label: t('projects.filterInfrastructure') }
-              ].map((cat) => (
-                <button
-                  key={cat.key}
-                  onClick={() => {
-                    setActiveCategory(cat.key);
-                    setCurrentPage(1);
-                  }}
-                  className={`px-5 py-2 rounded-full border transition-all text-xs font-bold cursor-pointer ${activeCategory === cat.key ? 'bg-primary border-primary text-white shadow-sm' : 'border-outline/50 hover:border-primary text-on-surface bg-white'}`}
-                >
-                  {cat.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Clean Grid Display */}
-          {(() => {
-            const totalPages = Math.ceil(filteredProjects.length / projectsPerPage) || 1;
-            const startIndex = (currentPage - 1) * projectsPerPage;
-            const currentProjects = filteredProjects.slice(startIndex, startIndex + projectsPerPage);
-
-            return (
-              <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {currentProjects.map((p, i) => (
-                    <div
-                      key={i}
-                      onClick={() => setSelectedProject(p)}
-                      className="group relative overflow-hidden rounded-2xl bg-slate-900 shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer h-[380px] flex flex-col justify-end"
-                    >
-                      <img
-                        className="absolute inset-0 w-full h-full object-cover opacity-85 group-hover:scale-105 group-hover:opacity-70 transition-all duration-700"
-                        src={p.img}
-                        alt={p.title}
-                        loading="lazy"
-                        decoding="async"
-                      />
-                      <div className="relative z-10 p-7 bg-gradient-to-t from-black/95 via-black/50 to-transparent flex flex-col justify-end text-white">
-                        <span className="text-blue-400 font-extrabold text-[11px] uppercase tracking-wider mb-1">
-                          {(() => {
-                            if (p.category === 'Residential') return lang === 'EN' ? 'Residential' : 'Residensial';
-                            if (p.category === 'Commercial') return lang === 'EN' ? 'Commercial' : 'Komersial';
-                            if (p.category === 'Infrastructure') return lang === 'EN' ? 'Infrastructure' : 'Infrastruktur';
-                            return p.category;
-                          })()}
-                        </span>
-                        <h3 className="text-xl font-black leading-tight text-white mb-2 group-hover:text-blue-200 transition-colors">
-                          {translateText(p.title)}
-                        </h3>
-                        <p className="text-xs text-slate-300 line-clamp-2 mb-3 leading-relaxed">
-                          {translateText(p.desc || p.fullDesc || (lang === 'EN' ? 'High-precision construction built to the highest architectural standards.' : 'Pembangunan konstruksi dengan spesifikasi dan standar presisi terbaik.'))}
-                        </p>
-                        <div className="flex justify-between items-center text-[11px] text-white/70 border-t border-white/15 pt-3">
-                          <span>{translateText(p.location)}</span>
-                          <span>{p.year}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Portfolio Pagination Controls */}
-                {totalPages > 1 && (
-                  <div className="flex items-center justify-center gap-2 pt-8">
-                    <button
-                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                      disabled={currentPage === 1}
-                      className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-sm flex items-center gap-1.5"
-                    >
-                      <FiChevronLeft size={16} />
-                      <span>{t('projects.prev')}</span>
-                    </button>
-
-                    <div className="flex items-center gap-1.5 px-2">
-                      {[...Array(totalPages)].map((_, pageIdx) => {
-                        const pageNum = pageIdx + 1;
-                        return (
-                          <button
-                            key={pageNum}
-                            onClick={() => setCurrentPage(pageNum)}
-                            className={`w-10 h-10 rounded-xl text-xs font-bold transition-all cursor-pointer shadow-sm ${
-                              currentPage === pageNum
-                                ? 'bg-primary text-white scale-105 shadow-md shadow-blue-600/30'
-                                : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-100'
-                            }`}
-                          >
-                            {pageNum}
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    <button
-                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                      disabled={currentPage === totalPages}
-                      className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-700 hover:bg-slate-100 disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer shadow-sm flex items-center gap-1.5"
-                    >
-                      <span>{t('projects.next')}</span>
-                      <FiChevronRight size={16} />
-                    </button>
-                  </div>
-                )}
-              </>
-            );
-          })()}
         </div>
       </section>
 

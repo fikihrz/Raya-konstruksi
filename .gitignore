@@ -39,3 +39,6 @@ sync-*.js
 verify-*.js
 disable-*.js
 scratch/
+
+.vercel
+.env*

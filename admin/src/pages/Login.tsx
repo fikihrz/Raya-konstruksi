@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
-import { FiBox, FiLock, FiMail, FiCheck, FiArrowLeft, FiAlertCircle, FiKey } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { FiBox, FiLock, FiMail, FiCheck, FiArrowLeft, FiAlertCircle, FiKey, FiShield } from 'react-icons/fi';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const API = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
 
 const Login = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   // State: 'login' | 'forgot' | 'verify_pin' | 'success'
   const [view, setView] = useState<'login' | 'forgot' | 'verify_pin' | 'success'>('login');
 
@@ -17,8 +18,19 @@ const Login = () => {
   const [newPassword, setNewPassword] = useState('');
 
   const [error, setError] = useState('');
+  const [sessionMsg, setSessionMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Show message if redirected due to session invalidation
+  useEffect(() => {
+    const reason = searchParams.get('reason');
+    if (reason === 'session_invalidated') {
+      setSessionMsg('Sesi Anda telah diakhiri karena akun ini masuk dari perangkat lain.');
+    } else if (reason === 'session_expired') {
+      setSessionMsg('Sesi Anda telah berakhir. Silakan login kembali.');
+    }
+  }, [searchParams]);
 
   // 1. Handle Login
   const handleLogin = async (e: React.FormEvent) => {
@@ -129,6 +141,16 @@ const Login = () => {
             {view === 'success' && 'Pemulihan Sandi Berhasil'}
           </p>
         </div>
+
+        {sessionMsg && (
+          <div className="mb-4 p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-start gap-3 text-amber-300 text-sm">
+            <FiShield className="flex-shrink-0 mt-0.5 text-amber-400" />
+            <div>
+              <p className="font-semibold text-amber-200 text-xs uppercase tracking-wide mb-0.5">Sesi Diakhiri</p>
+              <p className="leading-relaxed">{sessionMsg}</p>
+            </div>
+          </div>
+        )}
 
         {error && (
           <div className="mb-6 p-3 bg-red-500/10 border border-red-500/30 rounded-lg flex items-center gap-2 text-red-400 text-sm">
