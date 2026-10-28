@@ -97,6 +97,13 @@ const translations: Record<Language, Record<string, string>> = {
     'reviews.desc': 'Bukti kepuasan nyata dari para mitra korporat, arsitek, dan pemilik proyek yang telah mempercayakan konstruksi kepada Raya Konstruksi Jaya.',
     'reviews.btnWrite': 'Tulis Ulasan Anda',
     'reviews.trustedBy': 'Dipercaya Oleh Berbagai Perusahaan Terkemuka:',
+    'reviews.filterAll': 'Semua Kategori',
+    'reviews.filterAllRating': 'Semua Rating',
+    'reviews.searchPlaceholder': 'Cari ulasan, nama klien, atau proyek...',
+    'reviews.empty': 'Belum ada ulasan yang sesuai dengan kriteria pencarian.',
+    'reviews.prev': 'Sebelumnya',
+    'reviews.next': 'Selanjutnya',
+    'reviews.page': 'Halaman',
 
     // Review Modal Form
     'modal.title': 'Tulis Ulasan Klien',
@@ -247,6 +254,13 @@ const translations: Record<Language, Record<string, string>> = {
     'reviews.desc': 'Real testimonials and confidence from corporate partners, architects, and project owners who trust Raya Konstruksi Jaya.',
     'reviews.btnWrite': 'Write a Review',
     'reviews.trustedBy': 'Trusted By Leading Industry Enterprises:',
+    'reviews.filterAll': 'All Categories',
+    'reviews.filterAllRating': 'All Ratings',
+    'reviews.searchPlaceholder': 'Search reviews, client name, or project...',
+    'reviews.empty': 'No reviews match your search criteria.',
+    'reviews.prev': 'Previous',
+    'reviews.next': 'Next',
+    'reviews.page': 'Page',
 
     // Review Modal Form
     'modal.title': 'Client Feedback Review',

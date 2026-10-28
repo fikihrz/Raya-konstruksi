@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
-import { FiHome, FiArrowRight, FiPhoneCall, FiMail, FiMapPin, FiX, FiCalendar, FiMap, FiChevronLeft, FiChevronRight, FiPause, FiPlay, FiStar, FiEdit3, FiMaximize, FiMinimize, FiVolume2, FiVolumeX } from 'react-icons/fi';
+import { FiHome, FiArrowRight, FiPhoneCall, FiMail, FiMapPin, FiX, FiCalendar, FiMap, FiChevronLeft, FiChevronRight, FiPause, FiPlay, FiStar, FiEdit3, FiMaximize, FiMinimize, FiVolume2, FiVolumeX, FiSearch, FiFilter } from 'react-icons/fi';
 import { FaWhatsapp, FaStar } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -44,6 +44,21 @@ const Home = () => {
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewSuccessMsg, setReviewSuccessMsg] = useState('');
+
+  // Review Filter & Pagination State
+  const [reviewCategoryFilter, setReviewCategoryFilter] = useState('All');
+  const [reviewRatingFilter, setReviewRatingFilter] = useState<number | 'All'>('All');
+  const [reviewSearchQuery, setReviewSearchQuery] = useState('');
+  const [reviewPage, setReviewPage] = useState(1);
+  const reviewsPerPage = 6;
+
+  const handleReviewPageChange = (newPage: number) => {
+    setReviewPage(newPage);
+    const el = document.getElementById('clients');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  };
 
   // Consultation Modal State
   const [consultService, setConsultService] = useState<string | null>(null);
@@ -1006,46 +1021,232 @@ const Home = () => {
             </button>
           </div>
 
-          {/* Testimonial Cards Slider / Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {reviews.slice(0, 6).map((rev, idx) => (
-              <div
-                key={idx}
-                className="bg-slate-900/70 border border-blue-900/40 hover:border-blue-500/50 p-7 rounded-2xl flex flex-col justify-between space-y-5 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-blue-950/50"
-              >
-                <div className="space-y-4">
-                  {/* Rating Stars & Project Type */}
-                  <div className="flex items-center justify-between">
-                    <div className="flex text-amber-400 gap-1">
-                      {[...Array(rev.rating || 5)].map((_, i) => (
-                        <FaStar key={i} size={14} />
-                      ))}
-                    </div>
-                    <span className="text-[10px] uppercase font-bold text-blue-400 bg-blue-950/80 px-2.5 py-1 rounded-full border border-blue-800/40">
-                      {translateText(rev.projectType || 'Konstruksi')}
-                    </span>
-                  </div>
-
-                  {/* Review Text */}
-                  <p className="text-slate-300 text-xs sm:text-sm leading-relaxed italic">
-                    "{translateText(rev.review)}"
-                  </p>
-                </div>
-
-                {/* Reviewer Profile */}
-                <div className="flex items-center gap-3.5 pt-4 border-t border-slate-800/80">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-black flex items-center justify-center text-sm shadow-md flex-shrink-0">
-                    {rev.name ? rev.name.charAt(0).toUpperCase() : 'K'}
-                  </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-white leading-snug">{rev.name}</h4>
-                    <p className="text-[11px] text-slate-400">{rev.role ? `${translateText(rev.role)} • ` : ''}{rev.company}</p>
-                    <span className="text-[10px] text-blue-400/80">{rev.date}</span>
-                  </div>
-                </div>
+          {/* Filter, Search & Rating Controls for Reviews */}
+          <div className="space-y-4 bg-slate-900/60 border border-slate-800 p-5 rounded-2xl backdrop-blur-md">
+            <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center">
+              {/* Search Bar */}
+              <div className="relative flex-1">
+                <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                <input
+                  type="text"
+                  value={reviewSearchQuery}
+                  onChange={(e) => {
+                    setReviewSearchQuery(e.target.value);
+                    setReviewPage(1);
+                  }}
+                  placeholder={t('reviews.searchPlaceholder')}
+                  className="w-full bg-slate-950/80 border border-slate-700/80 rounded-xl pl-11 pr-10 py-2.5 text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                />
+                {reviewSearchQuery && (
+                  <button
+                    onClick={() => {
+                      setReviewSearchQuery('');
+                      setReviewPage(1);
+                    }}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1"
+                    title="Clear search"
+                  >
+                    <FiX size={14} />
+                  </button>
+                )}
               </div>
-            ))}
+
+              {/* Rating Filter Pills */}
+              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setReviewRatingFilter('All');
+                    setReviewPage(1);
+                  }}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                    reviewRatingFilter === 'All'
+                      ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
+                      : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
+                  }`}
+                >
+                  {t('reviews.filterAllRating')}
+                </button>
+                {[5, 4, 3].map((stars) => (
+                  <button
+                    key={stars}
+                    type="button"
+                    onClick={() => {
+                      setReviewRatingFilter(stars);
+                      setReviewPage(1);
+                    }}
+                    className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                      reviewRatingFilter === stars
+                        ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/30'
+                        : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
+                    }`}
+                  >
+                    <span>{stars}</span>
+                    <FaStar size={11} className={reviewRatingFilter === stars ? 'text-slate-950' : 'text-amber-400'} />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Category / Project Type Filter Pills */}
+            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1 border-t border-slate-800/80">
+              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 flex-shrink-0">
+                <FiFilter size={12} className="text-blue-400" />
+                <span>{lang === 'EN' ? 'Type:' : 'Jenis:'}</span>
+              </span>
+              {['All', 'Residensial', 'Komersial', 'Industri', 'Infrastruktur'].map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => {
+                    setReviewCategoryFilter(cat);
+                    setReviewPage(1);
+                  }}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
+                    reviewCategoryFilter === cat
+                      ? 'bg-blue-500/20 text-blue-300 border border-blue-400/50'
+                      : 'bg-slate-800/50 text-slate-400 hover:text-white border border-transparent'
+                  }`}
+                >
+                  {cat === 'All' ? t('reviews.filterAll') : translateText(cat)}
+                </button>
+              ))}
+            </div>
           </div>
+
+          {/* Testimonial Cards Slider / Grid */}
+          {(() => {
+            const filteredReviews = reviews.filter((rev) => {
+              // Category filter
+              const matchesCat = reviewCategoryFilter === 'All' || 
+                (rev.projectType && rev.projectType.toLowerCase().includes(reviewCategoryFilter.toLowerCase()));
+              
+              // Rating filter
+              const matchesRating = reviewRatingFilter === 'All' || (rev.rating || 5) === reviewRatingFilter;
+              
+              // Search query filter
+              const q = reviewSearchQuery.toLowerCase().trim();
+              const matchesSearch = !q || 
+                (rev.name && rev.name.toLowerCase().includes(q)) ||
+                (rev.company && rev.company.toLowerCase().includes(q)) ||
+                (rev.role && rev.role.toLowerCase().includes(q)) ||
+                (rev.review && rev.review.toLowerCase().includes(q)) ||
+                (rev.projectType && rev.projectType.toLowerCase().includes(q));
+
+              return matchesCat && matchesRating && matchesSearch;
+            });
+
+            const totalReviewPages = Math.ceil(filteredReviews.length / reviewsPerPage) || 1;
+            const currentReviews = filteredReviews.slice((reviewPage - 1) * reviewsPerPage, reviewPage * reviewsPerPage);
+
+            if (filteredReviews.length === 0) {
+              return (
+                <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-12 text-center space-y-3">
+                  <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 mx-auto">
+                    <FiSearch size={20} />
+                  </div>
+                  <h4 className="text-base font-bold text-white">{t('reviews.empty')}</h4>
+                  <button
+                    onClick={() => {
+                      setReviewSearchQuery('');
+                      setReviewCategoryFilter('All');
+                      setReviewRatingFilter('All');
+                      setReviewPage(1);
+                    }}
+                    className="px-4 py-2 text-xs font-semibold bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 rounded-xl border border-blue-500/40 transition-colors"
+                  >
+                    {lang === 'EN' ? 'Reset Filters' : 'Reset Filter'}
+                  </button>
+                </div>
+              );
+            }
+
+            return (
+              <div className="space-y-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {currentReviews.map((rev, idx) => (
+                    <div
+                      key={idx}
+                      className="bg-slate-900/70 border border-blue-900/40 hover:border-blue-500/50 p-7 rounded-2xl flex flex-col justify-between space-y-5 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-blue-950/50"
+                    >
+                      <div className="space-y-4">
+                        {/* Rating Stars & Project Type */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex text-amber-400 gap-1">
+                            {[...Array(rev.rating || 5)].map((_, i) => (
+                              <FaStar key={i} size={14} />
+                            ))}
+                          </div>
+                          <span className="text-[10px] uppercase font-bold text-blue-400 bg-blue-950/80 px-2.5 py-1 rounded-full border border-blue-800/40">
+                            {translateText(rev.projectType || 'Konstruksi')}
+                          </span>
+                        </div>
+
+                        {/* Review Text */}
+                        <p className="text-slate-300 text-xs sm:text-sm leading-relaxed italic">
+                          "{translateText(rev.review)}"
+                        </p>
+                      </div>
+
+                      {/* Reviewer Profile */}
+                      <div className="flex items-center gap-3.5 pt-4 border-t border-slate-800/80">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-black flex items-center justify-center text-sm shadow-md flex-shrink-0">
+                          {rev.name ? rev.name.charAt(0).toUpperCase() : 'K'}
+                        </div>
+                        <div>
+                          <h4 className="text-sm font-bold text-white leading-snug">{rev.name}</h4>
+                          <p className="text-[11px] text-slate-400">{rev.role ? `${translateText(rev.role)} • ` : ''}{rev.company}</p>
+                          <span className="text-[10px] text-blue-400/80">{rev.date}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Reviews Pagination Controls */}
+                {totalReviewPages > 1 && (
+                  <div className="flex items-center justify-center gap-2 pt-4">
+                    <button
+                      onClick={() => handleReviewPageChange(Math.max(reviewPage - 1, 1))}
+                      disabled={reviewPage === 1}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-slate-300 bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
+                    >
+                      <FiChevronLeft size={14} />
+                      <span className="hidden sm:inline">{t('reviews.prev')}</span>
+                    </button>
+
+                    <div className="flex items-center gap-1">
+                      {Array.from({ length: totalReviewPages }).map((_, i) => {
+                        const pageNum = i + 1;
+                        return (
+                          <button
+                            key={pageNum}
+                            onClick={() => handleReviewPageChange(pageNum)}
+                            className={`w-9 h-9 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                              reviewPage === pageNum
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
+                                : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800'
+                            }`}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    <button
+                      onClick={() => handleReviewPageChange(Math.min(reviewPage + 1, totalReviewPages))}
+                      disabled={reviewPage === totalReviewPages}
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-slate-300 bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
+                    >
+                      <span className="hidden sm:inline">{t('reviews.next')}</span>
+                      <FiChevronRight size={14} />
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Client Logos Ticker */}
           <div className="space-y-6 pt-4 border-t border-blue-900/30">
@@ -1412,113 +1613,155 @@ const Home = () => {
       {/* Consultation Choice Modal */}
       <AnimatePresence>
         {consultService && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
-            onClick={() => setConsultService(null)}
-          >
-            {/* Backdrop */}
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-
-            {/* Modal Content */}
+          <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
+            {/* Backdrop with explicit onClick */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="fixed inset-0 bg-slate-950/80 backdrop-blur-md"
+              onClick={() => setConsultService(null)}
+            />
+
+            {/* Modal Card */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              exit={{ opacity: 0, scale: 0.94, y: 16 }}
+              transition={{ type: 'spring', damping: 28, stiffness: 320 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden"
+              className="relative w-full max-w-lg bg-slate-900 border border-slate-700/80 rounded-3xl shadow-2xl shadow-blue-950/80 overflow-hidden z-10 text-white"
             >
-              {/* Header Gradient */}
-              <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 px-6 pt-7 pb-8 text-white relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
-                
-                <button 
-                  onClick={() => setConsultService(null)} 
-                  className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors bg-white/10 hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center cursor-pointer border-none"
-                >
-                  <FiX size={16} />
-                </button>
-                
-                <div className="relative z-10">
-                  <div className="flex items-center gap-2 text-blue-200 text-xs font-bold uppercase tracking-widest mb-2">
-                    <FiPhoneCall size={14} />
+              {/* Top Accent Gradient Bar */}
+              <div className="h-1.5 w-full bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-400" />
+
+              {/* Close Button - prominent, high z-index, styled for effortless clicking */}
+              <button 
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setConsultService(null);
+                }} 
+                aria-label="Tutup modal"
+                className="absolute top-5 right-5 z-20 w-9 h-9 rounded-full bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 shadow-md"
+              >
+                <FiX size={18} />
+              </button>
+
+              <div className="p-6 sm:p-8 space-y-6">
+                {/* Header */}
+                <div className="pr-10 space-y-2">
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/15 border border-blue-400/30 text-blue-300 text-xs font-bold uppercase tracking-wider">
+                    <FiPhoneCall size={12} />
                     <span>{t('consult.title')}</span>
                   </div>
-                  <p className="text-white/70 text-sm">{t('consult.subtitle')}</p>
-                  <div className="mt-4 inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm px-4 py-2 rounded-xl">
-                    <span className="text-blue-200 text-xs font-semibold">{t('consult.forService')}</span>
-                    <span className="text-white text-sm font-bold">{consultService}</span>
+                  <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
+                    {lang === 'EN' ? 'Direct Consultation' : 'Mulai Diskusi Proyek'}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                    {t('consult.subtitle')}
+                  </p>
+                </div>
+
+                {/* Selected Service Pill */}
+                <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-800/60 border border-slate-700/70 flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
+                      {t('consult.forService')}
+                    </span>
+                    <span className="text-sm sm:text-base font-extrabold text-white truncate block">
+                      {consultService}
+                    </span>
                   </div>
+                  <span className="px-2.5 py-1 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded-lg flex-shrink-0">
+                    {lang === 'EN' ? 'Online' : 'Tersedia'}
+                  </span>
+                </div>
+
+                {/* Action Options */}
+                <div className="space-y-3 pt-1">
+                  {/* WhatsApp Option */}
+                  <a
+                    href={(() => {
+                      const company = settings.companyName || 'Raya Konstruksi Jaya';
+                      const waNum = (settings.whatsappNumber || '6281234567890').replace(/\D/g, '');
+                      const template = t('consult.waTemplate')
+                        .replace('{company}', company)
+                        .replace('{service}', consultService || '');
+                      return `https://wa.me/${waNum}?text=${encodeURIComponent(template)}`;
+                    })()}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => setConsultService(null)}
+                    className="group flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-slate-800/80 to-slate-800/80 hover:to-emerald-950/40 border border-emerald-500/30 hover:border-emerald-400 transition-all duration-300 no-underline cursor-pointer shadow-lg hover:shadow-emerald-950/40"
+                  >
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white shadow-md shadow-emerald-600/30 group-hover:scale-105 transition-transform flex-shrink-0">
+                      <FaWhatsapp size={24} />
+                    </div>
+                    <div className="flex-grow min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">
+                          {t('consult.viaWa')}
+                        </h4>
+                        <span className="px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 rounded border border-emerald-400/30">
+                          {lang === 'EN' ? 'Fast Response' : 'Paling Cepat'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">{t('consult.viaWaDesc')}</p>
+                    </div>
+                    <div className="w-8 h-8 rounded-full bg-slate-800 group-hover:bg-emerald-500 text-slate-400 group-hover:text-white flex items-center justify-center transition-all flex-shrink-0">
+                      <FiArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                    </div>
+                  </a>
+
+                  {/* Email Option */}
+                  <a
+                    href={(() => {
+                      const company = settings.companyName || 'Raya Konstruksi Jaya';
+                      const emailAddr = settings.emailAddress || 'contact@rayakonstruksi.com';
+                      const subject = t('consult.emailSubject')
+                        .replace('{service}', consultService || '')
+                        .replace('{company}', company);
+                      const body = t('consult.emailBody')
+                        .replace(/\{company\}/g, company)
+                        .replace(/\{service\}/g, consultService || '');
+                      return `mailto:${emailAddr}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                    })()}
+                    onClick={() => setConsultService(null)}
+                    className="group flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-blue-950/40 via-slate-800/80 to-slate-800/80 hover:to-blue-950/40 border border-blue-500/30 hover:border-blue-400 transition-all duration-300 no-underline cursor-pointer shadow-lg hover:shadow-blue-950/40"
+                  >
+                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-600/30 group-hover:scale-105 transition-transform flex-shrink-0">
+                      <FiMail size={22} />
+                    </div>
+                    <div className="flex-grow min-w-0">
+                      <h4 className="text-sm font-bold text-white group-hover:text-blue-300 transition-colors">
+                        {t('consult.viaEmail')}
+                      </h4>
+                      <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">{t('consult.viaEmailDesc')}</p>
+                    </div>
+                    <div className="w-8 h-8 rounded-full bg-slate-800 group-hover:bg-blue-600 text-slate-400 group-hover:text-white flex items-center justify-center transition-all flex-shrink-0">
+                      <FiArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
+                    </div>
+                  </a>
+                </div>
+
+                {/* Footer Note & Cancel Button */}
+                <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-800">
+                  <span className="text-[11px] text-slate-400 text-center sm:text-left">
+                    {lang === 'ID' ? '⏱ Respon cepat tim estimator: 1x24 jam' : '⏱ Typical estimator response: within 24h'}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setConsultService(null)}
+                    className="text-xs font-semibold text-slate-400 hover:text-white py-1.5 px-3 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+                  >
+                    {lang === 'EN' ? 'Cancel' : 'Batal'}
+                  </button>
                 </div>
               </div>
-
-              {/* Options */}
-              <div className="p-6 space-y-3">
-                {/* WhatsApp Option */}
-                <a
-                  href={(() => {
-                    const company = settings.companyName || 'Raya Konstruksi Jaya';
-                    const waNum = (settings.whatsappNumber || '6281234567890').replace(/\D/g, '');
-                    const template = t('consult.waTemplate')
-                      .replace('{company}', company)
-                      .replace('{service}', consultService || '');
-                    return `https://wa.me/${waNum}?text=${encodeURIComponent(template)}`;
-                  })()}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => setConsultService(null)}
-                  className="group flex items-center gap-4 p-4 rounded-2xl border-2 border-green-100 bg-green-50/50 hover:bg-green-50 hover:border-green-300 transition-all duration-300 no-underline cursor-pointer"
-                >
-                  <div className="flex-shrink-0 w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/20 group-hover:scale-110 transition-transform">
-                    <FaWhatsapp className="text-white text-xl" />
-                  </div>
-                  <div className="flex-grow min-w-0">
-                    <h4 className="text-sm font-bold text-gray-900 mb-0.5">{t('consult.viaWa')}</h4>
-                    <p className="text-xs text-gray-500 leading-relaxed">{t('consult.viaWaDesc')}</p>
-                  </div>
-                  <FiArrowRight className="text-green-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
-                </a>
-
-                {/* Email Option */}
-                <a
-                  href={(() => {
-                    const company = settings.companyName || 'Raya Konstruksi Jaya';
-                    const emailAddr = settings.emailAddress || 'contact@rayakonstruksi.com';
-                    const subject = t('consult.emailSubject')
-                      .replace('{service}', consultService || '')
-                      .replace('{company}', company);
-                    const body = t('consult.emailBody')
-                      .replace(/\{company\}/g, company)
-                      .replace(/\{service\}/g, consultService || '');
-                    return `mailto:${emailAddr}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                  })()}
-                  onClick={() => setConsultService(null)}
-                  className="group flex items-center gap-4 p-4 rounded-2xl border-2 border-blue-100 bg-blue-50/50 hover:bg-blue-50 hover:border-blue-300 transition-all duration-300 no-underline cursor-pointer"
-                >
-                  <div className="flex-shrink-0 w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:scale-110 transition-transform">
-                    <FiMail className="text-white text-xl" />
-                  </div>
-                  <div className="flex-grow min-w-0">
-                    <h4 className="text-sm font-bold text-gray-900 mb-0.5">{t('consult.viaEmail')}</h4>
-                    <p className="text-xs text-gray-500 leading-relaxed">{t('consult.viaEmailDesc')}</p>
-                  </div>
-                  <FiArrowRight className="text-blue-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
-                </a>
-              </div>
-
-              {/* Footer */}
-              <div className="px-6 pb-5 pt-1">
-                <p className="text-center text-[10px] text-gray-400">
-                  {lang === 'ID' ? 'Tim kami akan merespon dalam waktu 1x24 jam' : 'Our team will respond within 24 hours'}
-                </p>
-              </div>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
 
