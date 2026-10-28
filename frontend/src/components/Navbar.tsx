@@ -103,14 +103,9 @@ const Navbar = () => {
                   className="h-full w-auto max-w-[120px] object-contain drop-shadow"
                 />
               </div>
-              <div className="flex flex-col">
-                <span className="text-lg sm:text-xl font-bold text-white tracking-wide leading-none uppercase">
-                  Raya Konstruksi Jaya
-                </span>
-                <span className="text-[10px] sm:text-[11px] font-medium text-blue-100 tracking-widest uppercase">
-                  {t('nav.brandSubtitle')}
-                </span>
-              </div>
+              <span className="text-base sm:text-lg lg:text-xl font-bold text-white tracking-wide uppercase leading-tight">
+                Raya Konstruksi Jaya
+              </span>
             </Link>
           </div>
 
