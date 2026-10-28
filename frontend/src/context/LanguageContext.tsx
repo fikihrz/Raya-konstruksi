@@ -144,10 +144,22 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.openMaps': 'Buka Peta ↗',
     'footer.rights': 'Hak Cipta Dilindungi.',
 
+    // Consultation Modal
+    'consult.title': 'Konsultasi Layanan',
+    'consult.subtitle': 'Pilih metode untuk menghubungi tim kami',
+    'consult.forService': 'Layanan:',
+    'consult.viaWa': 'Chat WhatsApp',
+    'consult.viaWaDesc': 'Respon cepat, langsung terhubung dengan tim estimator kami',
+    'consult.viaEmail': 'Kirim Email',
+    'consult.viaEmailDesc': 'Kirim detail kebutuhan proyek secara lengkap via email',
+    'consult.waTemplate': 'Halo {company}, saya tertarik dengan layanan *{service}*. Saya ingin berkonsultasi mengenai kebutuhan proyek saya. Bisakah kita berdiskusi lebih lanjut?',
+    'consult.emailSubject': 'Konsultasi Layanan {service} - {company}',
+    'consult.emailBody': 'Yth. Tim {company},\n\nSaya tertarik dengan layanan {service} yang ditawarkan.\nSaya ingin berkonsultasi mengenai kebutuhan proyek saya sebagai berikut:\n\n- Jenis Proyek: \n- Lokasi: \n- Estimasi Anggaran: \n- Timeline: \n\nMohon informasi lebih lanjut mengenai layanan ini.\n\nTerima kasih.',
+
     // Floating Widget
-    'widget.wa': 'WhatsApp Resmi',
-    'widget.instagram': 'Instagram Resmi',
-    'widget.telegram': 'Telegram Resmi'
+    'widget.wa': 'WhatsApp',
+    'widget.instagram': 'Instagram',
+    'widget.telegram': 'Telegram'
   },
   EN: {
     // Navbar
@@ -281,6 +293,18 @@ const translations: Record<Language, Record<string, string>> = {
     'footer.mapTitle': 'Office Location',
     'footer.openMaps': 'Open Maps ↗',
     'footer.rights': 'All Rights Reserved.',
+
+    // Consultation Modal
+    'consult.title': 'Service Consultation',
+    'consult.subtitle': 'Choose how to contact our team',
+    'consult.forService': 'Service:',
+    'consult.viaWa': 'WhatsApp Chat',
+    'consult.viaWaDesc': 'Quick response, connect directly with our estimator team',
+    'consult.viaEmail': 'Send Email',
+    'consult.viaEmailDesc': 'Send your complete project details via email',
+    'consult.waTemplate': 'Hello {company}, I am interested in your *{service}* service. I would like to consult regarding my project needs. Could we discuss further?',
+    'consult.emailSubject': '{service} Service Consultation - {company}',
+    'consult.emailBody': 'Dear {company} Team,\n\nI am interested in the {service} service offered.\nI would like to consult regarding my project needs as follows:\n\n- Project Type: \n- Location: \n- Estimated Budget: \n- Timeline: \n\nPlease provide more information about this service.\n\nThank you.',
 
     // Floating Widget
     'widget.wa': 'WhatsApp Chat',

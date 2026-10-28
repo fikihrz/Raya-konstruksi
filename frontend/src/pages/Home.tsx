@@ -44,6 +44,9 @@ const Home = () => {
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewSuccessMsg, setReviewSuccessMsg] = useState('');
+
+  // Consultation Modal State
+  const [consultService, setConsultService] = useState<string | null>(null);
   const [newReview, setNewReview] = useState({
     name: '',
     company: '',
@@ -819,9 +822,12 @@ const Home = () => {
                         {sDesc}
                       </p>
                     </div>
-                    <a href="#contact" className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:gap-3 transition-all pt-4">
+                    <button 
+                      onClick={() => setConsultService(sTitle)}
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:gap-3 transition-all pt-4 cursor-pointer bg-transparent border-none"
+                    >
                       {t('services.btnConsult')} <FiArrowRight />
-                    </a>
+                    </button>
                   </div>
                 </div>
               );
@@ -1403,6 +1409,118 @@ const Home = () => {
           </div>
         </div>
       </section>
+      {/* Consultation Choice Modal */}
+      <AnimatePresence>
+        {consultService && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4"
+            onClick={() => setConsultService(null)}
+          >
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              onClick={(e) => e.stopPropagation()}
+              className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden"
+            >
+              {/* Header Gradient */}
+              <div className="bg-gradient-to-br from-blue-600 via-blue-700 to-blue-900 px-6 pt-7 pb-8 text-white relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2" />
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-1/2 -translate-x-1/2" />
+                
+                <button 
+                  onClick={() => setConsultService(null)} 
+                  className="absolute top-4 right-4 text-white/60 hover:text-white transition-colors bg-white/10 hover:bg-white/20 rounded-full w-8 h-8 flex items-center justify-center cursor-pointer border-none"
+                >
+                  <FiX size={16} />
+                </button>
+                
+                <div className="relative z-10">
+                  <div className="flex items-center gap-2 text-blue-200 text-xs font-bold uppercase tracking-widest mb-2">
+                    <FiPhoneCall size={14} />
+                    <span>{t('consult.title')}</span>
+                  </div>
+                  <p className="text-white/70 text-sm">{t('consult.subtitle')}</p>
+                  <div className="mt-4 inline-flex items-center gap-2 bg-white/15 backdrop-blur-sm px-4 py-2 rounded-xl">
+                    <span className="text-blue-200 text-xs font-semibold">{t('consult.forService')}</span>
+                    <span className="text-white text-sm font-bold">{consultService}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Options */}
+              <div className="p-6 space-y-3">
+                {/* WhatsApp Option */}
+                <a
+                  href={(() => {
+                    const company = settings.companyName || 'Raya Konstruksi Jaya';
+                    const waNum = (settings.whatsappNumber || '6281234567890').replace(/\D/g, '');
+                    const template = t('consult.waTemplate')
+                      .replace('{company}', company)
+                      .replace('{service}', consultService || '');
+                    return `https://wa.me/${waNum}?text=${encodeURIComponent(template)}`;
+                  })()}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => setConsultService(null)}
+                  className="group flex items-center gap-4 p-4 rounded-2xl border-2 border-green-100 bg-green-50/50 hover:bg-green-50 hover:border-green-300 transition-all duration-300 no-underline cursor-pointer"
+                >
+                  <div className="flex-shrink-0 w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center shadow-lg shadow-green-500/20 group-hover:scale-110 transition-transform">
+                    <FaWhatsapp className="text-white text-xl" />
+                  </div>
+                  <div className="flex-grow min-w-0">
+                    <h4 className="text-sm font-bold text-gray-900 mb-0.5">{t('consult.viaWa')}</h4>
+                    <p className="text-xs text-gray-500 leading-relaxed">{t('consult.viaWaDesc')}</p>
+                  </div>
+                  <FiArrowRight className="text-green-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                </a>
+
+                {/* Email Option */}
+                <a
+                  href={(() => {
+                    const company = settings.companyName || 'Raya Konstruksi Jaya';
+                    const emailAddr = settings.emailAddress || 'contact@rayakonstruksi.com';
+                    const subject = t('consult.emailSubject')
+                      .replace('{service}', consultService || '')
+                      .replace('{company}', company);
+                    const body = t('consult.emailBody')
+                      .replace(/\{company\}/g, company)
+                      .replace(/\{service\}/g, consultService || '');
+                    return `mailto:${emailAddr}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                  })()}
+                  onClick={() => setConsultService(null)}
+                  className="group flex items-center gap-4 p-4 rounded-2xl border-2 border-blue-100 bg-blue-50/50 hover:bg-blue-50 hover:border-blue-300 transition-all duration-300 no-underline cursor-pointer"
+                >
+                  <div className="flex-shrink-0 w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:scale-110 transition-transform">
+                    <FiMail className="text-white text-xl" />
+                  </div>
+                  <div className="flex-grow min-w-0">
+                    <h4 className="text-sm font-bold text-gray-900 mb-0.5">{t('consult.viaEmail')}</h4>
+                    <p className="text-xs text-gray-500 leading-relaxed">{t('consult.viaEmailDesc')}</p>
+                  </div>
+                  <FiArrowRight className="text-blue-400 group-hover:translate-x-1 transition-transform flex-shrink-0" />
+                </a>
+              </div>
+
+              {/* Footer */}
+              <div className="px-6 pb-5 pt-1">
+                <p className="text-center text-[10px] text-gray-400">
+                  {lang === 'ID' ? 'Tim kami akan merespon dalam waktu 1x24 jam' : 'Our team will respond within 24 hours'}
+                </p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Cinematic Fullscreen Video Lightbox Modal */}
       <AnimatePresence>
