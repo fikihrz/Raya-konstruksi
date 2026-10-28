@@ -35,11 +35,15 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleNavClick = (id: string) => {
+  const handleNavClick = (id: string, category?: string) => {
     setActiveDropdown(null);
     setMobileMenuOpen(false);
     setLangDropdownOpen(false);
     
+    if (category !== undefined) {
+      window.dispatchEvent(new CustomEvent('project-filter', { detail: category }));
+    }
+
     const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -134,13 +138,19 @@ const Navbar = () => {
                 <div className="absolute top-full left-0 pt-2 w-52 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                   <div className="bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-xl shadow-2xl py-2 overflow-hidden">
                     <button
-                      onClick={() => handleNavClick('about')}
+                      onClick={() => {
+                        window.dispatchEvent(new CustomEvent('about-tab', { detail: 'story' }));
+                        handleNavClick('about');
+                      }}
                       className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:text-white hover:bg-blue-600/30 transition-colors block cursor-pointer"
                     >
                       {t('nav.about.story')}
                     </button>
                     <button
-                      onClick={() => handleNavClick('about')}
+                      onClick={() => {
+                        window.dispatchEvent(new CustomEvent('about-tab', { detail: 'vision' }));
+                        handleNavClick('about');
+                      }}
                       className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:text-white hover:bg-blue-600/30 transition-colors block cursor-pointer"
                     >
                       {t('nav.about.vision')}
@@ -228,25 +238,25 @@ const Navbar = () => {
                 <div className="absolute top-full left-0 pt-2 w-52 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                   <div className="bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-xl shadow-2xl py-2 overflow-hidden">
                     <button
-                      onClick={() => handleNavClick('projects')}
+                      onClick={() => handleNavClick('projects', 'All')}
                       className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:text-white hover:bg-blue-600/30 transition-colors block cursor-pointer"
                     >
                       {t('nav.projects.all')}
                     </button>
                     <button
-                      onClick={() => handleNavClick('projects')}
+                      onClick={() => handleNavClick('projects', 'Residential')}
                       className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:text-white hover:bg-blue-600/30 transition-colors block cursor-pointer"
                     >
                       {t('nav.projects.residential')}
                     </button>
                     <button
-                      onClick={() => handleNavClick('projects')}
+                      onClick={() => handleNavClick('projects', 'Commercial')}
                       className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:text-white hover:bg-blue-600/30 transition-colors block cursor-pointer"
                     >
                       {t('nav.projects.commercial')}
                     </button>
                     <button
-                      onClick={() => handleNavClick('projects')}
+                      onClick={() => handleNavClick('projects', 'Infrastructure')}
                       className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:text-white hover:bg-blue-600/30 transition-colors block cursor-pointer"
                     >
                       {t('nav.projects.infrastructure')}

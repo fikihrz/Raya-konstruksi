@@ -209,7 +209,7 @@ const Home = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Listen to search events from Navbar
+  // Listen to search and project category filter events from Navbar
   useEffect(() => {
     const handleSearchEvent = (e: any) => {
       const q = e.detail || '';
@@ -219,8 +219,29 @@ const Home = () => {
         setCurrentPage(1);
       }
     };
+
+    const handleProjectFilterEvent = (e: any) => {
+      const cat = e.detail || 'All';
+      setActiveCategory(cat);
+      setCurrentPage(1);
+      setSearchQuery('');
+    };
+
+    const handleAboutTabEvent = (e: any) => {
+      const tab = e.detail;
+      if (tab === 'story' || tab === 'vision' || tab === 'mission') {
+        setActiveAboutTab(tab);
+      }
+    };
+
     window.addEventListener('site-search', handleSearchEvent);
-    return () => window.removeEventListener('site-search', handleSearchEvent);
+    window.addEventListener('project-filter', handleProjectFilterEvent);
+    window.addEventListener('about-tab', handleAboutTabEvent);
+    return () => {
+      window.removeEventListener('site-search', handleSearchEvent);
+      window.removeEventListener('project-filter', handleProjectFilterEvent);
+      window.removeEventListener('about-tab', handleAboutTabEvent);
+    };
   }, []);
 
   const filteredProjects = projects.filter(p => {
