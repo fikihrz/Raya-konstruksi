@@ -1554,11 +1554,11 @@ const Home = () => {
         <div className="absolute inset-0 z-0">
           {settings.contactBgType === 'video' && settings.contactVideo ? (
             getYouTubeEmbedId(settings.contactVideo) ? (
-              <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
+              <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none flex items-center justify-center">
                 <iframe
                   src={`https://www.youtube.com/embed/${getYouTubeEmbedId(settings.contactVideo)}?autoplay=1&mute=1&loop=1&playlist=${getYouTubeEmbedId(settings.contactVideo)}&controls=0&showinfo=0&rel=0&modestbranding=1&disablekb=1&playsinline=1`}
                   title="Contact Background Video"
-                  className="w-full h-full object-cover scale-150 border-0 pointer-events-none"
+                  className="w-[100vw] h-[56.25vw] min-h-full min-w-[177.77vh] absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none border-0"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 />
               </div>
@@ -1579,17 +1579,27 @@ const Home = () => {
               className="w-full h-full object-cover"
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-b from-blue-950/95 via-blue-950/90 to-blue-950/95"></div>
+          {/* Dynamic Clear Overlay */}
+          <div 
+            className="absolute inset-0 bg-slate-950 transition-opacity duration-300"
+            style={{ 
+              opacity: (settings.contactOverlayOpacity !== undefined && settings.contactOverlayOpacity !== '')
+                ? Number(settings.contactOverlayOpacity) / 100 
+                : 0.35 
+            }}
+          />
+          {/* Subtle top & bottom edge gradients for seamless transition */}
+          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-transparent to-slate-950/70 pointer-events-none" />
         </div>
 
         <div className="relative z-10 max-w-4xl mx-auto text-center">
           {/* Main Headline */}
           <div className="space-y-6">
-            <span className="text-primary-container text-xs font-black uppercase tracking-[0.25em]">{t('contact.badge')}</span>
-            <h2 className="text-4xl md:text-6xl font-black text-white leading-tight tracking-tight">
+            <span className="text-primary-container text-xs font-black uppercase tracking-[0.25em] drop-shadow-md">{t('contact.badge')}</span>
+            <h2 className="text-4xl md:text-6xl font-black text-white leading-tight tracking-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)]">
               {lang === 'EN' ? t('contact.title') : (settings.contactTitle || t('contact.title'))}
             </h2>
-            <p className="text-white/60 max-w-xl mx-auto text-sm md:text-base leading-relaxed">
+            <p className="text-white/95 max-w-xl mx-auto text-sm md:text-base leading-relaxed drop-shadow-[0_1px_6px_rgba(0,0,0,0.85)] font-medium">
               {lang === 'EN' ? t('contact.desc') : (settings.contactDesc || t('contact.desc'))}
             </p>
 

@@ -119,6 +119,180 @@ const ImageField = ({ label, value, fieldKey, onChange }: { label: string; value
   );
 };
 
+
+const getYouTubeEmbedId = (url?: string) => {
+  if (!url) return null;
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length === 11) ? match[2] : null;
+};
+
+const VideoField = ({
+  label,
+  value,
+  fieldKey,
+  onChange,
+  tips
+}: {
+  label: string;
+  value: string;
+  fieldKey: string;
+  onChange: (key: string, url: string) => void;
+  tips?: string;
+}) => {
+  const { showSuccess, showError } = useToast();
+  const [uploading, setUploading] = useState(false);
+  const [inputUrl, setInputUrl] = useState(value || '');
+
+  useEffect(() => {
+    setInputUrl(value || '');
+  }, [value]);
+
+  const handleVideoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const validExts = ['mp4', 'webm', 'ogg', 'mov'];
+    const ext = file.name.split('.').pop()?.toLowerCase() || '';
+    if (!validExts.includes(ext) && !file.type.startsWith('video/')) {
+      showError('Format Tidak Didukung', 'Harap pilih file video berformat MP4, WebM, atau MOV.');
+      return;
+    }
+
+    const maxMB = 4.0;
+    const fileSizeMB = file.size / (1024 * 1024);
+    if (fileSizeMB > maxMB) {
+      showError(
+        'Ukuran Video Melebihi 4MB',
+        'File video Anda berukuran ' + fileSizeMB.toFixed(1) + 'MB. Untuk menjaga kecepatan loading website, upload video lokal dibatasi maksimal 4MB. Jika video Anda berukuran besar, silakan gunakan link YouTube.'
+      );
+      e.target.value = '';
+      return;
+    }
+
+    setUploading(true);
+    const reader = new FileReader();
+    reader.onload = () => {
+      const dataUrl = reader.result as string;
+      onChange(fieldKey, dataUrl);
+      setInputUrl(dataUrl);
+      showSuccess(
+        'Video Berhasil Dimuat!',
+        'Video lokal "' + file.name + '" (' + fileSizeMB.toFixed(1) + 'MB) berhasil dipilih dan siap disimpan!'
+      );
+      setUploading(false);
+    };
+    reader.onerror = () => {
+      showError('Gagal Membaca File', 'Terjadi kesalahan saat membaca file video dari perangkat Anda.');
+      setUploading(false);
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
+
+  const isDataUrl = typeof value === 'string' && value.startsWith('data:video');
+  const ytId = getYouTubeEmbedId(value);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex justify-between items-center">
+        <label className="block text-xs sm:text-sm font-semibold text-slate-700">{label}</label>
+        <span className="text-[11px] text-slate-400">MP4, WebM (Maks 4MB) atau Link YouTube</span>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <label className="cursor-pointer inline-flex items-center gap-2 bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 rounded-xl px-4 py-2.5 text-xs sm:text-sm font-bold transition-all shadow-sm">
+          <FiUpload size={16} />
+          <span>{uploading ? 'Memproses Video...' : 'Pilih File Video dari Komputer / HP'}</span>
+          <input
+            type="file"
+            accept="video/mp4,video/webm,video/ogg,video/quicktime"
+            onChange={handleVideoUpload}
+            className="hidden"
+            disabled={uploading}
+          />
+        </label>
+
+        {value && (
+          <button
+            type="button"
+            onClick={() => {
+              onChange(fieldKey, '');
+              setInputUrl('');
+            }}
+            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-all cursor-pointer"
+            title="Hapus video saat ini"
+          >
+            <FiTrash2 size={13} />
+            <span>Hapus Video</span>
+          </button>
+        )}
+      </div>
+
+      <div>
+        <label className="block text-[11px] font-semibold text-slate-500 mb-1">
+          ATAU Masukkan Link Video (YouTube URL / MP4 URL Online):
+        </label>
+        <input
+          type="text"
+          value={isDataUrl ? '[File Video Lokal Tersimpan]' : inputUrl}
+          disabled={isDataUrl}
+          onChange={(e) => {
+            setInputUrl(e.target.value);
+            onChange(fieldKey, e.target.value);
+          }}
+          placeholder="Misal: https://www.youtube.com/watch?v=... atau https://youtu.be/..."
+          className={'w-full border border-slate-300 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all ' + (isDataUrl ? 'bg-slate-100 text-slate-500 cursor-not-allowed italic' : '')}
+        />
+        {isDataUrl && (
+          <p className="text-[11px] text-blue-600 mt-1">
+            * File video dari komputer Anda sedang aktif. Klik tombol "Hapus Video" di atas jika ingin mengganti ke link YouTube.
+          </p>
+        )}
+      </div>
+
+      {value && (
+        <div className="p-3 bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 space-y-2">
+          <div className="flex items-center justify-between text-xs text-slate-300 px-1">
+            <span className="font-semibold flex items-center gap-1.5">
+              <FiVideo className="text-blue-400" />
+              {isDataUrl ? 'Preview File Video Lokal' : ytId ? 'Preview YouTube Video' : 'Preview Video URL'}
+            </span>
+            <span className="text-[10px] text-slate-400">Loop & Muted</span>
+          </div>
+
+          <div className="relative rounded-xl overflow-hidden aspect-video bg-black max-h-56 flex items-center justify-center">
+            {ytId ? (
+              <iframe
+                src={'https://www.youtube.com/embed/' + ytId + '?controls=1&mute=1'}
+                className="w-full h-full border-0"
+                title="Preview"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              />
+            ) : (
+              <video
+                src={value}
+                controls
+                muted
+                autoPlay
+                loop
+                playsInline
+                className="w-full h-full object-contain"
+              />
+            )}
+          </div>
+        </div>
+      )}
+
+      {tips && (
+        <p className="text-xs text-slate-500 leading-relaxed">
+          💡 <strong>Tips:</strong> {tips}
+        </p>
+      )}
+    </div>
+  );
+};
+
 const Settings = () => {
   const { showSuccess, showError } = useToast();
   const [settings, setSettings] = useState<any>({});
@@ -267,15 +441,13 @@ const Settings = () => {
                 <FiVideo size={18} />
                 <span>Video Showcase Tentang Kami</span>
               </div>
-              <Field 
-                label="Link Video (YouTube URL atau File MP4)" 
-                value={settings.aboutVideo} 
-                onChange={(v: string) => set('aboutVideo', v)} 
-                placeholder="Misal: https://www.youtube.com/watch?v=... atau /construction-video.mp4" 
+              <VideoField
+                label="Video Profil Perusahaan"
+                value={settings.aboutVideo}
+                fieldKey="aboutVideo"
+                onChange={set}
+                tips="Video ini akan ditampilkan di halaman Tentang Kami. Bisa upload video lokal atau masukkan link YouTube."
               />
-              <p className="text-xs text-slate-500 leading-relaxed">
-                💡 <strong>Tips:</strong> Anda bisa memasukkan link video YouTube langsung (misal: <code>https://www.youtube.com/watch?v=...</code> atau <code>https://youtu.be/...</code>) atau file video lokal <code>/construction-video.mp4</code>.
-              </p>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -355,22 +527,44 @@ const Settings = () => {
               </div>
 
               {settings.contactBgType === 'video' ? (
-                <div className="space-y-2 pt-2 border-t border-slate-200/60">
-                  <Field 
-                    label="Link Video Background Banner (YouTube URL atau File MP4)" 
-                    value={settings.contactVideo} 
-                    onChange={(v: string) => set('contactVideo', v)} 
-                    placeholder="Misal: https://www.youtube.com/watch?v=... atau /construction-video.mp4" 
+                <div className="space-y-4 pt-2 border-t border-slate-200/60">
+                  <VideoField
+                    label="Video Background Banner Kontak"
+                    value={settings.contactVideo}
+                    fieldKey="contactVideo"
+                    onChange={set}
+                    tips="Video akan otomatis diputar berulang-ulang tanpa suara (loop, muted, autoplay) sebagai latar belakang banner kontak."
                   />
-                  <p className="text-xs text-slate-500 leading-relaxed">
-                    💡 <strong>Tips:</strong> Video akan otomatis diputar berulang-ulang tanpa suara (loop, muted, autoplay) sebagai latar belakang banner kontak.
-                  </p>
                 </div>
               ) : (
                 <div className="pt-2 border-t border-slate-200/60">
-                  <ImageField label="Gambar Background Banner Kontak" value={settings.contactImage} fieldKey="contactImage" onChange={set} />
+                  <ImageField
+                    label="Gambar Background Banner Kontak"
+                    value={settings.contactImage}
+                    fieldKey="contactImage"
+                    onChange={set}
+                  />
                 </div>
               )}
+
+              {/* Kontrol Tingkat Kegelapan Overlay Background */}
+              <div className="pt-3 border-t border-slate-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <span className="text-xs sm:text-sm font-semibold text-slate-700 block">Tingkat Kegelapan Overlay Background</span>
+                  <span className="text-[11px] text-slate-400">Atur seberapa terang/jelas video atau gambar latar belakang kontak</span>
+                </div>
+                <select
+                  value={settings.contactOverlayOpacity ?? '35'}
+                  onChange={(e) => set('contactOverlayOpacity', e.target.value)}
+                  className="border border-slate-300 rounded-xl px-3 py-2 text-xs font-semibold text-slate-700 bg-white focus:ring-2 focus:ring-blue-500 outline-none cursor-pointer"
+                >
+                  <option value="20">Sangat Jelas & Terang (20% Gelap)</option>
+                  <option value="35">Jelas & Kontras Seimbang (35% Gelap) - Rekomendasi</option>
+                  <option value="50">Sedang (50% Gelap)</option>
+                  <option value="70">Cukup Gelap (70% Gelap)</option>
+                  <option value="90">Sangat Gelap (90% Gelap)</option>
+                </select>
+              </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Judul Kontak" value={settings.contactTitle} onChange={(v: string) => set('contactTitle', v)} placeholder="Siap Memulai Proyek Anda?" />
