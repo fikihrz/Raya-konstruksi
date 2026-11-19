@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { FiSave, FiChevronDown, FiChevronUp, FiUpload, FiLock, FiCheckCircle, FiAlertCircle, FiVideo, FiTrash2 } from 'react-icons/fi';
+﻿import React, { useState, useEffect } from 'react';
+import { FiSave, FiChevronDown, FiChevronUp, FiUpload, FiLock, FiCheckCircle, FiAlertCircle, FiVideo, FiImage, FiTrash2 } from 'react-icons/fi';
 import { useToast } from '../context/ToastContext';
 import { processImageFile } from '../utils/imageUpload';
 import { apiFetch } from '../utils/api';
@@ -283,8 +283,6 @@ const Settings = () => {
               <Field label="Nama Perusahaan (Heading Utama)" value={settings.aboutTitle} onChange={(v: string) => set('aboutTitle', v)} placeholder="Raya Konstruksi Jaya" />
             </div>
 
-            <Field label="Kisah Perusahaan (Paragraf 1)" value={settings.aboutStory} onChange={(v: string) => set('aboutStory', v)} multiline />
-            <Field label="Kisah Perusahaan (Paragraf 2)" value={settings.aboutStory2} onChange={(v: string) => set('aboutStory2', v)} multiline />
 
             <div className="pt-2 border-t border-slate-100 space-y-3">
               <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Visi & Misi Perusahaan</h4>
@@ -323,7 +321,57 @@ const Settings = () => {
         {/* 4. Contact & Company Info */}
         <Section title="4. Informasi Kontak & Perusahaan">
           <div className="space-y-4">
-            <ImageField label="Gambar Background Banner Kontak" value={settings.contactImage} fieldKey="contactImage" onChange={set} />
+                        {/* Background Banner Kontak (Gambar atau Video) */}
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <span className="text-xs sm:text-sm font-semibold text-slate-700 block">Tipe Background Banner Kontak</span>
+                  <span className="text-[11px] text-slate-400">Pilih apakah banner kontak menggunakan gambar atau video</span>
+                </div>
+                <div className="inline-flex p-1 bg-slate-200/80 rounded-xl gap-1 self-start sm:self-auto">
+                  <button
+                    type="button"
+                    onClick={() => set('contactBgType', 'image')}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                      (settings.contactBgType || 'image') !== 'video'
+                        ? 'bg-white text-blue-600 shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Gambar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => set('contactBgType', 'video')}
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                      settings.contactBgType === 'video'
+                        ? 'bg-white text-blue-600 shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
+                    }`}
+                  >
+                    Video
+                  </button>
+                </div>
+              </div>
+
+              {settings.contactBgType === 'video' ? (
+                <div className="space-y-2 pt-2 border-t border-slate-200/60">
+                  <Field 
+                    label="Link Video Background Banner (YouTube URL atau File MP4)" 
+                    value={settings.contactVideo} 
+                    onChange={(v: string) => set('contactVideo', v)} 
+                    placeholder="Misal: https://www.youtube.com/watch?v=... atau /construction-video.mp4" 
+                  />
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    💡 <strong>Tips:</strong> Video akan otomatis diputar berulang-ulang tanpa suara (loop, muted, autoplay) sebagai latar belakang banner kontak.
+                  </p>
+                </div>
+              ) : (
+                <div className="pt-2 border-t border-slate-200/60">
+                  <ImageField label="Gambar Background Banner Kontak" value={settings.contactImage} fieldKey="contactImage" onChange={set} />
+                </div>
+              )}
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Judul Kontak" value={settings.contactTitle} onChange={(v: string) => set('contactTitle', v)} placeholder="Siap Memulai Proyek Anda?" />
               <Field label="Nama Resmi Perusahaan" value={settings.companyName} onChange={(v: string) => set('companyName', v)} placeholder="Raya Konstruksi Jaya" />
@@ -334,7 +382,7 @@ const Settings = () => {
               <Field label="Nomor WhatsApp Resmi (tanpa +)" value={settings.whatsappNumber} onChange={(v: string) => set('whatsappNumber', v)} placeholder="6281234567890" type="tel" />
               <Field label="Alamat Email Resmi" value={settings.emailAddress} onChange={(v: string) => set('emailAddress', v)} placeholder="contact@rayakonstruksi.com" type="email" />
               <Field label="Akun Instagram (tanpa @)" value={settings.instagram} onChange={(v: string) => set('instagram', v)} placeholder="rayakonstruksijaya" />
-              <Field label="Akun Telegram (tanpa @)" value={settings.telegram} onChange={(v: string) => set('telegram', v)} placeholder="rayakonstruksijaya" />
+              <Field label="Akun TikTok (tanpa @)" value={settings.tiktok} onChange={(v: string) => set('tiktok', v)} placeholder="rayakonstruksijaya" />
               <Field label="Slogan / Brand Tagline" value={settings.brandTagline} onChange={(v: string) => set('brandTagline', v)} placeholder="Membangun Keunggulan Mutu" />
               <Field label="Alamat Kantor Pusat" value={settings.companyAddress} onChange={(v: string) => set('companyAddress', v)} placeholder="Surakarta, Jawa Tengah, Indonesia" />
               <Field label="Link Google Maps (Buka Peta)" value={settings.mapsUrl} onChange={(v: string) => set('mapsUrl', v)} placeholder="https://maps.app.goo.gl/RZbeLE6SmbqKgyN78" />

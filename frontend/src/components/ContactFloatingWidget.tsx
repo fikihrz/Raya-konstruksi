@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiMessageCircle, FiX } from 'react-icons/fi';
-import { FaWhatsapp, FaInstagram, FaTelegramPlane } from 'react-icons/fa';
+import { FiX } from 'react-icons/fi';
+import { FaWhatsapp, FaInstagram, FaTiktok } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
 
 const API = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
@@ -29,13 +29,13 @@ const ContactFloatingWidget = () => {
     return `https://instagram.com/${cleanHandle}`;
   };
 
-  const getTelegramUrl = () => {
-    if (settings.telegram) {
-      if (settings.telegram.startsWith('http')) return settings.telegram;
-      const cleanHandle = settings.telegram.replace(/^@/, '');
-      return `https://t.me/${cleanHandle}`;
+  const getTiktokUrl = () => {
+    if (settings.tiktok) {
+      if (settings.tiktok.startsWith('http')) return settings.tiktok;
+      const cleanHandle = settings.tiktok.replace(/^@/, '');
+      return `https://www.tiktok.com/@${cleanHandle}`;
     }
-    return `https://t.me/rayakonstruksijaya`;
+    return `https://www.tiktok.com/@rayakonstruksijaya`;
   };
 
   const whatsappNum = settings.whatsappNumber || '6281234567890';
@@ -65,7 +65,7 @@ const ContactFloatingWidget = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Chat WhatsApp Resmi"
-                className="h-12 w-12 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white flex items-center justify-center shadow-xl shadow-emerald-600/40 hover:scale-110 active:scale-95 transition-all"
+                className="h-12 w-12 rounded-full bg-[#25D366] hover:bg-[#20ba5a] text-white flex items-center justify-center shadow-lg shadow-emerald-600/30 hover:scale-110 active:scale-95 transition-all"
                 title={t('widget.wa')}
               >
                 <FaWhatsapp size={24} />
@@ -82,52 +82,45 @@ const ContactFloatingWidget = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram Resmi"
-                className="h-12 w-12 rounded-full bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] text-white flex items-center justify-center shadow-xl shadow-pink-600/40 hover:scale-110 active:scale-95 transition-all"
+                className="h-12 w-12 rounded-full bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888] text-white flex items-center justify-center shadow-lg shadow-pink-600/30 hover:scale-110 active:scale-95 transition-all"
                 title={t('widget.instagram')}
               >
                 <FaInstagram size={22} />
               </a>
             </div>
 
-            {/* Telegram */}
+            {/* TikTok */}
             <div className="flex items-center gap-3">
               <span className="bg-slate-900/90 text-white text-xs font-bold px-3 py-1.5 rounded-lg border border-slate-700 shadow-md whitespace-nowrap">
-                {t('widget.telegram')}
+                {t('widget.tiktok')}
               </span>
               <a
-                href={getTelegramUrl()}
+                href={getTiktokUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Telegram Resmi"
-                className="h-12 w-12 rounded-full bg-[#229ED9] hover:bg-[#1d8fc4] text-white flex items-center justify-center shadow-xl shadow-[#229ED9]/40 hover:scale-110 active:scale-95 transition-all"
-                title={t('widget.telegram')}
+                aria-label="TikTok Resmi"
+                className="h-12 w-12 rounded-full bg-black hover:bg-neutral-800 border border-neutral-700 text-white flex items-center justify-center shadow-lg shadow-black/40 hover:scale-110 active:scale-95 transition-all"
+                title={t('widget.tiktok')}
               >
-                <FaTelegramPlane size={22} className="-ml-0.5" />
+                <FaTiktok size={19} />
               </a>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Main Single Floating Toggle Button */}
+      {/* Main Single Floating Toggle Button (Official WhatsApp styling) */}
       <button
         onClick={() => setOpen(!open)}
         className={`h-14 w-14 rounded-full flex items-center justify-center text-white shadow-2xl transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer relative ${
           open
-            ? 'bg-slate-800 border-2 border-slate-600 rotate-90'
-            : 'bg-gradient-to-tr from-blue-600 via-indigo-600 to-blue-500 shadow-blue-600/50 border border-blue-400/40'
+            ? 'bg-slate-900 hover:bg-slate-800 border-2 border-slate-700'
+            : 'bg-[#25D366] hover:bg-[#20ba5a] shadow-emerald-600/40 border border-white/20'
         }`}
-        aria-label="Toggle Social Media Contacts"
+        aria-label="Kontak Kami"
+        title={open ? "Tutup" : "Hubungi Kami (WhatsApp / Media Sosial)"}
       >
-        {/* Glow pulse dot when closed */}
-        {!open && (
-          <span className="absolute -top-1 -right-1 flex h-4 w-4">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-4 w-4 bg-emerald-500"></span>
-          </span>
-        )}
-
-        {open ? <FiX size={26} /> : <FiMessageCircle size={26} />}
+        {open ? <FiX size={26} /> : <FaWhatsapp size={30} className="text-white drop-shadow-sm" />}
       </button>
 
     </div>

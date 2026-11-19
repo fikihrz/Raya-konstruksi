@@ -139,15 +139,6 @@ const Navbar = () => {
                   <div className="bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-xl shadow-2xl py-2 overflow-hidden">
                     <button
                       onClick={() => {
-                        window.dispatchEvent(new CustomEvent('about-tab', { detail: 'story' }));
-                        handleNavClick('about');
-                      }}
-                      className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:text-white hover:bg-blue-600/30 transition-colors block cursor-pointer"
-                    >
-                      {t('nav.about.story')}
-                    </button>
-                    <button
-                      onClick={() => {
                         window.dispatchEvent(new CustomEvent('about-tab', { detail: 'vision' }));
                         handleNavClick('about');
                       }}

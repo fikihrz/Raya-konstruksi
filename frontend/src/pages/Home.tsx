@@ -8,7 +8,7 @@ const Home = () => {
   const { t, lang, translateText } = useLanguage();
   const [activeCategory, setActiveCategory] = useState('All');
   const [selectedProject, setSelectedProject] = useState<any>(null);
-  const [activeAboutTab, setActiveAboutTab] = useState<'story' | 'vision' | 'mission'>('story');
+  const [activeAboutTab, setActiveAboutTab] = useState<'vision' | 'mission'>('vision');
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -249,7 +249,7 @@ const Home = () => {
 
     const handleAboutTabEvent = (e: any) => {
       const tab = e.detail;
-      if (tab === 'story' || tab === 'vision' || tab === 'mission') {
+      if (tab === 'vision' || tab === 'mission') {
         setActiveAboutTab(tab);
       }
     };
@@ -334,11 +334,11 @@ const Home = () => {
                       alt={current.title}
                       fetchPriority="high"
                       decoding="sync"
-                      className="w-full h-full object-cover filter brightness-[0.72] contrast-[1.12]"
+                      className="w-full h-full object-cover filter brightness-[0.9] contrast-[1.05]"
                     />
-                    {/* Deep gradient overlays matching Kiewit's bottom-left focus */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/30" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/35 to-transparent" />
+                    {/* Soft gradient overlays to keep text readable while making background brighter */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/25 to-black/10" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/20 to-transparent" />
                   </motion.div>
                 </AnimatePresence>
               </div>
@@ -649,7 +649,6 @@ const Home = () => {
 
             <div className="flex border-b border-outline-variant/30 text-sm font-semibold">
               {[
-                { id: 'story', label: t('about.tabStory') },
                 { id: 'vision', label: t('about.tabVision') },
                 { id: 'mission', label: t('about.tabMission') }
               ].map((tab) => (
@@ -671,24 +670,6 @@ const Home = () => {
 
             <div className="min-h-[160px] flex items-center">
               <AnimatePresence mode="wait">
-                {activeAboutTab === 'story' && (
-                  <motion.div
-                    key="story"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-4"
-                  >
-                    <p className="text-on-surface-variant leading-relaxed text-base">
-                      {lang === 'EN' ? t('about.story') : (settings.aboutStory ? settings.aboutStory.replace(/Raya Konstruksi(?!\s+Jaya)/g, 'Raya Konstruksi Jaya') : t('about.story'))}
-                    </p>
-                    <p className="text-on-surface-variant leading-relaxed text-sm">
-                      {lang === 'EN' ? t('about.story2') : (settings.aboutStory2 || t('about.story2'))}
-                    </p>
-                  </motion.div>
-                )}
-
                 {activeAboutTab === 'vision' && (
                   <motion.div
                     key="vision"
@@ -1569,13 +1550,35 @@ const Home = () => {
 
       {/* Contact Section - Clean Centered Dark Banner */}
       <section id="contact" className="relative py-32 px-8 overflow-hidden scroll-mt-24">
-        {/* Background Image */}
+        {/* Background Image / Video */}
         <div className="absolute inset-0 z-0">
-          <img 
-            src={settings.contactImage || '/galery/WhatsApp Image 2026-07-01 at 23.38.37.jpeg'} 
-            alt="Construction site" 
-            className="w-full h-full object-cover"
-          />
+          {settings.contactBgType === 'video' && settings.contactVideo ? (
+            getYouTubeEmbedId(settings.contactVideo) ? (
+              <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
+                <iframe
+                  src={`https://www.youtube.com/embed/${getYouTubeEmbedId(settings.contactVideo)}?autoplay=1&mute=1&loop=1&playlist=${getYouTubeEmbedId(settings.contactVideo)}&controls=0&showinfo=0&rel=0&modestbranding=1&disablekb=1&playsinline=1`}
+                  title="Contact Background Video"
+                  className="w-full h-full object-cover scale-150 border-0 pointer-events-none"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                />
+              </div>
+            ) : (
+              <video
+                src={settings.contactVideo}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover"
+              />
+            )
+          ) : (
+            <img 
+              src={settings.contactImage || '/galery/WhatsApp Image 2026-07-01 at 23.38.37.jpeg'} 
+              alt="Construction site" 
+              className="w-full h-full object-cover"
+            />
+          )}
           <div className="absolute inset-0 bg-gradient-to-b from-blue-950/95 via-blue-950/90 to-blue-950/95"></div>
         </div>
 

@@ -8,7 +8,7 @@ const Hero = () => {
         <img 
           src="https://images.unsplash.com/photo-1541888086225-f6406f32e92c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80" 
           alt="Construction Background" 
-          className="w-full h-full object-cover opacity-40"
+          className="w-full h-full object-cover opacity-65 brightness-90"
         />
       </div>
       

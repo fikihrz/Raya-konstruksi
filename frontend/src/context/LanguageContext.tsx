@@ -166,7 +166,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Floating Widget
     'widget.wa': 'WhatsApp',
     'widget.instagram': 'Instagram',
-    'widget.telegram': 'Telegram'
+    'widget.tiktok': 'TikTok'
   },
   EN: {
     // Navbar
@@ -323,7 +323,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Floating Widget
     'widget.wa': 'WhatsApp Chat',
     'widget.instagram': 'Official Instagram',
-    'widget.telegram': 'Official Telegram'
+    'widget.tiktok': 'Official TikTok'
   }
 };
 

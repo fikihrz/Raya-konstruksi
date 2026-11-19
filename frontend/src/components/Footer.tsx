@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { FiMapPin, FiPhone, FiMail, FiClock } from 'react-icons/fi';
-import { FaInstagram, FaTelegramPlane } from 'react-icons/fa';
+import { FaInstagram, FaTiktok } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
 
 const API = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
@@ -25,6 +25,13 @@ const Footer = () => {
     if (settings.instagram.startsWith('http')) return settings.instagram;
     const cleanHandle = settings.instagram.replace(/^@/, '');
     return `https://instagram.com/${cleanHandle}`;
+  };
+
+  const getTiktokUrl = () => {
+    if (!settings.tiktok) return 'https://www.tiktok.com/@rayakonstruksijaya';
+    if (settings.tiktok.startsWith('http')) return settings.tiktok;
+    const cleanHandle = settings.tiktok.replace(/^@/, '');
+    return `https://www.tiktok.com/@${cleanHandle}`;
   };
 
   const getInstagramHandle = () => {
@@ -83,14 +90,14 @@ const Footer = () => {
                 <FaInstagram size={15} />
               </a>
               <a
-                href="https://t.me/rayakonstruksijaya"
+                href={getTiktokUrl()}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Telegram Resmi"
-                className="h-9 w-9 rounded-xl bg-slate-900 border border-slate-800 hover:border-sky-500/50 hover:bg-sky-500/10 text-slate-400 hover:text-sky-400 flex items-center justify-center transition-all shadow-sm"
-                title="Telegram Resmi"
+                aria-label="TikTok Resmi"
+                className="h-9 w-9 rounded-xl bg-slate-900 border border-slate-800 hover:border-cyan-400/50 hover:bg-neutral-900 text-slate-400 hover:text-white flex items-center justify-center transition-all shadow-sm"
+                title="TikTok Resmi"
               >
-                <FaTelegramPlane size={14} />
+                <FaTiktok size={14} />
               </a>
               <a
                 href={`mailto:${settings.emailAddress || 'contact@rayakonstruksi.com'}`}
