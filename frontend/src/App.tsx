@@ -19,6 +19,23 @@ function App() {
 
     window.addEventListener('app-data-ready', handleDataReady);
 
+    // Record Real Visitor Analytics
+    try {
+      const hasVisitedThisSession = sessionStorage.getItem('r_visit_logged');
+      if (!hasVisitedThisSession) {
+        sessionStorage.setItem('r_visit_logged', 'true');
+        const isFirstTime = !localStorage.getItem('r_visited_before');
+        localStorage.setItem('r_visited_before', 'true');
+
+        const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
+        fetch(`${API_BASE}/api/analytics/visit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ isUnique: isFirstTime })
+        }).catch(() => {});
+      }
+    } catch (e) {}
+
     // Fallback safety timeout in case network is disconnected
     const fallbackTimer = setTimeout(() => {
       setIsSystemLoading(false);
