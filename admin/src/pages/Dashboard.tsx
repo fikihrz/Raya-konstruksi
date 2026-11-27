@@ -80,11 +80,11 @@ const Dashboard = () => {
   const commercialCount = projects.filter((p: any) => (p.category || '').toLowerCase().includes('komersial') || (p.category || '').toLowerCase().includes('commercial')).length;
   const infraCount = projects.filter((p: any) => (p.category || '').toLowerCase().includes('infrastruktur') || (p.category || '').toLowerCase().includes('infrastructure') || (p.category || '').toLowerCase().includes('industri')).length;
 
-  // Build visitor trend for selected date range
+  // Build visitor trend for selected date range (use UTC consistently to match backend YYYY-MM-DD dates)
   const todayStr = new Date().toISOString().slice(0, 10);
   const rawHistory: Array<{ date: string; visits: number }> = Array.isArray(analytics.history) ? analytics.history : [];
   const historyMap = new Map(rawHistory.map(h => [h.date, Number(h.visits) || 0]));
-  historyMap.set(todayStr, Number(analytics.todayVisits) || 0);
+  historyMap.set(analytics.lastDate || todayStr, Number(analytics.todayVisits) || 0);
 
   const effectiveStart = rangeMode === 'custom'
     ? startDate
@@ -93,8 +93,8 @@ const Dashboard = () => {
 
   const chartDays: Array<{ date: string; label: string; fullLabel: string; visits: number }> = [];
   {
-    const start = new Date(`${effectiveStart}T00:00:00`);
-    const end = new Date(`${effectiveEnd}T00:00:00`);
+    const start = new Date(`${effectiveStart}T00:00:00Z`);
+    const end = new Date(`${effectiveEnd}T00:00:00Z`);
     if (!isNaN(start.getTime()) && !isNaN(end.getTime()) && start <= end) {
       const cur = new Date(start);
       let guard = 0;
@@ -102,15 +102,15 @@ const Dashboard = () => {
         const iso = cur.toISOString().slice(0, 10);
         const label = iso === todayStr
           ? 'Hari Ini'
-          : cur.toLocaleDateString('id-ID', { day: '2-digit', month: 'short' });
-        const fullLabel = cur.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' });
+          : cur.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', timeZone: 'UTC' });
+        const fullLabel = cur.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric', timeZone: 'UTC' });
         chartDays.push({
           date: iso,
           label,
           fullLabel,
           visits: historyMap.get(iso) ?? 0
         });
-        cur.setDate(cur.getDate() + 1);
+        cur.setUTCDate(cur.getUTCDate() + 1);
         guard++;
       }
     }
