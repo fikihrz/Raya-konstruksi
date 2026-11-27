@@ -6,7 +6,7 @@ import { useLanguage } from '../context/LanguageContext';
 const API = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
 
 const Footer = () => {
-  const { t, lang } = useLanguage();
+  const { t, lang, resolveDynamicText } = useLanguage();
   const [settings, setSettings] = useState<any>({});
 
   useEffect(() => {
@@ -62,7 +62,7 @@ const Footer = () => {
                 <h3 className="text-lg font-black tracking-wider uppercase leading-none">
                   {settings.companyName || 'Raya Konstruksi Jaya'}
                 </h3>
-                <span className="text-[10px] text-blue-400 font-bold tracking-[0.2em] uppercase">{t('footer.brandTagline')}</span>
+                <span className="text-[10px] text-blue-400 font-bold tracking-[0.2em] uppercase">{resolveDynamicText(settings.brandTagline, 'footer.brandTagline')}</span>
               </div>
             </div>
             <p className="text-slate-400 text-xs sm:text-sm leading-relaxed max-w-sm">

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useRef } from 'react';
 
 export type Language = 'ID' | 'EN';
 
@@ -8,6 +8,7 @@ interface LanguageContextType {
   toggleLang: () => void;
   t: (key: string) => string;
   translateText: (text: string) => string;
+  resolveDynamicText: (dbValue: string | undefined, fallbackKey: string) => string;
 }
 
 const translations: Record<Language, Record<string, string>> = {
@@ -20,9 +21,9 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.whyUs': 'Keunggulan',
     'nav.contact': 'Kontak',
     'nav.searchPlaceholder': 'Cari...',
-    'nav.about.story': 'Kisah & Sejarah',
-    'nav.about.vision': 'Visi & Misi',
-    'nav.about.clients': 'Klien & Mitra',
+    'nav.about.profile': 'Profil Perusahaan',
+    'nav.about.whyUs': 'Keunggulan Kami',
+    'nav.about.clients': 'Klien & Testimoni',
     'nav.services.residential': 'Residensial & Vila',
     'nav.services.commercial': 'Komersial & Gedung',
     'nav.services.infrastructure': 'Infrastruktur Sipil',
@@ -30,6 +31,7 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.projects.all': 'Semua Portofolio',
     'nav.projects.residential': 'Proyek Residensial',
     'nav.projects.commercial': 'Proyek Komersial',
+    'nav.projects.industrial': 'Proyek Industri',
     'nav.projects.infrastructure': 'Proyek Infrastruktur',
 
     // Hero
@@ -49,58 +51,39 @@ const translations: Record<Language, Record<string, string>> = {
     'hero.cta3': 'Kapabilitas Industri Kami',
 
     // About
-    'about.badge': 'Profil Perusahaan',
+    'about.heading': 'Tentang Kami',
     'about.title': 'Raya Konstruksi Jaya',
-    'about.tabStory': 'Kisah Kami',
-    'about.tabVision': 'Visi Kami',
-    'about.tabMission': 'Misi Kami',
-    'about.story': 'Lebih dari 15 tahun, Raya Konstruksi Jaya telah memimpin industri konstruksi tanah air. Kami mengombinasikan teknologi mutakhir, material pilihan, dan keahlian arsitektur kelas dunia untuk menciptakan bangunan kokoh yang bernilai estetika tinggi.',
-    'about.story2': 'Didirikan dengan semangat integritas kerja yang tinggi, kami berkomitmen untuk mendampingi setiap tahap konstruksi mulai dari konsep sketsa hingga penyerahan kunci.',
-    'about.visionTitle': 'Pelopor Pembangunan Berkelanjutan',
-    'about.visionDesc': 'Menjadi kontraktor terdepan yang inovatif, ramah lingkungan, dan dipercaya sebagai pilar utama pembangunan infrastruktur modern di Indonesia.',
-    'about.mission1': 'Memberikan hasil karya terbaik dengan mengutamakan keselamatan kerja (K3) di setiap lokasi proyek.',
-    'about.mission2': 'Menjaga presisi detail dan keselarasan arsitektur di setiap bangunan yang kami tangani.',
-    'about.mission3': 'Menjamin transparansi anggaran dan ketepatan waktu serah terima proyek secara konsisten.',
+    'about.f1.title': 'Presisi Arsitektur',
+    'about.f1.desc': 'Perencanaan matang dari gambar kerja hingga finishing.',
+    'about.f2.title': 'Tepat Waktu',
+    'about.f2.desc': 'Manajemen jadwal terukur dan laporan progres jelas.',
+    'about.f3.title': 'Standar Mutu & K3',
+    'about.f3.desc': 'Prioritas keselamatan kerja dan material teruji.',
+    'about.f4.title': 'Konstruksi Kokoh',
+    'about.f4.desc': 'Bangunan berdaya tahan tinggi untuk investasi jangka panjang.',
+    'about.cta': 'Jelajahi Layanan',
 
     // Why Us
     'whyUs.badge': 'Keunggulan Kami',
     'whyUs.title': 'Kenapa Memilih Kami?',
     'whyUs.desc': 'Kami tidak sekadar menyusun beton dan besi. Kami merancang ruang hidup dan bisnis yang mengutamakan keamanan tinggi, presisi struktural, serta keselarasan estetika.',
-    'whyUs.r1.title': 'Keunggulan Arsitektur',
-    'whyUs.r1.desc': 'Kami mengutamakan keselarasan antara kekuatan struktur bangunan dan keindahan nilai estetika arsitektur modern.',
-    'whyUs.r2.title': 'Pilihan Material Premium',
-    'whyUs.r2.desc': 'Setiap bahan bangunan dipilih secara ketat untuk menjamin ketahanan konstruksi yang andal melintasi generasi.',
-    'whyUs.r3.title': 'Alur Kerja & Waktu Presisi',
-    'whyUs.r3.desc': 'Manajemen proyek profesional yang transparan dengan penjadwalan presisi memastikan ketepatan waktu serah terima.',
 
     // Services
     'services.badge': 'Ikhtisar Layanan',
     'services.title': 'Bidang Keahlian Kami',
     'services.desc': 'Menyediakan layanan penuh mulai dari konsep perencanaan arsitektur, pelaksanaan konstruksi sipil, hingga tahap finishing interior.',
     'services.btnConsult': 'Konsultasi Layanan',
-    'services.s1.title': 'Desain Residensial',
-    'services.s1.desc': 'Pembangunan rumah tinggal eksklusif, vila modern, dan residensial premium dengan detail arsitektur tingkat tinggi.',
-    'services.s2.title': 'Ruang Komersial',
-    'services.s2.desc': 'Konstruksi gedung perkantoran mewah, pusat perbelanjaan, dan ruko modern yang fungsional dan estetis.',
-    'services.s3.title': 'Kawasan Industri',
-    'services.s3.desc': 'Pembangunan kawasan industri, gudang logistik skala besar, dan pabrik dengan spesifikasi standar tinggi.',
-    'services.s4.title': 'Pekerjaan Infrastruktur',
-    'services.s4.desc': 'Pengerjaan infrastruktur vital seperti jalan raya modern, jembatan kokoh, dan fasilitas publik.',
-    'services.s5.title': 'Fabrikasi & Bengkel Baja',
-    'services.s5.desc': 'Fabrikasi baja struktural, rangka atap baja ringan, dan komponen logam presisi untuk kebutuhan konstruksi sipil dan industri.',
-    'services.s6.title': 'Renovasi & Retrofit',
-    'services.s6.desc': 'Alih fungsi dan renovasi total bangunan eksisting, modernisasi fasad, dan perkuatan struktur gedung lama.',
 
     // Reviews & Clients
-    'reviews.badge': 'Testimoni & Kemitraan',
-    'reviews.title': 'Ulasan & Klien Terpercaya',
-    'reviews.desc': 'Bukti kepuasan nyata dari para mitra korporat, arsitek, dan pemilik proyek yang telah mempercayakan konstruksi kepada Raya Konstruksi Jaya.',
-    'reviews.btnWrite': 'Tulis Ulasan Anda',
-    'reviews.trustedBy': 'Dipercaya Oleh Berbagai Perusahaan Terkemuka:',
-    'reviews.filterAll': 'Semua Kategori',
+    'reviews.badge': 'Testimoni Klien',
+    'reviews.title': 'Dipercaya Oleh Klien & Mitra Industri',
+    'reviews.desc': 'Pengalaman nyata para pemilik proyek dan mitra usaha yang bekerja sama dengan kami.',
+    'reviews.btnWrite': 'Tulis Ulasan',
+    'reviews.trustedBy': 'Dipercaya Oleh Berbagai Perusahaan Terkemuka',
+    'reviews.filterAll': 'Semua',
     'reviews.filterAllRating': 'Semua Rating',
-    'reviews.searchPlaceholder': 'Cari ulasan, nama klien, atau proyek...',
-    'reviews.empty': 'Belum ada ulasan yang sesuai dengan kriteria pencarian.',
+    'reviews.searchPlaceholder': 'Cari ulasan atau nama klien...',
+    'reviews.empty': 'Belum ada ulasan yang sesuai dengan filter pencarian.',
     'reviews.prev': 'Sebelumnya',
     'reviews.next': 'Selanjutnya',
     'reviews.page': 'Halaman',
@@ -108,7 +91,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Review Modal Form
     'modal.title': 'Tulis Ulasan Klien',
     'modal.subtitle': 'Beri Tanggapan Anda',
-    'modal.desc': 'Ulasan Anda sangat berarti bagi pengembangan mutu layanan Raya Konstruksi Jaya.',
+    'modal.desc': 'Ulasan Anda sangat berarti bagi pengembangan mutu layanan kami.',
     'modal.nameLabel': 'Nama Lengkap *',
     'modal.companyLabel': 'Perusahaan / Afiliasi',
     'modal.roleLabel': 'Jabatan / Peran',
@@ -125,6 +108,7 @@ const translations: Record<Language, Record<string, string>> = {
     'projects.filterAll': 'Semua',
     'projects.filterResidential': 'Residensial',
     'projects.filterCommercial': 'Komersial',
+    'projects.filterIndustrial': 'Industri',
     'projects.filterInfrastructure': 'Infrastruktur',
     'projects.detailsHeader': 'Detail Proyek',
     'projects.client': 'Klien',
@@ -156,9 +140,7 @@ const translations: Record<Language, Record<string, string>> = {
     'consult.subtitle': 'Pilih metode untuk menghubungi tim kami',
     'consult.forService': 'Layanan:',
     'consult.viaWa': 'Chat WhatsApp',
-    'consult.viaWaDesc': 'Respon cepat, langsung terhubung dengan tim estimator kami',
     'consult.viaEmail': 'Kirim Email',
-    'consult.viaEmailDesc': 'Kirim detail kebutuhan proyek secara lengkap via email',
     'consult.waTemplate': 'Halo {company}, saya tertarik dengan layanan *{service}*. Saya ingin berkonsultasi mengenai kebutuhan proyek saya. Bisakah kita berdiskusi lebih lanjut?',
     'consult.emailSubject': 'Konsultasi Layanan {service} - {company}',
     'consult.emailBody': 'Yth. Tim {company},\n\nSaya tertarik dengan layanan {service} yang ditawarkan.\nSaya ingin berkonsultasi mengenai kebutuhan proyek saya sebagai berikut:\n\n- Jenis Proyek: \n- Lokasi: \n- Estimasi Anggaran: \n- Timeline: \n\nMohon informasi lebih lanjut mengenai layanan ini.\n\nTerima kasih.',
@@ -177,9 +159,9 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.whyUs': 'Why Us',
     'nav.contact': 'Contact',
     'nav.searchPlaceholder': 'Search...',
-    'nav.about.story': 'Our Story',
-    'nav.about.vision': 'Vision & Mission',
-    'nav.about.clients': 'Clients & Partners',
+    'nav.about.profile': 'Company Profile',
+    'nav.about.whyUs': 'Our Strengths',
+    'nav.about.clients': 'Clients & Reviews',
     'nav.services.residential': 'Residential & Villas',
     'nav.services.commercial': 'Commercial Buildings',
     'nav.services.infrastructure': 'Civil Infrastructure',
@@ -187,6 +169,7 @@ const translations: Record<Language, Record<string, string>> = {
     'nav.projects.all': 'All Portfolio',
     'nav.projects.residential': 'Residential Projects',
     'nav.projects.commercial': 'Commercial Projects',
+    'nav.projects.industrial': 'Industrial Projects',
     'nav.projects.infrastructure': 'Infrastructure Projects',
 
     // Hero
@@ -206,58 +189,39 @@ const translations: Record<Language, Record<string, string>> = {
     'hero.cta3': 'Our Industrial Capabilities',
 
     // About
-    'about.badge': 'Company Profile',
+    'about.heading': 'About Us',
     'about.title': 'Raya Konstruksi Jaya',
-    'about.tabStory': 'Our Story',
-    'about.tabVision': 'Our Vision',
-    'about.tabMission': 'Our Mission',
-    'about.story': 'For over 15 years, Raya Konstruksi Jaya has been leading the national construction industry. We combine cutting-edge technology, premium materials, and world-class architectural expertise to build structures of exceptional aesthetics and strength.',
-    'about.story2': 'Founded with high professional integrity, we are committed to guiding every phase of construction from preliminary architectural blueprints to key handover.',
-    'about.visionTitle': 'Pioneering Sustainable Horizons',
-    'about.visionDesc': 'To be the forefront, innovative, and eco-conscious general contractor recognized as a cornerstone of modern infrastructure.',
-    'about.mission1': 'Deliver superior workmanship with strict priority on Occupational Safety and Health (K3) across all job sites.',
-    'about.mission2': 'Uphold exact structural precision and refined architectural elegance in every single build.',
-    'about.mission3': 'Ensure budgetary transparency and consistent on-schedule delivery milestones.',
+    'about.f1.title': 'Architectural Precision',
+    'about.f1.desc': 'Integrated planning from blueprint to final structure.',
+    'about.f2.title': 'On-Schedule Delivery',
+    'about.f2.desc': 'Disciplined timeline control with transparent reporting.',
+    'about.f3.title': 'Safety & K3 Standard',
+    'about.f3.desc': 'Certified workplace safety across every project site.',
+    'about.f4.title': 'Long-Term Value',
+    'about.f4.desc': 'Built with structural reliability across generations.',
+    'about.cta': 'Explore Services',
 
     // Why Us
     'whyUs.badge': 'Our Strengths',
     'whyUs.title': 'Why Choose Us?',
     'whyUs.desc': 'We do not simply assemble concrete and steel. We create livable, sustainable spaces that balance structural resilience, rigorous safety, and architectural elegance.',
-    'whyUs.r1.title': 'Architectural Excellence',
-    'whyUs.r1.desc': 'We integrate core structural fortitude with timeless, sophisticated contemporary architectural design.',
-    'whyUs.r2.title': 'Premium Grade Materials',
-    'whyUs.r2.desc': 'Every material is rigorously tested and selected to guarantee enduring structural performance across generations.',
-    'whyUs.r3.title': 'Seamless Project Timelines',
-    'whyUs.r3.desc': 'Transparent project management combined with rigorous scheduling ensures dependable milestone completion and handover.',
 
     // Services
     'services.badge': 'Services Overview',
     'services.title': 'Our Areas of Expertise',
     'services.desc': 'Providing comprehensive construction services from architectural conception and civil engineering to interior fit-out.',
     'services.btnConsult': 'Consultation',
-    'services.s1.title': 'Residential Design',
-    'services.s1.desc': 'Custom luxury home building, modern villas, and residential developments engineered with exceptional craftsmanship.',
-    'services.s2.title': 'Commercial Spaces',
-    'services.s2.desc': 'High-rise office buildings, retail shopping complexes, and mixed-use spaces optimized for aesthetics and traffic flow.',
-    'services.s3.title': 'Industrial Development',
-    'services.s3.desc': 'Large-scale logistic distribution warehouses, manufacturing plants, and industrial complexes built to international industrial codes.',
-    'services.s4.title': 'Infrastructure Works',
-    'services.s4.desc': 'Critical public and private civil infrastructure including arterial highways, bridges, and municipal works.',
-    'services.s5.title': 'Steel Fabrication & Workshop',
-    'services.s5.desc': 'Heavy structural steel framing, engineered lightweight roof trusses, and precision steel elements for civil & industrial projects.',
-    'services.s6.title': 'Retrofit & Modernization',
-    'services.s6.desc': 'Complete architectural renovation, structural reinforcement, and modern facade rejuvenation for legacy buildings.',
 
     // Reviews & Clients
-    'reviews.badge': 'Client Endorsements',
-    'reviews.title': 'Client Trust & Testimonials',
-    'reviews.desc': 'Real testimonials and confidence from corporate partners, architects, and project owners who trust Raya Konstruksi Jaya.',
+    'reviews.badge': 'Client Testimonials',
+    'reviews.title': 'Trusted By Clients & Industry Partners',
+    'reviews.desc': 'Real feedback from project owners and corporate partners who trust our construction standards.',
     'reviews.btnWrite': 'Write a Review',
-    'reviews.trustedBy': 'Trusted By Leading Industry Enterprises:',
-    'reviews.filterAll': 'All Categories',
+    'reviews.trustedBy': 'Trusted By Leading Enterprises',
+    'reviews.filterAll': 'All',
     'reviews.filterAllRating': 'All Ratings',
-    'reviews.searchPlaceholder': 'Search reviews, client name, or project...',
-    'reviews.empty': 'No reviews match your search criteria.',
+    'reviews.searchPlaceholder': 'Search reviews or client name...',
+    'reviews.empty': 'No reviews match your filter criteria.',
     'reviews.prev': 'Previous',
     'reviews.next': 'Next',
     'reviews.page': 'Page',
@@ -265,7 +229,7 @@ const translations: Record<Language, Record<string, string>> = {
     // Review Modal Form
     'modal.title': 'Client Feedback Review',
     'modal.subtitle': 'Share Your Feedback',
-    'modal.desc': 'Your input directly helps uphold and elevate the service quality of Raya Konstruksi Jaya.',
+    'modal.desc': 'Your input helps uphold and elevate our construction service quality.',
     'modal.nameLabel': 'Full Name *',
     'modal.companyLabel': 'Company / Affiliation',
     'modal.roleLabel': 'Role / Title',
@@ -282,6 +246,7 @@ const translations: Record<Language, Record<string, string>> = {
     'projects.filterAll': 'All',
     'projects.filterResidential': 'Residential',
     'projects.filterCommercial': 'Commercial',
+    'projects.filterIndustrial': 'Industrial',
     'projects.filterInfrastructure': 'Infrastructure',
     'projects.detailsHeader': 'Project Details',
     'projects.client': 'Client',
@@ -313,9 +278,7 @@ const translations: Record<Language, Record<string, string>> = {
     'consult.subtitle': 'Choose how to contact our team',
     'consult.forService': 'Service:',
     'consult.viaWa': 'WhatsApp Chat',
-    'consult.viaWaDesc': 'Quick response, connect directly with our estimator team',
     'consult.viaEmail': 'Send Email',
-    'consult.viaEmailDesc': 'Send your complete project details via email',
     'consult.waTemplate': 'Hello {company}, I am interested in your *{service}* service. I would like to consult regarding my project needs. Could we discuss further?',
     'consult.emailSubject': '{service} Service Consultation - {company}',
     'consult.emailBody': 'Dear {company} Team,\n\nI am interested in the {service} service offered.\nI would like to consult regarding my project needs as follows:\n\n- Project Type: \n- Location: \n- Estimated Budget: \n- Timeline: \n\nPlease provide more information about this service.\n\nThank you.',
@@ -332,7 +295,8 @@ const LanguageContext = createContext<LanguageContextType>({
   setLang: () => {},
   toggleLang: () => {},
   t: (key: string) => key,
-  translateText: (text: string) => text
+  translateText: (text: string) => text,
+  resolveDynamicText: (dbValue: string | undefined, fallbackKey: string) => dbValue || fallbackKey
 });
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -341,15 +305,51 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return saved === 'EN' ? 'EN' : 'ID';
   });
 
-  // Translation cache persisted in localStorage
   const [translationCache, setTranslationCache] = useState<Record<string, Record<string, string>>>(() => {
     try {
       const saved = localStorage.getItem('site_auto_translations');
-      return saved ? JSON.parse(saved) : { ID_to_EN: {}, EN_to_ID: {} };
+      if (!saved) return { ID_to_EN: {}, EN_to_ID: {} };
+      const parsed = JSON.parse(saved);
+      const cleanMap = (obj: Record<string, string> = {}) => {
+        const res: Record<string, string> = {};
+        for (const [k, v] of Object.entries(obj)) {
+          if (typeof v === 'string' && !v.toUpperCase().includes('MYMEMORY WARNING') && !v.toUpperCase().includes('USAGELIMITS.PHP')) {
+            res[k] = v;
+          }
+        }
+        return res;
+      };
+      const cleaned = {
+        ID_to_EN: cleanMap(parsed.ID_to_EN),
+        EN_to_ID: cleanMap(parsed.EN_to_ID)
+      };
+      localStorage.setItem('site_auto_translations', JSON.stringify(cleaned));
+      return cleaned;
     } catch {
       return { ID_to_EN: {}, EN_to_ID: {} };
     }
   });
+
+  const inFlightRef = useRef<Set<string>>(new Set());
+
+  const saveTranslation = (key: string, translated: string) => {
+    if (!translated || translated.toUpperCase().includes('MYMEMORY WARNING') || translated.toUpperCase().includes('USAGELIMITS.PHP')) {
+      return;
+    }
+    setTranslationCache(prev => {
+      const updated = {
+        ...prev,
+        ID_to_EN: {
+          ...prev.ID_to_EN,
+          [key]: translated
+        }
+      };
+      try {
+        localStorage.setItem('site_auto_translations', JSON.stringify(updated));
+      } catch (e) {}
+      return updated;
+    });
+  };
 
   const setLang = (newLang: Language) => {
     setLangState(newLang);
@@ -364,53 +364,67 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return translations[lang]?.[key] || translations['ID']?.[key] || key;
   };
 
-  // Auto-translate dynamic text (from database/admin)
   const translateText = (text: string): string => {
     if (!text || typeof text !== 'string') return text;
     const trimmed = text.trim();
     if (!trimmed) return text;
 
-    // If Indonesian is active, return original text as Indonesian is native
     if (lang === 'ID') {
       const fromEn = translationCache.EN_to_ID?.[trimmed];
       return fromEn || text;
     }
 
-    // In English mode, check cache first
     const cached = translationCache.ID_to_EN?.[trimmed];
-    if (cached) return cached;
+    if (cached && !cached.toUpperCase().includes('MYMEMORY WARNING')) {
+      return cached;
+    }
 
-    // Trigger async background translation to translate and populate cache
-    if (!translationCache.ID_to_EN?.[trimmed]) {
-      const pair = 'id|en';
-      fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(trimmed)}&langpair=${pair}`)
+    if (!inFlightRef.current.has(trimmed)) {
+      inFlightRef.current.add(trimmed);
+      fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=id&tl=en&dt=t&q=${encodeURIComponent(trimmed)}`)
         .then(res => res.json())
         .then(data => {
-          if (data && data.responseData && data.responseData.translatedText) {
-            const translated = data.responseData.translatedText;
-            setTranslationCache(prev => {
-              const updated = {
-                ...prev,
-                ID_to_EN: {
-                  ...prev.ID_to_EN,
-                  [trimmed]: translated
-                }
-              };
-              try {
-                localStorage.setItem('site_auto_translations', JSON.stringify(updated));
-              } catch (e) {}
-              return updated;
-            });
+          if (Array.isArray(data) && Array.isArray(data[0])) {
+            const translated = data[0].map((seg: any) => seg?.[0] || '').join('').trim();
+            if (translated) {
+              saveTranslation(trimmed, translated);
+              return;
+            }
           }
+          throw new Error('Fallback to MyMemory');
         })
-        .catch(() => {});
+        .catch(() => {
+          fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(trimmed)}&langpair=id|en`)
+            .then(res => res.json())
+            .then(data => {
+              const translated = data?.responseData?.translatedText;
+              const isValid = data?.responseStatus === 200 && !data?.quotaFinished && typeof translated === 'string' && !translated.toUpperCase().includes('MYMEMORY WARNING') && !translated.toUpperCase().includes('USAGELIMITS.PHP');
+              if (isValid) {
+                saveTranslation(trimmed, translated);
+              }
+            })
+            .catch(() => {});
+        });
     }
 
     return text;
   };
 
+  // Sync admin-edited settings with curated fallback translations across ID & EN
+  const resolveDynamicText = (dbValue: string | undefined, fallbackKey: string): string => {
+    const trimmed = dbValue?.trim();
+    if (!trimmed) return t(fallbackKey);
+
+    const idDefault = translations['ID'][fallbackKey];
+    if (idDefault && trimmed.toLowerCase() === idDefault.toLowerCase()) {
+      return t(fallbackKey);
+    }
+
+    return lang === 'EN' ? translateText(trimmed) : trimmed;
+  };
+
   return (
-    <LanguageContext.Provider value={{ lang, setLang, toggleLang, t, translateText }}>
+    <LanguageContext.Provider value={{ lang, setLang, toggleLang, t, translateText, resolveDynamicText }}>
       {children}
     </LanguageContext.Provider>
   );

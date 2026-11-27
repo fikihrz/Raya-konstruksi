@@ -1,15 +1,14 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
-import { FiHome, FiArrowRight, FiPhoneCall, FiMail, FiMapPin, FiX, FiCalendar, FiMap, FiChevronLeft, FiChevronRight, FiPause, FiPlay, FiStar, FiEdit3, FiMaximize, FiMinimize, FiVolume2, FiVolumeX, FiSearch, FiFilter } from 'react-icons/fi';
+import { FiArrowRight, FiMail, FiX, FiCalendar, FiMap, FiChevronLeft, FiChevronRight, FiPause, FiPlay, FiStar, FiEdit3, FiMaximize, FiMinimize, FiVolume2, FiVolumeX, FiSearch, FiShield, FiCompass, FiClock, FiLayers } from 'react-icons/fi';
 import { FaWhatsapp, FaStar } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
 import { EmailModal } from '../components/EmailModal';
 
 const Home = () => {
-  const { t, lang, translateText } = useLanguage();
+  const { t, lang, translateText, resolveDynamicText } = useLanguage();
   const [activeCategory, setActiveCategory] = useState('All');
   const [selectedProject, setSelectedProject] = useState<any>(null);
-  const [activeAboutTab, setActiveAboutTab] = useState<'vision' | 'mission'>('vision');
 
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -21,6 +20,8 @@ const Home = () => {
   const [reviews, setReviews] = useState<any[]>([]);
   const [settings, setSettings] = useState<any>({});
   const [loading, setLoading] = useState(true);
+
+  const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
 
   // Portfolio Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,11 +35,21 @@ const Home = () => {
     }
   };
 
-  const getProjectImg = (src?: string) => {
-    if (!src) return 'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f6?w=800&q=80';
-    if (src.startsWith('http') || src.startsWith('data:')) return src;
-    if (src.startsWith('/uploads')) return `${API_BASE}${src}`;
-    return src;
+  const getAssetUrl = (src?: string, fallback = 'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f6?w=800&q=80') => {
+    if (!src || !src.trim()) return fallback;
+    const clean = src.trim();
+    if (clean.startsWith('http') || clean.startsWith('data:')) return clean;
+    if (clean.startsWith('/uploads')) return `${API_BASE}${clean}`;
+    return clean;
+  };
+
+  const getAboutVideoSrc = () => {
+    const v = settings.aboutVideo?.trim();
+    if (!v) return '/construction-video.mp4';
+    if (v.startsWith('data:video') || /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(v) || v.startsWith('/') || v.startsWith('http')) {
+      return v;
+    }
+    return '/construction-video.mp4';
   };
 
   // Review Form & Modal State
@@ -46,19 +57,15 @@ const Home = () => {
   const [reviewSubmitting, setReviewSubmitting] = useState(false);
   const [reviewSuccessMsg, setReviewSuccessMsg] = useState('');
 
-  // Review Filter & Pagination State
+  // Review Filter & Carousel Pagination State (3 cards per page so cards never stack downward)
   const [reviewCategoryFilter, setReviewCategoryFilter] = useState('All');
   const [reviewRatingFilter, setReviewRatingFilter] = useState<number | 'All'>('All');
   const [reviewSearchQuery, setReviewSearchQuery] = useState('');
   const [reviewPage, setReviewPage] = useState(1);
-  const reviewsPerPage = 6;
+  const reviewsPerPage = 3;
 
   const handleReviewPageChange = (newPage: number) => {
     setReviewPage(newPage);
-    const el = document.getElementById('clients');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
   };
 
   // Consultation Modal State
@@ -212,8 +219,6 @@ const Home = () => {
     return (match && match[2].length === 11) ? match[2] : null;
   };
 
-  const API_BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
-
   useEffect(() => {
     fetch(`${API_BASE}/api/data`)
       .then(res => res.json())
@@ -263,20 +268,11 @@ const Home = () => {
       setSearchQuery('');
     };
 
-    const handleAboutTabEvent = (e: any) => {
-      const tab = e.detail;
-      if (tab === 'vision' || tab === 'mission') {
-        setActiveAboutTab(tab);
-      }
-    };
-
     window.addEventListener('site-search', handleSearchEvent);
     window.addEventListener('project-filter', handleProjectFilterEvent);
-    window.addEventListener('about-tab', handleAboutTabEvent);
     return () => {
       window.removeEventListener('site-search', handleSearchEvent);
       window.removeEventListener('project-filter', handleProjectFilterEvent);
-      window.removeEventListener('about-tab', handleAboutTabEvent);
     };
   }, []);
 
@@ -299,33 +295,33 @@ const Home = () => {
   return (
     <div>
       {/* === KIEWIT-STYLE HERO CAROUSEL === */}
-      <section className="relative w-full overflow-hidden bg-black h-screen min-h-[620px]">
+      <section className="relative w-full overflow-hidden bg-black h-screen min-h-[520px] sm:min-h-[620px]">
         
         {/* Slides Definition */}
         {(() => {
           const slides = [
             {
               id: 1,
-              tag: lang === 'EN' ? t('hero.tag1') : (settings.heroTag1 && settings.heroTag1 !== "ARCHITECTURE & DESIGN" ? settings.heroTag1 : t('hero.tag1')),
-              title: lang === 'EN' ? t('hero.title1') : (settings.heroTitle || t('hero.title1')),
-              subtitle: lang === 'EN' ? t('hero.sub1') : (settings.heroDesc || t('hero.sub1')),
-              img: settings.heroImage || "/galery/WhatsApp Image 2026-07-01 at 23.38.36.jpeg",
+              tag: resolveDynamicText(settings.heroTag1, 'hero.tag1'),
+              title: resolveDynamicText(settings.heroTitle, 'hero.title1'),
+              subtitle: resolveDynamicText(settings.heroDesc, 'hero.sub1'),
+              img: getAssetUrl(settings.heroImage, '/galery/WhatsApp Image 2026-07-01 at 23.38.36.jpeg'),
               cta: t('hero.cta1')
             },
             {
               id: 2,
-              tag: lang === 'EN' ? t('hero.tag2') : (settings.heroTag2 && settings.heroTag2 !== "COMMERCIAL DEVELOPMENT" ? settings.heroTag2 : t('hero.tag2')),
-              title: lang === 'EN' ? t('hero.title2') : (settings.heroTitle2 || t('hero.title2')),
-              subtitle: lang === 'EN' ? t('hero.sub2') : (settings.heroDesc2 || t('hero.sub2')),
-              img: settings.heroImage2 || "/galery/WhatsApp Image 2026-07-01 at 23.38.36 (2).jpeg",
+              tag: resolveDynamicText(settings.heroTag2, 'hero.tag2'),
+              title: resolveDynamicText(settings.heroTitle2, 'hero.title2'),
+              subtitle: resolveDynamicText(settings.heroDesc2, 'hero.sub2'),
+              img: getAssetUrl(settings.heroImage2, '/galery/WhatsApp Image 2026-07-01 at 23.38.36 (2).jpeg'),
               cta: t('hero.cta2')
             },
             {
               id: 3,
-              tag: lang === 'EN' ? t('hero.tag3') : (settings.heroTag3 && settings.heroTag3 !== "INDUSTRIAL INFRASTRUCTURE" ? settings.heroTag3 : t('hero.tag3')),
-              title: lang === 'EN' ? t('hero.title3') : (settings.heroTitle3 || t('hero.title3')),
-              subtitle: lang === 'EN' ? t('hero.sub3') : (settings.heroDesc3 || t('hero.sub3')),
-              img: settings.heroImage3 || "/galery/WhatsApp Image 2026-07-01 at 23.38.37.jpeg",
+              tag: resolveDynamicText(settings.heroTag3, 'hero.tag3'),
+              title: resolveDynamicText(settings.heroTitle3, 'hero.title3'),
+              subtitle: resolveDynamicText(settings.heroDesc3, 'hero.sub3'),
+              img: getAssetUrl(settings.heroImage3, '/galery/WhatsApp Image 2026-07-01 at 23.38.37.jpeg'),
               cta: t('hero.cta3')
             }
           ];
@@ -360,7 +356,7 @@ const Home = () => {
               </div>
 
               {/* Bottom-Left Content (Kiewit Style) */}
-              <div className="absolute bottom-0 left-0 right-0 z-10 pb-20 sm:pb-24 px-6 sm:px-12 lg:px-20 max-w-5xl">
+              <div className="absolute bottom-0 left-0 right-0 z-10 pb-16 sm:pb-24 px-4 sm:px-12 lg:px-20 max-w-5xl">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={`content-${currentSlide}`}
@@ -479,15 +475,18 @@ const Home = () => {
         })()}
       </section>
 
-      {/* About Section */}
-      <section id="about" className="py-24 px-6 sm:px-8 bg-white scroll-mt-20">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+      {/* About Section - Clean Two-Column Corporate Layout */}
+      <section id="about" className="bg-white scroll-mt-20">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12">
           
-          {/* Left Column: Premium Cinematic Video Showcase (Styled exactly like YouTube player from user screenshot) */}
-          <div className="lg:col-span-6 w-full">
+          {/* Left Panel: Heading + Video Showcase */}
+          <div className="lg:col-span-6 px-6 sm:px-10 lg:px-12 py-16 sm:py-20 space-y-6 flex flex-col justify-center">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+              {resolveDynamicText(settings.aboutHeading, 'about.heading')}
+            </h2>
+
             {getYouTubeEmbedId(settings.aboutVideo) ? (
-              /* If YouTube URL is configured, use native YouTube player embed */
-              <div className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-100 bg-slate-950 aspect-[16/10] sm:aspect-[16/9]">
+              <div className="relative rounded-md overflow-hidden shadow-md bg-slate-950 aspect-[16/10] sm:aspect-[16/9]">
                 <iframe
                   src={`https://www.youtube.com/embed/${getYouTubeEmbedId(settings.aboutVideo)}?autoplay=1&mute=1&loop=1&playlist=${getYouTubeEmbedId(settings.aboutVideo)}&controls=1&rel=0`}
                   title="Company Video"
@@ -497,19 +496,14 @@ const Home = () => {
                 />
               </div>
             ) : (
-              /* HTML5 Player with YouTube UI: center Pause/Play, timeline scrubber, time display, and bottom-right Fullscreen toggle */
               <div 
                 ref={videoContainerRef}
-                className="relative rounded-3xl overflow-hidden shadow-2xl border-4 border-slate-100 bg-black aspect-[16/10] sm:aspect-[16/9] group select-none flex flex-col justify-between"
+                className="relative rounded-md overflow-hidden shadow-md bg-black aspect-[16/10] sm:aspect-[16/9] group select-none flex flex-col justify-between"
               >
                 {/* HTML5 Loop Video */}
                 <video
                   ref={videoRef}
-                  src={
-                    (settings.aboutVideo && (/\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(settings.aboutVideo.trim()) || settings.aboutVideo.trim().startsWith('/')))
-                      ? settings.aboutVideo.trim()
-                      : '/construction-video.mp4'
-                  }
+                  src={getAboutVideoSrc()}
                   onError={(e) => {
                     const target = e.currentTarget;
                     if (!target.src.endsWith('/construction-video.mp4')) {
@@ -655,84 +649,61 @@ const Home = () => {
             )}
           </div>
 
-          <div className="lg:col-span-6 space-y-8">
-            <div className="space-y-3">
-              <span className="text-primary font-bold uppercase tracking-widest text-xs">{lang === 'EN' ? t('about.badge') : (settings.aboutBadge || 'Behind The Blueprint')}</span>
-              <h2 className="text-4xl md:text-5xl font-black text-on-surface leading-tight">
-                {lang === 'EN' ? t('about.title') : ((settings.aboutTitle && settings.aboutTitle !== 'Raya Konstruksi') ? settings.aboutTitle : 'Raya Konstruksi Jaya')}
-              </h2>
-            </div>
+          {/* Right Panel: Concise 2x2 Expertise Grid + CTA */}
+          <div className="lg:col-span-6 bg-white px-6 sm:px-10 lg:px-12 py-16 sm:py-20 flex flex-col justify-center space-y-8">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">
+              {resolveDynamicText(settings.aboutTitle, 'about.title')}
+            </h2>
 
-            <div className="flex border-b border-outline-variant/30 text-sm font-semibold">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-7">
               {[
-                { id: 'vision', label: t('about.tabVision') },
-                { id: 'mission', label: t('about.tabMission') }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveAboutTab(tab.id as any)}
-                  className={`pb-4 pr-6 relative transition-colors ${activeAboutTab === tab.id ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'}`}
-                >
-                  {tab.label}
-                  {activeAboutTab === tab.id && (
-                    <motion.div
-                      layoutId="activeAboutTabLine"
-                      className="absolute bottom-0 left-0 right-6 h-0.5 bg-primary"
-                    />
-                  )}
-                </button>
+                {
+                  icon: <FiCompass size={26} strokeWidth={1.6} />,
+                  title: resolveDynamicText(settings.aboutFeature1Title, 'about.f1.title'),
+                  desc: resolveDynamicText(settings.aboutFeature1Desc, 'about.f1.desc')
+                },
+                {
+                  icon: <FiClock size={26} strokeWidth={1.6} />,
+                  title: resolveDynamicText(settings.aboutFeature2Title, 'about.f2.title'),
+                  desc: resolveDynamicText(settings.aboutFeature2Desc, 'about.f2.desc')
+                },
+                {
+                  icon: <FiShield size={26} strokeWidth={1.6} />,
+                  title: resolveDynamicText(settings.aboutFeature3Title, 'about.f3.title'),
+                  desc: resolveDynamicText(settings.aboutFeature3Desc, 'about.f3.desc')
+                },
+                {
+                  icon: <FiLayers size={26} strokeWidth={1.6} />,
+                  title: resolveDynamicText(settings.aboutFeature4Title, 'about.f4.title'),
+                  desc: resolveDynamicText(settings.aboutFeature4Desc, 'about.f4.desc')
+                }
+              ].map((item, idx) => (
+                <div key={idx} className="flex items-start gap-3.5">
+                  <div className="w-11 h-11 rounded-lg border border-blue-200 bg-blue-50/50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                    {item.icon}
+                  </div>
+                  <div className="space-y-1">
+                    <h3 className="text-sm font-bold text-slate-900">{item.title}</h3>
+                    <p className="text-xs text-slate-500 leading-relaxed">{item.desc}</p>
+                  </div>
+                </div>
               ))}
             </div>
 
-            <div className="min-h-[160px] flex items-center">
-              <AnimatePresence mode="wait">
-                {activeAboutTab === 'vision' && (
-                  <motion.div
-                    key="vision"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3 }}
-                    className="border-l-2 border-primary pl-6 py-2"
-                  >
-                    <h4 className="text-lg font-bold text-on-surface mb-2">
-                      {lang === 'EN' ? t('about.visionTitle') : (settings.visionTitle || t('about.visionTitle'))}
-                    </h4>
-                    <p className="text-on-surface-variant leading-relaxed text-base italic">
-                      "{lang === 'EN' ? t('about.visionDesc') : (settings.visionDesc || t('about.visionDesc'))}"
-                    </p>
-                  </motion.div>
-                )}
-
-                {activeAboutTab === 'mission' && (
-                  <motion.div
-                    key="mission"
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-3"
-                  >
-                    {[
-                      lang === 'EN' ? t('about.mission1') : (settings.mission1 || t('about.mission1')),
-                      lang === 'EN' ? t('about.mission2') : (settings.mission2 || t('about.mission2')),
-                      lang === 'EN' ? t('about.mission3') : (settings.mission3 || t('about.mission3'))
-                    ].map((item, idx) => (
-                      <div key={idx} className="flex gap-3 items-start">
-                        <span className="text-primary font-bold mt-0.5">•</span>
-                        <p className="text-on-surface-variant text-sm leading-relaxed">{item}</p>
-                      </div>
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            <div>
+              <a
+                href="#services"
+                className="inline-flex items-center justify-center px-6 py-2.5 rounded-md bg-blue-600 hover:bg-blue-700 text-white text-xs sm:text-sm font-semibold transition-colors shadow-xs"
+              >
+                {resolveDynamicText(settings.aboutCtaText, 'about.cta')}
+              </a>
             </div>
           </div>
         </div>
       </section>
 
       {/* Kenapa Memilih Kami Section */}
-      <section id="why-us" className="py-24 bg-slate-900 px-8 relative overflow-hidden scroll-mt-20">
+      <section id="why-us" className="py-16 sm:py-24 bg-slate-900 px-4 sm:px-8 relative overflow-hidden scroll-mt-20">
         {/* Abstract background blobs for premium feel */}
         <div className="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 rounded-full bg-blue-600/10 blur-3xl"></div>
         <div className="absolute bottom-0 left-0 -ml-32 -mb-32 w-96 h-96 rounded-full bg-blue-400/10 blur-3xl"></div>
@@ -742,20 +713,20 @@ const Home = () => {
             <span className="inline-block py-1 px-3 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 font-bold uppercase tracking-widest text-[10px]">
               {t('whyUs.badge')}
             </span>
-            <h2 className="text-4xl md:text-5xl font-black text-white leading-tight">
-              {lang === 'EN' ? t('whyUs.title') : (settings.whyTitle || t('whyUs.title'))}
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white leading-tight">
+              {resolveDynamicText(settings.whyTitle, 'whyUs.title')}
             </h2>
             <p className="text-slate-300 text-sm max-w-2xl mx-auto leading-relaxed">
-              {lang === 'EN' ? t('whyUs.desc') : (settings.whyDesc || t('whyUs.desc'))}
+              {resolveDynamicText(settings.whyDesc, 'whyUs.desc')}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-8">
             {reasons.map((reason, i) => {
-              const rTitle = t(`whyUs.r${i + 1}.title`);
-              const rDesc = t(`whyUs.r${i + 1}.desc`);
+              const rTitle = lang === 'EN' ? translateText(reason.title || '') : reason.title;
+              const rDesc = lang === 'EN' ? translateText(reason.desc || '') : reason.desc;
               return (
-                <div key={i} className="group relative bg-slate-800/40 hover:bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 hover:border-blue-500/50 p-8 rounded-2xl transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-900/20 flex flex-col items-center md:items-start text-center md:text-left space-y-5">
+                <div key={reason.id || i} className="group relative bg-slate-800/40 hover:bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 hover:border-blue-500/50 p-6 sm:p-8 rounded-2xl transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-blue-900/20 flex flex-col items-center md:items-start text-center md:text-left space-y-4 sm:space-y-5">
                   <div className="w-14 h-14 flex-shrink-0 rounded-xl bg-gradient-to-br from-blue-500/20 to-blue-600/5 flex items-center justify-center border border-blue-500/20 group-hover:scale-110 transition-transform duration-500">
                     <span className="text-xl font-black text-blue-400">{reason.number}</span>
                   </div>
@@ -769,14 +740,14 @@ const Home = () => {
       </section>
 
       {/* Section 2: Services (Layanan) - Horizontal Carousel Slider */}
-      <section className="py-24 bg-white px-4 sm:px-8">
+      <section className="py-16 sm:py-24 bg-white px-4 sm:px-8">
         <div id="services" className="max-w-7xl mx-auto space-y-8 scroll-mt-24">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div className="flex flex-col space-y-3 max-w-3xl">
               <span className="text-primary font-bold uppercase tracking-widest text-xs">{t('services.badge')}</span>
-              <h2 className="text-3xl md:text-5xl font-black text-on-surface leading-tight">{lang === 'EN' ? t('services.title') : (settings.servicesTitle || t('services.title'))}</h2>
+              <h2 className="text-3xl md:text-5xl font-black text-on-surface leading-tight">{resolveDynamicText(settings.servicesTitle, 'services.title')}</h2>
               <p className="text-on-surface-variant text-base leading-relaxed">
-                {lang === 'EN' ? t('services.desc') : (settings.servicesDesc || t('services.desc'))}
+                {resolveDynamicText(settings.servicesDesc, 'services.desc')}
               </p>
             </div>
 
@@ -812,18 +783,21 @@ const Home = () => {
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {services.map((service, idx) => {
-              const sTitle = t(`services.s${idx + 1}.title`) || service.title;
-              const sDesc = t(`services.s${idx + 1}.desc`) || service.desc;
+              const sTitle = lang === 'EN' ? translateText(service.title || '') : service.title;
+              const sDesc = lang === 'EN' ? translateText(service.desc || '') : service.desc;
               return (
                 <div
-                  key={idx}
+                  key={service.id || idx}
                   className="group relative bg-white border border-blue-100 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between flex-shrink-0 w-[290px] sm:w-[320px] h-[390px] snap-start"
                 >
                   <div className="h-48 overflow-hidden bg-blue-900 relative">
                     <img
-                      src={service.img}
+                      src={getAssetUrl(service.img)}
                       alt={sTitle}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f6?w=800&q=80';
+                      }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
                   </div>
@@ -851,14 +825,14 @@ const Home = () => {
       </section>
 
       {/* Projects Section with Pagination (Placed right after Services) */}
-      <section id="projects" className="py-24 px-6 sm:px-8 bg-slate-50 scroll-mt-24">
+      <section id="projects" className="py-16 sm:py-24 px-4 sm:px-8 bg-white border-t border-slate-100 scroll-mt-24">
         <div className="max-w-7xl mx-auto space-y-12">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8 border-b border-slate-200 pb-8">
             <div className="space-y-3">
               <span className="text-primary font-bold uppercase tracking-widest text-sm">{t('projects.badge')}</span>
-              <h2 className="text-3xl md:text-5xl font-black text-on-surface">{t('projects.title')}</h2>
+              <h2 className="text-3xl md:text-5xl font-black text-on-surface">{resolveDynamicText(settings.projectsTitle, 'projects.title')}</h2>
               <p className="text-on-surface-variant text-sm max-w-xl">
-                {t('projects.desc')}
+                {resolveDynamicText(settings.projectsDesc, 'projects.desc')}
               </p>
               {searchQuery && (
                 <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
@@ -881,6 +855,7 @@ const Home = () => {
                 { key: 'All', label: t('projects.filterAll') },
                 { key: 'Residential', label: t('projects.filterResidential') },
                 { key: 'Commercial', label: t('projects.filterCommercial') },
+                { key: 'Industrial', label: t('projects.filterIndustrial') },
                 { key: 'Infrastructure', label: t('projects.filterInfrastructure') }
               ].map((cat) => (
                 <button
@@ -905,16 +880,16 @@ const Home = () => {
 
             return (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 min-h-[460px] sm:min-h-[400px]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8 min-h-[320px] sm:min-h-[400px]">
                   {currentProjects.map((p, i) => (
                     <div
-                      key={i}
+                      key={p.id || i}
                       onClick={() => setSelectedProject(p)}
-                      className="group relative overflow-hidden rounded-2xl bg-slate-900 shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer h-[380px] flex flex-col justify-end"
+                      className="group relative overflow-hidden rounded-2xl bg-slate-900 shadow-md hover:shadow-2xl transition-all duration-500 cursor-pointer h-[300px] sm:h-[380px] flex flex-col justify-end"
                     >
                       <img
                         className="absolute inset-0 w-full h-full object-cover opacity-85 group-hover:scale-105 group-hover:opacity-70 transition-all duration-700 bg-slate-800"
-                        src={getProjectImg(p.img)}
+                        src={getAssetUrl(p.img)}
                         alt={p.title}
                         loading="lazy"
                         decoding="async"
@@ -927,6 +902,7 @@ const Home = () => {
                           {(() => {
                             if (p.category === 'Residential') return lang === 'EN' ? 'Residential' : 'Residensial';
                             if (p.category === 'Commercial') return lang === 'EN' ? 'Commercial' : 'Komersial';
+                            if (p.category === 'Industrial') return lang === 'EN' ? 'Industrial' : 'Industri';
                             if (p.category === 'Infrastructure') return lang === 'EN' ? 'Infrastructure' : 'Infrastruktur';
                             return p.category;
                           })()}
@@ -993,75 +969,80 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Client Logos & Real Testimonials Section (Moved below Portofolio) */}
-      <section id="clients" className="py-24 bg-gradient-to-b from-blue-950 via-slate-950 to-blue-950 text-white overflow-hidden scroll-mt-20">
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 space-y-16">
-          
-          {/* Header with Add Review Button */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-            <div className="space-y-3 max-w-2xl">
-              <span className="text-blue-400 font-bold uppercase tracking-widest text-xs">{t('reviews.badge')}</span>
-              <h2 className="text-3xl md:text-5xl font-black text-white leading-tight">{t('reviews.title')}</h2>
-              <p className="text-blue-200/70 text-sm sm:text-base leading-relaxed">
-                {t('reviews.desc')}
-              </p>
-            </div>
+      {/* Client Testimonials Carousel & Partner Strip */}
+      <section id="clients" className="py-16 sm:py-24 bg-gradient-to-b from-blue-950 via-slate-950 to-blue-950 text-white overflow-hidden scroll-mt-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 space-y-10 sm:space-y-12">
 
-            {/* Button to open Review Submission Modal */}
-            <button
-              onClick={() => {
-                setReviewSuccessMsg('');
-                setReviewModalOpen(true);
-              }}
-              className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-blue-600/30 hover:scale-105 active:scale-95 transition-all self-start md:self-auto cursor-pointer"
-            >
-              <FiEdit3 size={16} />
-              <span>{t('reviews.btnWrite')}</span>
-            </button>
+          {/* Centered Editorial Heading + CTA */}
+          <div className="text-center max-w-2xl mx-auto space-y-3">
+            <span className="inline-block text-blue-400 font-bold uppercase tracking-[0.18em] text-[11px]">
+              {t('reviews.badge')}
+            </span>
+            <h2 className="text-2xl sm:text-3xl lg:text-[42px] font-extrabold text-white leading-[1.15] tracking-tight">
+              {resolveDynamicText(settings.clientsTitle, 'reviews.title')}
+            </h2>
+            <p className="text-blue-200/75 text-sm sm:text-base leading-relaxed">
+              {resolveDynamicText(settings.clientsDesc, 'reviews.desc')}
+            </p>
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setReviewSuccessMsg('');
+                  setReviewModalOpen(true);
+                }}
+                className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs transition-all shadow-lg shadow-blue-600/30 hover:scale-105 active:scale-95 cursor-pointer"
+              >
+                <FiEdit3 size={14} />
+                <span>{t('reviews.btnWrite')}</span>
+              </button>
+            </div>
           </div>
 
-          {/* Filter, Search & Rating Controls for Reviews */}
-          <div className="space-y-4 bg-slate-900/60 border border-slate-800 p-5 rounded-2xl backdrop-blur-md">
-            <div className="flex flex-col md:flex-row gap-4 justify-between items-stretch md:items-center">
-              {/* Search Bar */}
-              <div className="relative flex-1">
-                <FiSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                <input
-                  type="text"
-                  value={reviewSearchQuery}
-                  onChange={(e) => {
-                    setReviewSearchQuery(e.target.value);
+          {/* Review-Tailored Corporate Filter Bar */}
+          <div className="max-w-5xl mx-auto bg-slate-900/75 border border-blue-800/50 p-2.5 sm:p-3 rounded-2xl backdrop-blur-md shadow-xl flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+            {/* Search Input */}
+            <div className="relative flex-1 min-w-0">
+              <FiSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={15} />
+              <input
+                type="text"
+                value={reviewSearchQuery}
+                onChange={(e) => {
+                  setReviewSearchQuery(e.target.value);
+                  setReviewPage(1);
+                }}
+                placeholder={lang === 'EN' ? 'Search client name or review...' : 'Cari nama klien atau isi ulasan...'}
+                className="w-full bg-slate-950/80 border border-slate-700/80 focus:border-blue-500 rounded-xl pl-10 pr-8 py-2 text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none transition-colors"
+              />
+              {reviewSearchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setReviewSearchQuery('');
                     setReviewPage(1);
                   }}
-                  placeholder={t('reviews.searchPlaceholder')}
-                  className="w-full bg-slate-950/80 border border-slate-700/80 rounded-xl pl-11 pr-10 py-2.5 text-xs sm:text-sm text-white placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
-                />
-                {reviewSearchQuery && (
-                  <button
-                    onClick={() => {
-                      setReviewSearchQuery('');
-                      setReviewPage(1);
-                    }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1"
-                    title="Clear search"
-                  >
-                    <FiX size={14} />
-                  </button>
-                )}
-              </div>
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white cursor-pointer"
+                  aria-label="Reset Search"
+                >
+                  <FiX size={14} />
+                </button>
+              )}
+            </div>
 
-              {/* Rating Filter Pills */}
-              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1">
+            {/* Right Controls: Rating Pills + Category Select */}
+            <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2">
+              {/* Rating Pills */}
+              <div className="bg-slate-950/70 border border-slate-800 p-1 rounded-xl flex items-center gap-1 overflow-x-auto no-scrollbar">
                 <button
                   type="button"
                   onClick={() => {
                     setReviewRatingFilter('All');
                     setReviewPage(1);
                   }}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                     reviewRatingFilter === 'All'
-                      ? 'bg-blue-600 text-white shadow-md shadow-blue-600/30'
-                      : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
+                      ? 'bg-blue-600 text-white shadow-sm'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
                   }`}
                 >
                   {t('reviews.filterAllRating')}
@@ -1074,58 +1055,63 @@ const Home = () => {
                       setReviewRatingFilter(stars);
                       setReviewPage(1);
                     }}
-                    className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap cursor-pointer ${
+                    className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                       reviewRatingFilter === stars
-                        ? 'bg-amber-500 text-slate-950 font-black shadow-md shadow-amber-500/30'
-                        : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700'
+                        ? 'bg-blue-600 text-white shadow-sm'
+                        : 'text-slate-300 hover:text-white hover:bg-slate-800/70'
                     }`}
                   >
                     <span>{stars}</span>
-                    <FaStar size={11} className={reviewRatingFilter === stars ? 'text-slate-950' : 'text-amber-400'} />
+                    <FaStar size={11} className={reviewRatingFilter === stars ? 'text-amber-300' : 'text-amber-400'} />
                   </button>
                 ))}
               </div>
-            </div>
 
-            {/* Category / Project Type Filter Pills */}
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pt-1 border-t border-slate-800/80">
-              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5 flex-shrink-0">
-                <FiFilter size={12} className="text-blue-400" />
-                <span>{lang === 'EN' ? 'Type:' : 'Jenis:'}</span>
-              </span>
-              {['All', 'Residensial', 'Komersial', 'Industri', 'Infrastruktur'].map((cat) => (
+              {/* Project Category Dropdown */}
+              <select
+                value={reviewCategoryFilter}
+                onChange={(e) => {
+                  setReviewCategoryFilter(e.target.value);
+                  setReviewPage(1);
+                }}
+                aria-label="Filter Kategori Proyek"
+                className="bg-slate-950/80 hover:bg-slate-900 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs font-semibold text-slate-200 focus:outline-none focus:border-blue-500 cursor-pointer w-full sm:w-auto"
+              >
+                <option value="All">{lang === 'EN' ? 'All Project Types' : 'Semua Jenis Proyek'}</option>
+                <option value="Residensial">{lang === 'EN' ? 'Residential' : 'Residensial'}</option>
+                <option value="Komersial">{lang === 'EN' ? 'Commercial' : 'Komersial'}</option>
+                <option value="Industri">{lang === 'EN' ? 'Industrial' : 'Industri'}</option>
+                <option value="Infrastruktur">{lang === 'EN' ? 'Infrastructure' : 'Infrastruktur'}</option>
+                <option value="Renovasi">{lang === 'EN' ? 'Renovation' : 'Renovasi'}</option>
+              </select>
+
+              {(reviewCategoryFilter !== 'All' || reviewRatingFilter !== 'All' || reviewSearchQuery) && (
                 <button
-                  key={cat}
                   type="button"
                   onClick={() => {
-                    setReviewCategoryFilter(cat);
+                    setReviewCategoryFilter('All');
+                    setReviewRatingFilter('All');
+                    setReviewSearchQuery('');
                     setReviewPage(1);
                   }}
-                  className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all whitespace-nowrap cursor-pointer ${
-                    reviewCategoryFilter === cat
-                      ? 'bg-blue-500/20 text-blue-300 border border-blue-400/50'
-                      : 'bg-slate-800/50 text-slate-400 hover:text-white border border-transparent'
-                  }`}
+                  className="px-3 py-2 rounded-xl text-xs font-semibold text-blue-300 hover:text-white hover:bg-blue-600/30 border border-blue-500/30 transition-colors cursor-pointer whitespace-nowrap"
                 >
-                  {cat === 'All' ? t('reviews.filterAll') : translateText(cat)}
+                  Reset
                 </button>
-              ))}
+              )}
             </div>
           </div>
 
-          {/* Testimonial Cards Slider / Grid */}
+          {/* 3-Card Paged Showcase Carousel */}
           {(() => {
             const filteredReviews = reviews.filter((rev) => {
-              // Category filter
-              const matchesCat = reviewCategoryFilter === 'All' || 
+              const matchesCat = reviewCategoryFilter === 'All' ||
                 (rev.projectType && rev.projectType.toLowerCase().includes(reviewCategoryFilter.toLowerCase()));
-              
-              // Rating filter
-              const matchesRating = reviewRatingFilter === 'All' || (rev.rating || 5) === reviewRatingFilter;
-              
-              // Search query filter
+
+              const matchesRating = reviewRatingFilter === 'All' || (Number(rev.rating) || 5) === reviewRatingFilter;
+
               const q = reviewSearchQuery.toLowerCase().trim();
-              const matchesSearch = !q || 
+              const matchesSearch = !q ||
                 (rev.name && rev.name.toLowerCase().includes(q)) ||
                 (rev.company && rev.company.toLowerCase().includes(q)) ||
                 (rev.role && rev.role.toLowerCase().includes(q)) ||
@@ -1135,24 +1121,26 @@ const Home = () => {
               return matchesCat && matchesRating && matchesSearch;
             });
 
-            const totalReviewPages = Math.ceil(filteredReviews.length / reviewsPerPage) || 1;
-            const currentReviews = filteredReviews.slice((reviewPage - 1) * reviewsPerPage, reviewPage * reviewsPerPage);
+            const totalReviewPages = Math.max(1, Math.ceil(filteredReviews.length / reviewsPerPage));
+            const safeReviewPage = Math.min(reviewPage, totalReviewPages);
+            const currentReviews = filteredReviews.slice((safeReviewPage - 1) * reviewsPerPage, safeReviewPage * reviewsPerPage);
 
             if (filteredReviews.length === 0) {
               return (
-                <div className="bg-slate-900/40 border border-slate-800 rounded-2xl p-12 text-center space-y-3">
-                  <div className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 mx-auto">
-                    <FiSearch size={20} />
+                <div className="bg-slate-900/50 border border-blue-900/40 rounded-2xl p-12 text-center space-y-3 max-w-xl mx-auto">
+                  <div className="w-11 h-11 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 mx-auto">
+                    <FiSearch size={18} />
                   </div>
-                  <h4 className="text-base font-bold text-white">{t('reviews.empty')}</h4>
+                  <h4 className="text-sm font-bold text-white">{t('reviews.empty')}</h4>
                   <button
+                    type="button"
                     onClick={() => {
                       setReviewSearchQuery('');
                       setReviewCategoryFilter('All');
                       setReviewRatingFilter('All');
                       setReviewPage(1);
                     }}
-                    className="px-4 py-2 text-xs font-semibold bg-blue-600/30 hover:bg-blue-600/50 text-blue-300 rounded-xl border border-blue-500/40 transition-colors"
+                    className="px-4 py-2 text-xs font-semibold bg-blue-600 hover:bg-blue-500 text-white rounded-full transition-colors cursor-pointer"
                   >
                     {lang === 'EN' ? 'Reset Filters' : 'Reset Filter'}
                   </button>
@@ -1162,108 +1150,173 @@ const Home = () => {
 
             return (
               <div className="space-y-8">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {currentReviews.map((rev, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-slate-900/70 border border-blue-900/40 hover:border-blue-500/50 p-7 rounded-2xl flex flex-col justify-between space-y-5 backdrop-blur-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:shadow-blue-950/50"
-                    >
-                      <div className="space-y-4">
-                        {/* Rating Stars & Project Type */}
-                        <div className="flex items-center justify-between">
-                          <div className="flex text-amber-400 gap-1">
-                            {[...Array(rev.rating || 5)].map((_, i) => (
-                              <FaStar key={i} size={14} />
-                            ))}
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={`${safeReviewPage}-${reviewCategoryFilter}-${reviewRatingFilter}-${reviewSearchQuery}`}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -10 }}
+                    transition={{ duration: 0.25, ease: 'easeOut' }}
+                    className={`grid grid-cols-1 ${
+                      currentReviews.length === 1
+                        ? 'sm:grid-cols-1 max-w-md mx-auto'
+                        : currentReviews.length === 2
+                          ? 'sm:grid-cols-2 max-w-4xl mx-auto'
+                          : 'sm:grid-cols-2 lg:grid-cols-3'
+                    } gap-5 sm:gap-6 lg:gap-7 py-4 items-stretch`}
+                  >
+                    {currentReviews.map((rev, idx) => {
+                      const tiltClass = currentReviews.length === 3
+                        ? idx === 0
+                          ? 'lg:-rotate-2 lg:translate-y-2 hover:lg:rotate-0 hover:lg:translate-y-0'
+                          : idx === 2
+                            ? 'lg:rotate-2 lg:translate-y-2 hover:lg:rotate-0 hover:lg:translate-y-0'
+                            : 'lg:z-10 hover:lg:-translate-y-1.5'
+                        : 'hover:-translate-y-1';
+
+                      const starCount = Math.min(5, Math.max(1, Number(rev.rating) || 5));
+
+                      return (
+                        <div
+                          key={rev.id || idx}
+                          className={`bg-white rounded-2xl p-7 sm:p-8 border border-white/80 shadow-[0_20px_50px_-15px_rgba(0,0,0,0.45)] flex flex-col items-center text-center justify-between transition-all duration-300 ${tiltClass}`}
+                        >
+                          <div className="w-full flex flex-col items-center">
+                            {/* Centered Circular Avatar (Admin Managed) */}
+                            <div className="w-14 h-14 rounded-full overflow-hidden bg-slate-100 ring-2 ring-blue-100 shadow-sm flex items-center justify-center flex-shrink-0">
+                              {rev.avatar ? (
+                                <img
+                                  src={getAssetUrl(rev.avatar)}
+                                  alt={rev.name}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    (e.currentTarget as HTMLImageElement).style.display = 'none';
+                                    const fallback = e.currentTarget.nextElementSibling as HTMLElement | null;
+                                    if (fallback) fallback.style.display = 'flex';
+                                  }}
+                                />
+                              ) : null}
+                              <div
+                                style={{ display: rev.avatar ? 'none' : 'flex' }}
+                                className="w-full h-full bg-blue-600 text-white font-bold text-base items-center justify-center"
+                              >
+                                {rev.name ? rev.name.charAt(0).toUpperCase() : 'K'}
+                              </div>
+                            </div>
+
+                            {/* Author Identity */}
+                            <h4 className="mt-4 text-sm sm:text-base font-bold text-slate-900 leading-snug">
+                              — {rev.name}{rev.role ? `, ${translateText(rev.role)}` : ''}
+                            </h4>
+
+                            {/* Company & Project Type */}
+                            <p className="mt-1 text-xs text-slate-500 leading-snug">
+                              {rev.company || (lang === 'EN' ? 'Private Client' : 'Klien Privat')}
+                              {rev.projectType ? ` · ${translateText(rev.projectType)}` : ''}
+                            </p>
+
+                            {/* Stars + Score */}
+                            <div className="mt-4 flex items-center justify-center gap-1.5">
+                              <div className="flex items-center gap-0.5 text-amber-500">
+                                {[...Array(starCount)].map((_, i) => (
+                                  <FaStar key={i} size={13} />
+                                ))}
+                              </div>
+                              <span className="text-xs font-bold text-slate-800 tabular-nums ml-1">
+                                {starCount.toFixed(1)}
+                              </span>
+                            </div>
+
+                            {/* Testimonial Quote */}
+                            <p className="mt-4 text-xs sm:text-sm text-slate-600 leading-relaxed line-clamp-5">
+                              "{translateText(rev.review)}"
+                            </p>
                           </div>
-                          <span className="text-[10px] uppercase font-bold text-blue-400 bg-blue-950/80 px-2.5 py-1 rounded-full border border-blue-800/40">
-                            {translateText(rev.projectType || 'Konstruksi')}
-                          </span>
+
+                          {rev.date && (
+                            <span className="mt-5 text-[11px] text-slate-400 font-medium">
+                              {rev.date}
+                            </span>
+                          )}
                         </div>
+                      );
+                    })}
+                  </motion.div>
+                </AnimatePresence>
 
-                        {/* Review Text */}
-                        <p className="text-slate-300 text-xs sm:text-sm leading-relaxed italic">
-                          "{translateText(rev.review)}"
-                        </p>
-                      </div>
-
-                      {/* Reviewer Profile */}
-                      <div className="flex items-center gap-3.5 pt-4 border-t border-slate-800/80">
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-indigo-700 text-white font-black flex items-center justify-center text-sm shadow-md flex-shrink-0">
-                          {rev.name ? rev.name.charAt(0).toUpperCase() : 'K'}
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-bold text-white leading-snug">{rev.name}</h4>
-                          <p className="text-[11px] text-slate-400">{rev.role ? `${translateText(rev.role)} • ` : ''}{rev.company}</p>
-                          <span className="text-[10px] text-blue-400/80">{rev.date}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Reviews Pagination Controls */}
-                {totalReviewPages > 1 && (
-                  <div className="flex items-center justify-center gap-2 pt-4">
-                    <button
-                      onClick={() => handleReviewPageChange(Math.max(reviewPage - 1, 1))}
-                      disabled={reviewPage === 1}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-slate-300 bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
-                    >
-                      <FiChevronLeft size={14} />
-                      <span className="hidden sm:inline">{t('reviews.prev')}</span>
-                    </button>
-
-                    <div className="flex items-center gap-1">
+                {/* Carousel Pagination Dots + Prev/Next Buttons */}
+                <div className="flex flex-col items-center gap-4 pt-2">
+                  {/* Indicator Dots */}
+                  {totalReviewPages > 1 && (
+                    <div className="flex items-center justify-center gap-1.5">
                       {Array.from({ length: totalReviewPages }).map((_, i) => {
                         const pageNum = i + 1;
+                        const active = safeReviewPage === pageNum;
                         return (
                           <button
                             key={pageNum}
+                            type="button"
                             onClick={() => handleReviewPageChange(pageNum)}
-                            className={`w-9 h-9 rounded-xl text-xs font-bold transition-all cursor-pointer ${
-                              reviewPage === pageNum
-                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/30'
-                                : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800'
+                            aria-label={`${t('reviews.page')} ${pageNum}`}
+                            className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                              active ? 'w-7 bg-blue-400' : 'w-1.5 bg-white/30 hover:bg-white/50'
                             }`}
-                          >
-                            {pageNum}
-                          </button>
+                          />
                         );
                       })}
                     </div>
+                  )}
 
-                    <button
-                      onClick={() => handleReviewPageChange(Math.min(reviewPage + 1, totalReviewPages))}
-                      disabled={reviewPage === totalReviewPages}
-                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-bold text-slate-300 bg-slate-900 border border-slate-800 hover:bg-slate-800 hover:text-white disabled:opacity-30 disabled:pointer-events-none transition-all cursor-pointer"
-                    >
-                      <span className="hidden sm:inline">{t('reviews.next')}</span>
-                      <FiChevronRight size={14} />
-                    </button>
-                  </div>
-                )}
+                  {/* Circular Arrow Controls */}
+                  {totalReviewPages > 1 && (
+                    <div className="flex items-center justify-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => handleReviewPageChange(Math.max(safeReviewPage - 1, 1))}
+                        disabled={safeReviewPage === 1}
+                        aria-label={t('reviews.prev')}
+                        className="w-11 h-11 rounded-full bg-white/10 border border-white/20 text-white hover:bg-blue-600 hover:border-blue-500 disabled:opacity-30 disabled:pointer-events-none shadow-sm flex items-center justify-center transition-all cursor-pointer active:scale-95"
+                      >
+                        <FiChevronLeft size={18} />
+                      </button>
+
+                      <span className="text-xs font-semibold text-blue-200/80 tabular-nums px-2">
+                        {safeReviewPage} / {totalReviewPages}
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() => handleReviewPageChange(Math.min(safeReviewPage + 1, totalReviewPages))}
+                        disabled={safeReviewPage === totalReviewPages}
+                        aria-label={t('reviews.next')}
+                        className="w-11 h-11 rounded-full bg-blue-600 hover:bg-blue-500 text-white disabled:opacity-30 disabled:pointer-events-none shadow-lg shadow-blue-600/30 flex items-center justify-center transition-all cursor-pointer active:scale-95"
+                      >
+                        <FiChevronRight size={18} />
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             );
           })()}
 
           {/* Client Logos Ticker */}
-          <div className="space-y-6 pt-4 border-t border-blue-900/30">
-            <p className="text-center text-xs font-bold uppercase tracking-widest text-blue-400/80">
-              {t('reviews.trustedBy')}
+          <div className="space-y-6 pt-8 border-t border-blue-900/40">
+            <p className="text-center text-xs font-bold uppercase tracking-widest text-blue-300/80">
+              {resolveDynamicText(settings.clientsTickerTitle, 'reviews.trustedBy')}
             </p>
             <div className="relative">
-              <div className="flex gap-8 overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_15%,white_85%,transparent)]">
-                <div className="flex gap-8 animate-[scroll_30s_linear_infinite] min-w-max">
+              <div className="flex gap-6 overflow-hidden [mask-image:linear-gradient(to_right,transparent,white_15%,white_85%,transparent)]">
+                <div className="flex gap-6 animate-[scroll_30s_linear_infinite] min-w-max">
                   {[...clients, ...clients].map((client, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center gap-3.5 bg-blue-900/30 border border-blue-800/40 rounded-xl px-5 py-3 flex-shrink-0 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-950/40 transition-all duration-300"
+                      className="flex items-center gap-3.5 bg-blue-900/35 border border-blue-800/50 rounded-xl px-5 py-3 flex-shrink-0 hover:border-blue-400 hover:shadow-lg hover:shadow-blue-950/40 transition-all duration-300"
                     >
                       <div className="w-9 h-9 rounded-full overflow-hidden bg-gradient-to-br from-blue-700 to-indigo-800 border-2 border-blue-400/50 flex items-center justify-center flex-shrink-0 shadow-md">
                         {client.logo || client.image ? (
                           <img
-                            src={client.logo || client.image}
+                            src={getAssetUrl(client.logo || client.image)}
                             alt={client.name}
                             loading="lazy"
                             decoding="async"
@@ -1305,36 +1358,49 @@ const Home = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setReviewModalOpen(false)}
-              className="fixed inset-0 bg-black/75 backdrop-blur-sm"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm"
             />
 
             <motion.div
               initial={{ scale: 0.95, y: 20, opacity: 0 }}
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.95, y: 20, opacity: 0 }}
-              className="relative w-full max-w-lg bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl p-6 sm:p-8 z-10 text-white"
+              className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl z-10 overflow-hidden"
             >
+              {/* Close Button */}
               <button
                 onClick={() => setReviewModalOpen(false)}
-                className="absolute top-5 right-5 h-8 w-8 rounded-full bg-slate-800 hover:bg-slate-700 flex items-center justify-center text-slate-400 hover:text-white transition-colors"
+                className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-sm text-white flex items-center justify-center transition-colors cursor-pointer"
               >
-                <FiX size={18} />
+                <FiX size={16} />
               </button>
 
-              <div className="space-y-2 mb-6">
-                <span className="text-blue-400 font-bold uppercase tracking-widest text-[11px]">{t('modal.subtitle')}</span>
-                <h3 className="text-2xl font-black text-white">{t('modal.title')}</h3>
-                <p className="text-xs text-slate-400">
-                  {t('modal.desc')}
-                </p>
+              {/* Image Header */}
+              <div className="relative h-36 sm:h-44 w-full overflow-hidden bg-blue-900">
+                <img
+                  src={getAssetUrl(settings.popupImage, 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80')}
+                  alt="Construction"
+                  className="w-full h-full object-cover opacity-80"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=600&q=80';
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-white via-white/30 to-transparent" />
+                <div className="absolute bottom-4 left-6 right-6">
+                  <span className="text-blue-600 font-bold uppercase tracking-widest text-[11px]">{t('modal.subtitle')}</span>
+                  <h3 className="text-xl sm:text-2xl font-black text-slate-900">{t('modal.title')}</h3>
+                </div>
               </div>
 
+              <div className="px-6 pb-6 pt-3">
+                <p className="text-xs text-slate-500 mb-4">{t('modal.desc')}</p>
+
               {reviewSuccessMsg ? (
-                <div className="bg-emerald-500/20 border border-emerald-500/40 p-5 rounded-xl text-center space-y-3">
-                  <p className="text-sm font-bold text-emerald-300">{reviewSuccessMsg}</p>
+                <div className="bg-emerald-50 border border-emerald-200 p-5 rounded-xl text-center space-y-3">
+                  <p className="text-sm font-bold text-emerald-700">{reviewSuccessMsg}</p>
                   <button
                     onClick={() => setReviewModalOpen(false)}
-                    className="px-6 py-2 rounded-full bg-emerald-600 text-white font-bold text-xs"
+                    className="px-6 py-2 rounded-full bg-emerald-600 text-white font-bold text-xs cursor-pointer"
                   >
                     {lang === 'EN' ? 'Close' : 'Tutup'}
                   </button>
@@ -1375,49 +1441,49 @@ const Home = () => {
                       setReviewSubmitting(false);
                     }
                   }}
-                  className="space-y-4"
+                  className="space-y-3.5"
                 >
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1">{t('modal.nameLabel')}</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">{t('modal.nameLabel')}</label>
                       <input
                         type="text"
                         required
                         value={newReview.name}
                         onChange={(e) => setNewReview({ ...newReview, name: e.target.value })}
                         placeholder={lang === 'EN' ? "e.g., John Smith" : "Contoh: Ir. Hendra"}
-                        className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1">{t('modal.companyLabel')}</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">{t('modal.companyLabel')}</label>
                       <input
                         type="text"
                         value={newReview.company}
                         onChange={(e) => setNewReview({ ...newReview, company: e.target.value })}
                         placeholder={lang === 'EN' ? "e.g., Apex Corporation" : "Contoh: PT Bangun Mandiri"}
-                        className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1">{t('modal.roleLabel')}</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">{t('modal.roleLabel')}</label>
                       <input
                         type="text"
                         value={newReview.role}
                         onChange={(e) => setNewReview({ ...newReview, role: e.target.value })}
                         placeholder={lang === 'EN' ? "e.g., Project Owner" : "Contoh: Project Owner"}
-                        className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-300 mb-1">{t('modal.typeLabel')}</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">{t('modal.typeLabel')}</label>
                       <select
                         value={newReview.projectType}
                         onChange={(e) => setNewReview({ ...newReview, projectType: e.target.value })}
-                        className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-blue-500"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                       >
                         <option value="Residensial">{lang === 'EN' ? 'Residential & Architecture' : 'Residensial & Arsitektur'}</option>
                         <option value="Komersial">{lang === 'EN' ? 'Commercial & Office' : 'Komersial & Perkantoran'}</option>
@@ -1428,9 +1494,9 @@ const Home = () => {
                     </div>
                   </div>
 
-                  {/* Rating Selector */}
+                  {/* Rating */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">{t('modal.ratingLabel')}</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t('modal.ratingLabel')}</label>
                     <div className="flex gap-2">
                       {[1, 2, 3, 4, 5].map((star) => (
                         <button
@@ -1439,34 +1505,36 @@ const Home = () => {
                           onClick={() => setNewReview({ ...newReview, rating: star })}
                           className="p-1 focus:outline-none cursor-pointer"
                         >
-                          <FaStar size={20} className={star <= newReview.rating ? 'text-amber-400' : 'text-slate-600'} />
+                          <FaStar size={20} className={star <= newReview.rating ? 'text-amber-400' : 'text-slate-200'} />
                         </button>
                       ))}
                     </div>
                   </div>
 
-                  {/* Review Text Area */}
+                  {/* Review Text */}
                   <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1">{t('modal.reviewLabel')}</label>
+                    <label className="block text-xs font-semibold text-slate-700 mb-1">{t('modal.reviewLabel')}</label>
                     <textarea
                       required
-                      rows={4}
+                      rows={3}
                       value={newReview.review}
                       onChange={(e) => setNewReview({ ...newReview, review: e.target.value })}
-                      placeholder={lang === 'EN' ? "Share your experience with workmanship quality, timelines, and collaboration..." : "Bagikan pengalaman kerjasama, ketepatan waktu, dan kualitas pengerjaan Raya Konstruksi Jaya..."}
-                      className="w-full bg-slate-800/80 border border-slate-700 rounded-xl p-3.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500"
+                      placeholder={lang === 'EN' ? "Share your experience with workmanship quality, timelines, and collaboration..." : "Bagikan pengalaman kerjasama, ketepatan waktu, dan kualitas pengerjaan..."}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={reviewSubmitting}
-                    className="w-full py-3.5 rounded-full bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs uppercase tracking-wider shadow-lg shadow-blue-600/30 transition-all disabled:opacity-50 cursor-pointer"
+                    className="w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-lg shadow-blue-600/25 transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2"
                   >
+                    <FiStar size={16} />
                     {reviewSubmitting ? t('modal.submitting') : t('modal.submitBtn')}
                   </button>
                 </form>
               )}
+              </div>
             </motion.div>
           </div>
         )}
@@ -1498,9 +1566,12 @@ const Home = () => {
 
               <div className="h-64 md:h-full relative bg-secondary">
                 <img
-                  src={selectedProject.img}
+                  src={getAssetUrl(selectedProject.img)}
                   alt={selectedProject.title}
                   className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f6?w=800&q=80';
+                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
               </div>
@@ -1511,6 +1582,7 @@ const Home = () => {
                     {t('projects.detailsHeader')} • {(() => {
                       if (selectedProject.category === 'Residential') return lang === 'EN' ? 'Residential' : 'Residensial';
                       if (selectedProject.category === 'Commercial') return lang === 'EN' ? 'Commercial' : 'Komersial';
+                      if (selectedProject.category === 'Industrial') return lang === 'EN' ? 'Industrial' : 'Industri';
                       if (selectedProject.category === 'Infrastructure') return lang === 'EN' ? 'Infrastructure' : 'Infrastruktur';
                       return selectedProject.category;
                     })()}
@@ -1565,7 +1637,7 @@ const Home = () => {
       </AnimatePresence>
 
       {/* Contact Section - Clean Centered Dark Banner */}
-      <section id="contact" className="relative py-32 px-8 overflow-hidden scroll-mt-24">
+      <section id="contact" className="relative py-20 sm:py-32 px-4 sm:px-8 overflow-hidden scroll-mt-24">
         {/* Background Image / Video */}
         <div className="absolute inset-0 z-0">
           {settings.contactBgType === 'video' && settings.contactVideo ? (
@@ -1590,7 +1662,7 @@ const Home = () => {
             )
           ) : (
             <img 
-              src={settings.contactImage || '/galery/WhatsApp Image 2026-07-01 at 23.38.37.jpeg'} 
+              src={getAssetUrl(settings.contactImage, '/galery/WhatsApp Image 2026-07-01 at 23.38.37.jpeg')} 
               alt="Construction site" 
               className="w-full h-full object-cover"
             />
@@ -1612,20 +1684,20 @@ const Home = () => {
           {/* Main Headline */}
           <div className="space-y-6">
             <span className="text-primary-container text-xs font-black uppercase tracking-[0.25em] drop-shadow-md">{t('contact.badge')}</span>
-            <h2 className="text-4xl md:text-6xl font-black text-white leading-tight tracking-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)]">
-              {lang === 'EN' ? t('contact.title') : (settings.contactTitle || t('contact.title'))}
+            <h2 className="text-2xl sm:text-4xl md:text-6xl font-black text-white leading-tight tracking-tight drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)]">
+              {resolveDynamicText(settings.contactTitle, 'contact.title')}
             </h2>
             <p className="text-white/95 max-w-xl mx-auto text-sm md:text-base leading-relaxed drop-shadow-[0_1px_6px_rgba(0,0,0,0.85)] font-medium">
-              {lang === 'EN' ? t('contact.desc') : (settings.contactDesc || t('contact.desc'))}
+              {resolveDynamicText(settings.contactDesc, 'contact.desc')}
             </p>
 
             {/* Action Buttons */}
-            <div className="flex flex-wrap justify-center gap-4 pt-6">
+            <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4 pt-6">
               <a 
                 href={`https://wa.me/${settings.whatsappNumber || '6281234567890'}?text=Halo%20${encodeURIComponent(settings.companyName || 'Raya Konstruksi Jaya')},%20saya%20tertarik%20untuk%20konsultasi%20proyek.`}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-3 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-green-500/50 text-white font-bold py-4.5 px-8 rounded-2xl transition-all duration-300 backdrop-blur-md hover:scale-[1.02] shadow-xl text-sm md:text-base cursor-pointer"
+                className="inline-flex items-center gap-2 sm:gap-3 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-green-500/50 text-white font-bold py-3.5 sm:py-4.5 px-5 sm:px-8 rounded-2xl transition-all duration-300 backdrop-blur-md hover:scale-[1.02] shadow-xl text-xs sm:text-sm md:text-base cursor-pointer"
               >
                 <FaWhatsapp className="text-xl text-green-400" />
                 <span>{t('contact.btnWa')}</span>
@@ -1637,7 +1709,7 @@ const Home = () => {
                   setEmailModalBody(`Halo Tim ${settings.companyName || 'Raya Konstruksi Jaya'},\n\nSaya tertarik untuk berkonsultasi mengenai rencana proyek saya.\nMohon informasi lebih lanjut mengenai tahapan, estimasi biaya, dan jadwal pengerjaan.\n\nTerima kasih.`);
                   setIsEmailModalOpen(true);
                 }}
-                className="inline-flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary-container/50 text-white font-bold py-4.5 px-8 rounded-2xl transition-all duration-300 backdrop-blur-md hover:scale-[1.02] shadow-xl text-sm md:text-base cursor-pointer"
+                className="inline-flex items-center gap-2 sm:gap-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary-container/50 text-white font-bold py-3.5 sm:py-4.5 px-5 sm:px-8 rounded-2xl transition-all duration-300 backdrop-blur-md hover:scale-[1.02] shadow-xl text-xs sm:text-sm md:text-base cursor-pointer"
               >
                 <FiMail className="text-xl text-primary-container" />
                 <span>{t('contact.btnEmail')}</span>
@@ -1650,29 +1722,24 @@ const Home = () => {
       <AnimatePresence>
         {consultService && (
           <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 sm:p-6 overflow-y-auto">
-            {/* Backdrop with explicit onClick */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-slate-950/80 backdrop-blur-md"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm"
               onClick={() => setConsultService(null)}
             />
 
-            {/* Modal Card */}
             <motion.div
               initial={{ opacity: 0, scale: 0.94, y: 16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.94, y: 16 }}
               transition={{ type: 'spring', damping: 28, stiffness: 320 }}
               onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-lg bg-slate-900 border border-slate-700/80 rounded-3xl shadow-2xl shadow-blue-950/80 overflow-hidden z-10 text-white"
+              className="relative w-full max-w-[700px] bg-[#F7F7F7] rounded-3xl shadow-2xl overflow-hidden z-10 grid grid-cols-1 md:grid-cols-2"
             >
-              {/* Top Accent Gradient Bar */}
-              <div className="h-1.5 w-full bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-400" />
-
-              {/* Close Button - prominent, high z-index, styled for effortless clicking */}
+              {/* Close Button */}
               <button 
                 type="button"
                 onClick={(e) => {
@@ -1680,44 +1747,28 @@ const Home = () => {
                   setConsultService(null);
                 }} 
                 aria-label="Tutup modal"
-                className="absolute top-5 right-5 z-20 w-9 h-9 rounded-full bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 flex items-center justify-center cursor-pointer transition-all duration-200 active:scale-95 shadow-md"
+                className="absolute top-3.5 right-3.5 z-20 w-8 h-8 rounded-full bg-black/30 hover:bg-black/50 backdrop-blur-xs text-white flex items-center justify-center cursor-pointer transition-all active:scale-95"
               >
-                <FiX size={18} />
+                <FiX size={16} />
               </button>
 
-              <div className="p-6 sm:p-8 space-y-6">
-                {/* Header */}
-                <div className="pr-10 space-y-2">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/15 border border-blue-400/30 text-blue-300 text-xs font-bold uppercase tracking-wider">
-                    <FiPhoneCall size={12} />
-                    <span>{t('consult.title')}</span>
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                    {lang === 'EN' ? 'Direct Consultation' : 'Mulai Diskusi Proyek'}
+              {/* Left Side: Content & Actions */}
+              <div className="p-7 sm:p-8 flex flex-col justify-center space-y-5 order-2 md:order-1">
+                <div className="space-y-1.5">
+                  <span className="inline-block text-[11px] font-bold uppercase tracking-widest text-blue-600">
+                    {consultService}
+                  </span>
+                  <h3 className="text-2xl font-black text-slate-900 tracking-tight">
+                    {lang === 'EN' ? 'Start Consultation' : 'Mulai Konsultasi'}
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                  <p className="text-xs sm:text-sm text-slate-500">
                     {t('consult.subtitle')}
                   </p>
                 </div>
 
-                {/* Selected Service Pill */}
-                <div className="p-3.5 sm:p-4 rounded-2xl bg-slate-800/60 border border-slate-700/70 flex items-center justify-between gap-3">
-                  <div className="min-w-0">
-                    <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                      {t('consult.forService')}
-                    </span>
-                    <span className="text-sm sm:text-base font-extrabold text-white truncate block">
-                      {consultService}
-                    </span>
-                  </div>
-                  <span className="px-2.5 py-1 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 rounded-lg flex-shrink-0">
-                    {lang === 'EN' ? 'Online' : 'Tersedia'}
-                  </span>
-                </div>
-
-                {/* Action Options */}
-                <div className="space-y-3 pt-1">
-                  {/* WhatsApp Option */}
+                {/* Action Buttons */}
+                <div className="space-y-2.5">
+                  {/* WhatsApp */}
                   <a
                     href={(() => {
                       const company = settings.companyName || 'Raya Konstruksi Jaya';
@@ -1730,73 +1781,57 @@ const Home = () => {
                     target="_blank"
                     rel="noreferrer"
                     onClick={() => setConsultService(null)}
-                    className="group flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-slate-800/80 to-slate-800/80 hover:to-emerald-950/40 border border-emerald-500/30 hover:border-emerald-400 transition-all duration-300 no-underline cursor-pointer shadow-lg hover:shadow-emerald-950/40"
+                    className="w-full flex items-center justify-center gap-2.5 py-3 px-5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm transition-all no-underline cursor-pointer shadow-sm"
                   >
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center text-white shadow-md shadow-emerald-600/30 group-hover:scale-105 transition-transform flex-shrink-0">
-                      <FaWhatsapp size={24} />
-                    </div>
-                    <div className="flex-grow min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors">
-                          {t('consult.viaWa')}
-                        </h4>
-                        <span className="px-1.5 py-0.5 text-[9px] font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 rounded border border-emerald-400/30">
-                          {lang === 'EN' ? 'Fast Response' : 'Paling Cepat'}
-                        </span>
-                      </div>
-                      <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">{t('consult.viaWaDesc')}</p>
-                    </div>
-                    <div className="w-8 h-8 rounded-full bg-slate-800 group-hover:bg-emerald-500 text-slate-400 group-hover:text-white flex items-center justify-center transition-all flex-shrink-0">
-                      <FiArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
-                    </div>
+                    <FaWhatsapp size={18} />
+                    <span>{t('consult.viaWa')}</span>
                   </a>
 
-                  {/* Email Option */}
+                  {/* Email - Langsung buka Gmail compose tanpa popup kedua */}
                   <button
                     type="button"
                     onClick={() => {
                       const company = settings.companyName || 'Raya Konstruksi Jaya';
+                      const cleanEmail = settings.emailAddress || 'contact@rayakonstruksi.com';
                       const subject = t('consult.emailSubject')
                         .replace('{service}', consultService || '')
                         .replace('{company}', company);
                       const body = t('consult.emailBody')
                         .replace(/\{company\}/g, company)
                         .replace(/\{service\}/g, consultService || '');
-                      setEmailModalSubject(subject);
-                      setEmailModalBody(body);
+                      const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(cleanEmail)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                      window.open(gmailUrl, '_blank', 'noopener,noreferrer');
                       setConsultService(null);
-                      setIsEmailModalOpen(true);
                     }}
-                    className="w-full group flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-blue-950/40 via-slate-800/80 to-slate-800/80 hover:to-blue-950/40 border border-blue-500/30 hover:border-blue-400 transition-all duration-300 text-left cursor-pointer shadow-lg hover:shadow-blue-950/40"
+                    className="w-full flex items-center justify-center gap-2.5 py-3 px-5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm transition-all cursor-pointer shadow-sm"
                   >
-                    <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-600/30 group-hover:scale-105 transition-transform flex-shrink-0">
-                      <FiMail size={22} />
-                    </div>
-                    <div className="flex-grow min-w-0">
-                      <h4 className="text-sm font-bold text-white group-hover:text-blue-300 transition-colors">
-                        {t('consult.viaEmail')}
-                      </h4>
-                      <p className="text-xs text-slate-400 mt-0.5 line-clamp-1">{t('consult.viaEmailDesc')}</p>
-                    </div>
-                    <div className="w-8 h-8 rounded-full bg-slate-800 group-hover:bg-blue-600 text-slate-400 group-hover:text-white flex items-center justify-center transition-all flex-shrink-0">
-                      <FiArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
-                    </div>
+                    <FiMail size={16} />
+                    <span>{t('consult.viaEmail')}</span>
                   </button>
                 </div>
 
-                {/* Footer Note & Cancel Button */}
-                <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-slate-800">
-                  <span className="text-[11px] text-slate-400 text-center sm:text-left">
-                    {lang === 'ID' ? '⏱ Respon cepat tim estimator: 1x24 jam' : '⏱ Typical estimator response: within 24h'}
-                  </span>
+                <div className="pt-2 flex items-center justify-between border-t border-slate-200/80 text-[11px] text-slate-400">
+                  <span>{lang === 'ID' ? 'Respon 1x24 jam' : 'Response within 24h'}</span>
                   <button
                     type="button"
                     onClick={() => setConsultService(null)}
-                    className="text-xs font-semibold text-slate-400 hover:text-white py-1.5 px-3 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+                    className="font-semibold text-slate-500 hover:text-slate-800 cursor-pointer"
                   >
                     {lang === 'EN' ? 'Cancel' : 'Batal'}
                   </button>
                 </div>
+              </div>
+
+              {/* Right Side: Full-Bleed Image */}
+              <div className="relative h-48 md:h-auto md:min-h-[340px] w-full overflow-hidden bg-slate-200 order-1 md:order-2">
+                <img
+                  src={getAssetUrl(settings.popupImage, 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80')}
+                  alt="Construction"
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80';
+                  }}
+                />
               </div>
             </motion.div>
           </div>
@@ -1867,7 +1902,7 @@ const Home = () => {
               <div className="relative w-full aspect-video rounded-2xl overflow-hidden shadow-[0_0_60px_rgba(0,0,0,0.9)] border border-white/15 bg-black">
                 <video
                   ref={fullscreenVideoRef}
-                  src={settings.aboutVideo || '/construction-video.mp4'}
+                  src={getAboutVideoSrc()}
                   autoPlay
                   controls
                   loop
@@ -1947,7 +1982,7 @@ const Home = () => {
             {/* Mini Video */}
             <div className="relative aspect-video bg-black group">
               <video
-                src={settings.aboutVideo || '/construction-video.mp4'}
+                src={getAboutVideoSrc()}
                 autoPlay
                 loop
                 muted
@@ -1978,6 +2013,7 @@ const Home = () => {
         companyName={settings.companyName || 'Raya Konstruksi Jaya'}
         defaultSubject={emailModalSubject || `Konsultasi Proyek - ${settings.companyName || 'Raya Konstruksi Jaya'}`}
         defaultBody={emailModalBody || `Halo Tim ${settings.companyName || 'Raya Konstruksi Jaya'},\n\nSaya ingin berkonsultasi mengenai kebutuhan proyek saya.\n\nTerima kasih.`}
+        popupImage={getAssetUrl(settings.popupImage, 'https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&q=80')}
       />
     </div>
   );

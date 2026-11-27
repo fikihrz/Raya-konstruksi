@@ -543,8 +543,8 @@ app.post('/api/analytics/visit', async (req, res) => {
           date: doc.analytics.lastDate,
           visits: doc.analytics.todayVisits
         });
-        if (doc.analytics.history.length > 14) {
-          doc.analytics.history = doc.analytics.history.slice(-14);
+        if (doc.analytics.history.length > 365) {
+          doc.analytics.history = doc.analytics.history.slice(-365);
         }
       }
       doc.analytics.todayVisits = 0;
@@ -583,6 +583,7 @@ app.post('/api/reviews', async (req, res) => {
       projectType: projectType || 'Konstruksi',
       rating: Number(rating) || 5,
       review: review.trim(),
+      avatar: '',
       date: new Date().toLocaleDateString('id-ID', { year: 'numeric', month: 'short', day: 'numeric' }),
       createdAt: new Date()
     };

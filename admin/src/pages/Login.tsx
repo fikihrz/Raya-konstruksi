@@ -124,12 +124,12 @@ const Login = () => {
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-indigo-600/20 rounded-full blur-3xl"></div>
       </div>
 
-      <div className="max-w-md w-full relative z-10 bg-slate-800/80 backdrop-blur-xl p-8 sm:p-10 rounded-2xl shadow-2xl border border-slate-700/60">
+      <div className="max-w-md w-full relative z-10 bg-slate-800/80 backdrop-blur-xl p-6 sm:p-10 rounded-2xl shadow-2xl border border-slate-700/60">
 
         {/* Header */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 bg-blue-600 rounded-2xl overflow-hidden flex items-center justify-center p-1.5 text-white shadow-xl shadow-blue-900/50 mb-4 border border-blue-400/30">
-            <img src="/Profil.png" alt="Raya Konstruksi Logo" className="w-full h-full object-contain" />
+        <div className="flex flex-col items-center mb-7 sm:mb-8">
+          <div className="w-16 h-16 flex items-center justify-center mb-3">
+            <img src="/Profil.png" alt="Raya Konstruksi Logo" className="w-full h-full object-contain drop-shadow" />
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
             Raya<span className="text-blue-400">.</span> Workspace

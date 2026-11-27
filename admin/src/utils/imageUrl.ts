@@ -7,8 +7,9 @@
  * - /galery/... or /... (frontend public assets)
  */
 
-const FRONTEND_ORIGIN = 'https://rayakonstruksijaya.vercel.app';
-const BACKEND_ORIGIN = 'https://backend-three-beta-90.vercel.app';
+const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+const FRONTEND_ORIGIN = isLocalhost ? 'http://localhost:5173' : 'https://rayakonstruksijaya.vercel.app';
+const BACKEND_ORIGIN = isLocalhost ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
 export const DEFAULT_FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1541888946425-d0fbb18f15f6?w=600&q=80';
 
 export function resolveImageUrl(src?: string): string {

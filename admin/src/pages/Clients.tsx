@@ -188,7 +188,49 @@ const Clients = () => {
       )}
 
       <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile Card View */}
+        <div className="md:hidden divide-y divide-slate-100">
+          {clients.map(client => (
+            <div key={client.id} className="p-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-100 border border-slate-300 flex items-center justify-center flex-shrink-0">
+                  {client.logo ? (
+                    <img src={resolveImageUrl(client.logo)} alt={client.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold">
+                      {client.abbr || (client.name ? client.name.charAt(0).toUpperCase() : 'K')}
+                    </div>
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-slate-800 truncate">{client.name}</p>
+                  <span className={`text-[11px] font-medium ${client.logo ? 'text-emerald-600' : 'text-amber-600'}`}>
+                    {client.logo ? 'Ada Foto PP' : 'Belum Ada PP'}
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <button 
+                  onClick={() => { setEditingId(client.id); setFormData(client); }} 
+                  className="p-2 rounded-lg text-blue-600 hover:bg-blue-50"
+                  title="Edit"
+                >
+                  <FiEdit2 size={16} />
+                </button>
+                <button 
+                  onClick={() => handleDelete(client.id)} 
+                  className="p-2 rounded-lg text-red-500 hover:bg-red-50"
+                  title="Hapus"
+                >
+                  <FiTrash2 size={16} />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-100">
             <thead className="bg-slate-50">
               <tr>

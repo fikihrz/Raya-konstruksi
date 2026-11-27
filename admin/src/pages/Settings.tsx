@@ -1,5 +1,5 @@
-﻿import React, { useState, useEffect } from 'react';
-import { FiSave, FiChevronDown, FiChevronUp, FiUpload, FiLock, FiCheckCircle, FiAlertCircle, FiVideo, FiImage, FiTrash2 } from 'react-icons/fi';
+import React, { useState, useEffect } from 'react';
+import { FiSave, FiChevronDown, FiChevronUp, FiUpload, FiLock, FiCheckCircle, FiAlertCircle, FiVideo, FiTrash2 } from 'react-icons/fi';
 import { useToast } from '../context/ToastContext';
 import { processImageFile } from '../utils/imageUpload';
 import { apiFetch } from '../utils/api';
@@ -12,7 +12,7 @@ const Section = ({ title, children, defaultOpen = false }: { title: string; chil
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="w-full flex justify-between items-center px-5 sm:px-6 py-4 hover:bg-slate-50/80 transition-colors"
+        className="w-full flex justify-between items-center px-5 sm:px-6 py-4 hover:bg-slate-50/80 transition-colors cursor-pointer"
       >
         <h3 className="text-sm sm:text-base font-bold text-slate-800 text-left">{title}</h3>
         {open ? <FiChevronUp className="text-slate-400 flex-shrink-0" /> : <FiChevronDown className="text-slate-400 flex-shrink-0" />}
@@ -31,7 +31,7 @@ const Field = ({ label, value, onChange, placeholder = '', multiline = false, ty
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
         rows={3}
-        className="w-full border border-slate-300 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none"
+        className="w-full border border-slate-300 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all resize-none bg-white"
       />
     ) : (
       <input
@@ -39,7 +39,7 @@ const Field = ({ label, value, onChange, placeholder = '', multiline = false, ty
         value={value || ''}
         onChange={e => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full border border-slate-300 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+        className="w-full border border-slate-300 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white"
       />
     )}
   </div>
@@ -91,10 +91,10 @@ const ImageField = ({ label, value, fieldKey, onChange }: { label: string; value
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
         {previewSrc && (
           <div className="relative group flex-shrink-0">
-            <img 
-              src={previewSrc} 
-              alt="Preview" 
-              className="w-24 h-16 object-cover rounded-xl border border-slate-200 shadow-sm bg-slate-100" 
+            <img
+              src={previewSrc}
+              alt="Preview"
+              className="w-24 h-16 object-cover rounded-xl border border-slate-200 shadow-sm bg-slate-100"
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).src = DEFAULT_FALLBACK_IMAGE;
               }}
@@ -102,7 +102,7 @@ const ImageField = ({ label, value, fieldKey, onChange }: { label: string; value
             <button
               type="button"
               onClick={() => onChange(fieldKey, '')}
-              className="absolute -top-1.5 -right-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-full p-1 shadow transition-colors"
+              className="absolute -top-1.5 -right-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-full p-1 shadow transition-colors cursor-pointer"
               title="Hapus gambar"
             >
               <FiTrash2 size={11} />
@@ -118,7 +118,6 @@ const ImageField = ({ label, value, fieldKey, onChange }: { label: string; value
     </div>
   );
 };
-
 
 const getYouTubeEmbedId = (url?: string) => {
   if (!url) return null;
@@ -242,7 +241,7 @@ const VideoField = ({
             onChange(fieldKey, e.target.value);
           }}
           placeholder="Misal: https://www.youtube.com/watch?v=... atau https://youtu.be/..."
-          className={'w-full border border-slate-300 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all ' + (isDataUrl ? 'bg-slate-100 text-slate-500 cursor-not-allowed italic' : '')}
+          className={'w-full border border-slate-300 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all ' + (isDataUrl ? 'bg-slate-100 text-slate-500 cursor-not-allowed italic' : 'bg-white')}
         />
         {isDataUrl && (
           <p className="text-[11px] text-blue-600 mt-1">
@@ -380,14 +379,14 @@ const Settings = () => {
     setPwdLoading(false);
   };
 
-  if (loading) return <div className="text-slate-500 text-sm py-8 text-center">Loading data pengaturan...</div>;
+  if (loading) return <div className="text-slate-500 text-sm py-8 text-center">Memuat data pengaturan...</div>;
 
   return (
     <div className="max-w-4xl space-y-6">
       <div className="mb-2">
         <h2 className="text-2xl sm:text-3xl font-bold text-slate-800">Pengaturan Lengkap Website</h2>
         <p className="text-slate-500 mt-1 text-xs sm:text-sm leading-relaxed">
-          Ubah semua konten teks, gambar banner hero, video tentang kami, kontak, dan kredensial akun admin.
+          Selaraskan seluruh teks, gambar banner hero, bagian Tentang Kami, judul section, gambar popup, dan info kontak website.
         </p>
       </div>
 
@@ -406,8 +405,8 @@ const Settings = () => {
             {/* Slide 1 */}
             <div className="p-4 sm:p-5 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-3.5">
               <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-100/70 px-2.5 py-1 rounded-md">Slide 1</span>
-              <Field label="Tagline Label Atas (Badge)" value={settings.heroTag1} onChange={(v: string) => set('heroTag1', v)} placeholder="Misal: ARCHITECTURE & DESIGN" />
-              <Field label="Judul Utama Slide 1" value={settings.heroTitle} onChange={(v: string) => set('heroTitle', v)} placeholder="Misal: Membangun Masa Depan Presisi & Berkualitas" />
+              <Field label="Tagline Label Atas (Badge)" value={settings.heroTag1} onChange={(v: string) => set('heroTag1', v)} placeholder="ARSITEKTUR & DESAIN" />
+              <Field label="Judul Utama Slide 1" value={settings.heroTitle} onChange={(v: string) => set('heroTitle', v)} placeholder="Membangun Masa Depan Presisi & Berkualitas" />
               <Field label="Deskripsi / Sub-judul Slide 1" value={settings.heroDesc} onChange={(v: string) => set('heroDesc', v)} placeholder="Deskripsi singkat slide 1..." multiline />
               <ImageField label="Foto Background Slide 1" value={settings.heroImage} fieldKey="heroImage" onChange={set} />
             </div>
@@ -415,8 +414,8 @@ const Settings = () => {
             {/* Slide 2 */}
             <div className="p-4 sm:p-5 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-3.5">
               <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-100/70 px-2.5 py-1 rounded-md">Slide 2</span>
-              <Field label="Tagline Label Atas (Badge)" value={settings.heroTag2} onChange={(v: string) => set('heroTag2', v)} placeholder="Misal: COMMERCIAL & TOWER" />
-              <Field label="Judul Utama Slide 2" value={settings.heroTitle2} onChange={(v: string) => set('heroTitle2', v)} placeholder="Misal: Konstruksi Megah Komersial & Perkantoran" />
+              <Field label="Tagline Label Atas (Badge)" value={settings.heroTag2} onChange={(v: string) => set('heroTag2', v)} placeholder="PENGEMBANGAN KOMERSIAL" />
+              <Field label="Judul Utama Slide 2" value={settings.heroTitle2} onChange={(v: string) => set('heroTitle2', v)} placeholder="Konstruksi Megah Komersial & Perkantoran" />
               <Field label="Deskripsi / Sub-judul Slide 2" value={settings.heroDesc2} onChange={(v: string) => set('heroDesc2', v)} placeholder="Deskripsi singkat slide 2..." multiline />
               <ImageField label="Foto Background Slide 2" value={settings.heroImage2} fieldKey="heroImage2" onChange={set} />
             </div>
@@ -424,8 +423,8 @@ const Settings = () => {
             {/* Slide 3 */}
             <div className="p-4 sm:p-5 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-3.5">
               <span className="text-xs font-bold uppercase tracking-wider text-blue-600 bg-blue-100/70 px-2.5 py-1 rounded-md">Slide 3</span>
-              <Field label="Tagline Label Atas (Badge)" value={settings.heroTag3} onChange={(v: string) => set('heroTag3', v)} placeholder="Misal: CIVIL & INFRASTRUCTURE" />
-              <Field label="Judul Utama Slide 3" value={settings.heroTitle3} onChange={(v: string) => set('heroTitle3', v)} placeholder="Misal: Infrastruktur Vital & Fabrikasi Industri" />
+              <Field label="Tagline Label Atas (Badge)" value={settings.heroTag3} onChange={(v: string) => set('heroTag3', v)} placeholder="INFRASTRUKTUR INDUSTRI" />
+              <Field label="Judul Utama Slide 3" value={settings.heroTitle3} onChange={(v: string) => set('heroTitle3', v)} placeholder="Infrastruktur Vital & Fabrikasi Industri" />
               <Field label="Deskripsi / Sub-judul Slide 3" value={settings.heroDesc3} onChange={(v: string) => set('heroDesc3', v)} placeholder="Deskripsi singkat slide 3..." multiline />
               <ImageField label="Foto Background Slide 3" value={settings.heroImage3} fieldKey="heroImage3" onChange={set} />
             </div>
@@ -433,9 +432,8 @@ const Settings = () => {
         </Section>
 
         {/* 2. About Section & Video Showcase */}
-        <Section title="2. Tentang Kami & Video Showcase (About Us)">
+        <Section title="2. Tentang Kami & Video Showcase (About Us)" defaultOpen>
           <div className="space-y-4">
-            {/* Video Configuration */}
             <div className="p-4 bg-blue-50/60 border border-blue-200/80 rounded-2xl space-y-3">
               <div className="flex items-center gap-2 text-blue-800 font-bold text-sm">
                 <FiVideo size={18} />
@@ -446,23 +444,48 @@ const Settings = () => {
                 value={settings.aboutVideo}
                 fieldKey="aboutVideo"
                 onChange={set}
-                tips="Video ini akan ditampilkan di halaman Tentang Kami. Bisa upload video lokal atau masukkan link YouTube."
+                tips="Video ini ditampilkan di kolom kiri section Tentang Kami. Bisa upload video lokal atau masukkan link YouTube."
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label="Badge Label Atas" value={settings.aboutBadge} onChange={(v: string) => set('aboutBadge', v)} placeholder="Behind The Blueprint" />
-              <Field label="Nama Perusahaan (Heading Utama)" value={settings.aboutTitle} onChange={(v: string) => set('aboutTitle', v)} placeholder="Raya Konstruksi Jaya" />
+              <Field label="Judul Kiri (Di Atas Video)" value={settings.aboutHeading} onChange={(v: string) => set('aboutHeading', v)} placeholder="Tentang Kami" />
+              <Field label="Heading Kanan (Nama Perusahaan)" value={settings.aboutTitle} onChange={(v: string) => set('aboutTitle', v)} placeholder="Raya Konstruksi Jaya" />
             </div>
 
+            <div className="pt-3 border-t border-slate-100 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">4 Poin Keunggulan Tentang Kami (Grid 2x2)</h4>
+                <span className="text-[11px] text-slate-400">Kosongkan untuk memakai teks bawaan website</span>
+              </div>
 
-            <div className="pt-2 border-t border-slate-100 space-y-3">
-              <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500">Visi & Misi Perusahaan</h4>
-              <Field label="Judul Visi" value={settings.visionTitle} onChange={(v: string) => set('visionTitle', v)} placeholder="Pioneering Sustainable Horizons" />
-              <Field label="Deskripsi Visi" value={settings.visionDesc} onChange={(v: string) => set('visionDesc', v)} multiline />
-              <Field label="Misi Poin 1" value={settings.mission1} onChange={(v: string) => set('mission1', v)} multiline />
-              <Field label="Misi Poin 2" value={settings.mission2} onChange={(v: string) => set('mission2', v)} multiline />
-              <Field label="Misi Poin 3" value={settings.mission3} onChange={(v: string) => set('mission3', v)} multiline />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl space-y-2.5">
+                  <span className="text-[11px] font-bold text-blue-600 uppercase">Poin 1</span>
+                  <Field label="Judul Poin 1" value={settings.aboutFeature1Title} onChange={(v: string) => set('aboutFeature1Title', v)} placeholder="Presisi Arsitektur" />
+                  <Field label="Deskripsi Poin 1" value={settings.aboutFeature1Desc} onChange={(v: string) => set('aboutFeature1Desc', v)} placeholder="Perencanaan matang dari gambar kerja hingga finishing." multiline />
+                </div>
+
+                <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl space-y-2.5">
+                  <span className="text-[11px] font-bold text-blue-600 uppercase">Poin 2</span>
+                  <Field label="Judul Poin 2" value={settings.aboutFeature2Title} onChange={(v: string) => set('aboutFeature2Title', v)} placeholder="Tepat Waktu" />
+                  <Field label="Deskripsi Poin 2" value={settings.aboutFeature2Desc} onChange={(v: string) => set('aboutFeature2Desc', v)} placeholder="Manajemen jadwal terukur dan laporan progres jelas." multiline />
+                </div>
+
+                <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl space-y-2.5">
+                  <span className="text-[11px] font-bold text-blue-600 uppercase">Poin 3</span>
+                  <Field label="Judul Poin 3" value={settings.aboutFeature3Title} onChange={(v: string) => set('aboutFeature3Title', v)} placeholder="Standar Mutu & K3" />
+                  <Field label="Deskripsi Poin 3" value={settings.aboutFeature3Desc} onChange={(v: string) => set('aboutFeature3Desc', v)} placeholder="Prioritas keselamatan kerja dan material teruji." multiline />
+                </div>
+
+                <div className="p-3.5 bg-slate-50 border border-slate-200/80 rounded-xl space-y-2.5">
+                  <span className="text-[11px] font-bold text-blue-600 uppercase">Poin 4</span>
+                  <Field label="Judul Poin 4" value={settings.aboutFeature4Title} onChange={(v: string) => set('aboutFeature4Title', v)} placeholder="Konstruksi Kokoh" />
+                  <Field label="Deskripsi Poin 4" value={settings.aboutFeature4Desc} onChange={(v: string) => set('aboutFeature4Desc', v)} placeholder="Bangunan berdaya tahan tinggi untuk investasi jangka panjang." multiline />
+                </div>
+              </div>
+
+              <Field label="Teks Tombol CTA Tentang Kami (Mengarah ke Layanan)" value={settings.aboutCtaText} onChange={(v: string) => set('aboutCtaText', v)} placeholder="Jelajahi Layanan" />
             </div>
           </div>
         </Section>
@@ -483,17 +506,38 @@ const Settings = () => {
             </div>
 
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
-              <span className="text-xs font-bold text-slate-600 uppercase">Klien & Mitra</span>
-              <Field label="Judul Section" value={settings.clientsTitle} onChange={(v: string) => set('clientsTitle', v)} placeholder="Klien & Mitra Kami" />
-              <Field label="Deskripsi Section" value={settings.clientsDesc} onChange={(v: string) => set('clientsDesc', v)} multiline />
+              <span className="text-xs font-bold text-slate-600 uppercase">Portofolio Proyek</span>
+              <Field label="Judul Section" value={settings.projectsTitle} onChange={(v: string) => set('projectsTitle', v)} placeholder="Mahakarya Arsitektur" />
+              <Field label="Deskripsi Section" value={settings.projectsDesc} onChange={(v: string) => set('projectsDesc', v)} placeholder="Eksplorasi portofolio karya arsitektur dan konstruksi presisi tinggi yang telah kami selesaikan." multiline />
+            </div>
+
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+              <span className="text-xs font-bold text-slate-600 uppercase">Ulasan Klien & Mitra</span>
+              <Field label="Judul Utama Ulasan" value={settings.clientsTitle} onChange={(v: string) => set('clientsTitle', v)} placeholder="Dipercaya Oleh Klien & Mitra Industri" />
+              <Field label="Deskripsi Section Ulasan" value={settings.clientsDesc} onChange={(v: string) => set('clientsDesc', v)} placeholder="Pengalaman nyata para pemilik proyek dan mitra usaha yang bekerja sama dengan kami." multiline />
+              <Field label="Label Baris Logo Perusahaan Mitra" value={settings.clientsTickerTitle} onChange={(v: string) => set('clientsTickerTitle', v)} placeholder="Dipercaya Oleh Berbagai Perusahaan Terkemuka:" />
             </div>
           </div>
         </Section>
 
-        {/* 4. Contact & Company Info */}
-        <Section title="4. Informasi Kontak & Perusahaan">
+        {/* 4. Gambar Popup / Modal Website */}
+        <Section title="4. Gambar Popup / Modal Website">
+          <div className="space-y-3">
+            <p className="text-xs text-slate-500 leading-relaxed">
+              Gambar ini akan ditampilkan pada popup email, popup konsultasi layanan, dan popup tulis ulasan di website. Upload gambar yang menampilkan proyek atau kegiatan konstruksi perusahaan.
+            </p>
+            <ImageField
+              label="Gambar Header Popup Website"
+              value={settings.popupImage}
+              fieldKey="popupImage"
+              onChange={set}
+            />
+          </div>
+        </Section>
+
+        {/* 5. Informasi Kontak & Perusahaan */}
+        <Section title="5. Informasi Kontak & Perusahaan">
           <div className="space-y-4">
-                        {/* Background Banner Kontak (Gambar atau Video) */}
             <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
@@ -504,7 +548,7 @@ const Settings = () => {
                   <button
                     type="button"
                     onClick={() => set('contactBgType', 'image')}
-                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
                       (settings.contactBgType || 'image') !== 'video'
                         ? 'bg-white text-blue-600 shadow-sm'
                         : 'text-slate-600 hover:text-slate-900'
@@ -515,7 +559,7 @@ const Settings = () => {
                   <button
                     type="button"
                     onClick={() => set('contactBgType', 'video')}
-                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                    className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
                       settings.contactBgType === 'video'
                         ? 'bg-white text-blue-600 shadow-sm'
                         : 'text-slate-600 hover:text-slate-900'
@@ -547,7 +591,6 @@ const Settings = () => {
                 </div>
               )}
 
-              {/* Kontrol Tingkat Kegelapan Overlay Background */}
               <div className="pt-3 border-t border-slate-200/60 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <span className="text-xs sm:text-sm font-semibold text-slate-700 block">Tingkat Kegelapan Overlay Background</span>
@@ -566,6 +609,7 @@ const Settings = () => {
                 </select>
               </div>
             </div>
+
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Field label="Judul Kontak" value={settings.contactTitle} onChange={(v: string) => set('contactTitle', v)} placeholder="Siap Memulai Proyek Anda?" />
               <Field label="Nama Resmi Perusahaan" value={settings.companyName} onChange={(v: string) => set('companyName', v)} placeholder="Raya Konstruksi Jaya" />
@@ -577,7 +621,7 @@ const Settings = () => {
               <Field label="Alamat Email Resmi" value={settings.emailAddress} onChange={(v: string) => set('emailAddress', v)} placeholder="contact@rayakonstruksi.com" type="email" />
               <Field label="Akun Instagram (tanpa @)" value={settings.instagram} onChange={(v: string) => set('instagram', v)} placeholder="rayakonstruksijaya" />
               <Field label="Akun TikTok (tanpa @)" value={settings.tiktok} onChange={(v: string) => set('tiktok', v)} placeholder="rayakonstruksijaya" />
-              <Field label="Slogan / Brand Tagline" value={settings.brandTagline} onChange={(v: string) => set('brandTagline', v)} placeholder="Membangun Keunggulan Mutu" />
+              <Field label="Slogan / Brand Tagline (Footer)" value={settings.brandTagline} onChange={(v: string) => set('brandTagline', v)} placeholder="Membangun Keunggulan Mutu" />
               <Field label="Alamat Kantor Pusat" value={settings.companyAddress} onChange={(v: string) => set('companyAddress', v)} placeholder="Surakarta, Jawa Tengah, Indonesia" />
               <Field label="Link Google Maps (Buka Peta)" value={settings.mapsUrl} onChange={(v: string) => set('mapsUrl', v)} placeholder="https://maps.app.goo.gl/RZbeLE6SmbqKgyN78" />
               <Field label="Link Embed Google Maps (Iframe)" value={settings.mapsEmbedUrl} onChange={(v: string) => set('mapsEmbedUrl', v)} placeholder="https://maps.google.com/maps?q=-7.5017637,111.0782002+(Raya+Konstruksi)&t=&z=16&ie=UTF8&iwloc=&output=embed" />
@@ -586,11 +630,11 @@ const Settings = () => {
         </Section>
 
         {/* Sticky Save All Changes Bar */}
-        <div className="sticky bottom-4 z-20 pt-2">
+        <div className="sticky bottom-3 sm:bottom-4 z-20 pt-2">
           <button
             type="submit"
             disabled={saving}
-            className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-blue-400 text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-xl shadow-blue-900/30 text-sm sm:text-base cursor-pointer"
+            className="w-full bg-blue-600 hover:bg-blue-500 disabled:bg-blue-400 text-white font-bold py-3.5 sm:py-4 px-5 sm:px-6 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-xl shadow-blue-900/30 text-xs sm:text-base cursor-pointer"
           >
             <FiSave size={18} />
             <span>{saving ? 'Menyimpan Perubahan...' : 'Simpan Semua Perubahan Konten'}</span>
@@ -598,7 +642,7 @@ const Settings = () => {
         </div>
       </form>
 
-      {/* 5. Change Password Form (Secure) */}
+      {/* 6. Change Password Form (Secure) */}
       <div className="mt-10 bg-white rounded-2xl border border-slate-200 p-5 sm:p-6 shadow-sm space-y-4">
         <div className="flex items-center gap-2 text-slate-800 font-bold text-base sm:text-lg border-b border-slate-100 pb-3">
           <FiLock className="text-blue-600" />
@@ -607,8 +651,8 @@ const Settings = () => {
 
         {pwdMsg && (
           <div className={`p-3.5 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2 ${
-            pwdMsg.type === 'success' 
-              ? 'bg-emerald-50 border border-emerald-200 text-emerald-800' 
+            pwdMsg.type === 'success'
+              ? 'bg-emerald-50 border border-emerald-200 text-emerald-800'
               : 'bg-red-50 border border-red-200 text-red-700'
           }`}>
             {pwdMsg.type === 'success' ? <FiCheckCircle className="flex-shrink-0" /> : <FiAlertCircle className="flex-shrink-0" />}
@@ -658,13 +702,12 @@ const Settings = () => {
           <button
             type="submit"
             disabled={pwdLoading}
-            className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs sm:text-sm font-semibold transition-colors disabled:opacity-50"
+            className="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs sm:text-sm font-semibold transition-colors disabled:opacity-50 cursor-pointer"
           >
             {pwdLoading ? 'Memproses...' : 'Perbarui Kata Sandi'}
           </button>
         </form>
       </div>
-
     </div>
   );
 };

@@ -3,11 +3,14 @@ import { useState, useEffect, useRef } from 'react';
 import { FiChevronDown, FiSearch, FiMenu, FiX, FiCheck } from 'react-icons/fi';
 import { useLanguage } from '../context/LanguageContext';
 
+const API = window.location.hostname === 'localhost' ? 'http://localhost:3000' : 'https://backend-three-beta-90.vercel.app';
+
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchActive, setSearchActive] = useState(false);
   const [searchVal, setSearchVal] = useState('');
+  const [companyName, setCompanyName] = useState('Raya Konstruksi Jaya');
 
   // Dropdown States
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
@@ -16,6 +19,17 @@ const Navbar = () => {
   const { lang, setLang, t } = useLanguage();
 
   const navRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    fetch(`${API}/api/data`)
+      .then(res => res.json())
+      .then(data => {
+        if (data?.settings?.companyName?.trim()) {
+          setCompanyName(data.settings.companyName.trim());
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 30);
@@ -107,8 +121,8 @@ const Navbar = () => {
                   className="h-full w-auto max-w-[120px] object-contain drop-shadow"
                 />
               </div>
-              <span className="text-base sm:text-lg lg:text-xl font-bold text-white tracking-wide uppercase leading-tight">
-                Raya Konstruksi Jaya
+              <span className="hidden sm:inline text-base sm:text-lg lg:text-xl font-bold text-white tracking-wide uppercase leading-tight">
+                {companyName}
               </span>
             </Link>
           </div>
@@ -138,13 +152,16 @@ const Navbar = () => {
                 <div className="absolute top-full left-0 pt-2 w-52 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                   <div className="bg-slate-900/95 backdrop-blur-md border border-slate-700/80 rounded-xl shadow-2xl py-2 overflow-hidden">
                     <button
-                      onClick={() => {
-                        window.dispatchEvent(new CustomEvent('about-tab', { detail: 'vision' }));
-                        handleNavClick('about');
-                      }}
+                      onClick={() => handleNavClick('about')}
                       className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:text-white hover:bg-blue-600/30 transition-colors block cursor-pointer"
                     >
-                      {t('nav.about.vision')}
+                      {t('nav.about.profile')}
+                    </button>
+                    <button
+                      onClick={() => handleNavClick('why-us')}
+                      className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:text-white hover:bg-blue-600/30 transition-colors block cursor-pointer border-t border-slate-800"
+                    >
+                      {t('nav.about.whyUs')}
                     </button>
                     <button
                       onClick={() => handleNavClick('clients')}
@@ -245,6 +262,12 @@ const Navbar = () => {
                       className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:text-white hover:bg-blue-600/30 transition-colors block cursor-pointer"
                     >
                       {t('nav.projects.commercial')}
+                    </button>
+                    <button
+                      onClick={() => handleNavClick('projects', 'Industrial')}
+                      className="w-full text-left px-4 py-2.5 text-xs text-slate-200 hover:text-white hover:bg-blue-600/30 transition-colors block cursor-pointer"
+                    >
+                      {t('nav.projects.industrial')}
                     </button>
                     <button
                       onClick={() => handleNavClick('projects', 'Infrastructure')}

@@ -127,7 +127,7 @@ const Projects = () => {
         </div>
         <button 
           onClick={() => { setEditingId(0); setFormData({ title: '', location: '', year: 2026, category: 'Residential', budget: '', duration: '', fullDesc: '', img: '' }); }} 
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-md shadow-blue-600/20 text-sm font-semibold whitespace-nowrap"
+          className="w-full sm:w-auto justify-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-md shadow-blue-600/20 text-sm font-semibold whitespace-nowrap cursor-pointer"
         >
           <FiPlus /> <span>Tambah Proyek</span>
         </button>
@@ -146,6 +146,7 @@ const Projects = () => {
               <select value={formData.category || 'Residential'} onChange={e => setFormData({ ...formData, category: e.target.value })} className="w-full border border-slate-300 p-2.5 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500 bg-white">
                 <option value="Residential">Residential</option>
                 <option value="Commercial">Commercial</option>
+                <option value="Industrial">Industrial</option>
                 <option value="Infrastructure">Infrastructure</option>
               </select>
             </div>
@@ -228,7 +229,35 @@ const Projects = () => {
       )}
 
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Mobile Card View */}
+        <div className="md:hidden divide-y divide-slate-100">
+          {projects.map((project) => (
+            <div key={project.id} className="p-4 flex items-center gap-3.5">
+              <img 
+                src={resolveImageUrl(project.img)} 
+                alt={project.title} 
+                className="w-16 h-14 rounded-lg object-cover border border-slate-200 bg-slate-100 flex-shrink-0" 
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = DEFAULT_FALLBACK_IMAGE;
+                }}
+              />
+              <div className="flex-1 min-w-0">
+                <h4 className="text-sm font-bold text-slate-800 truncate">{project.title}</h4>
+                <div className="flex items-center gap-2 mt-1 flex-wrap">
+                  <span className="px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 text-[11px] font-semibold">{project.category}</span>
+                  <span className="text-xs text-slate-500 truncate">{project.location}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-1 flex-shrink-0">
+                <button onClick={() => { setEditingId(project.id); setFormData(project); }} className="p-2 rounded-lg text-blue-600 hover:bg-blue-50"><FiEdit2 size={16} /></button>
+                <button onClick={() => handleDelete(project.id)} className="p-2 rounded-lg text-red-500 hover:bg-red-50"><FiTrash2 size={16} /></button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-200">
             <thead className="bg-slate-50/80">
               <tr>

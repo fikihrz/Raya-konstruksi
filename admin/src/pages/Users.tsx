@@ -232,15 +232,15 @@ const Users = () => {
       </div>
 
       {/* Role Notice Card */}
-      <div className="bg-gradient-to-r from-blue-50 via-slate-50 to-indigo-50 border border-blue-200/80 rounded-2xl p-4 sm:p-5 flex items-start gap-3.5 shadow-sm">
-        <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0 shadow-md shadow-blue-500/20">
+      <div className="bg-blue-50/70 border border-blue-200/80 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-start gap-3.5 shadow-2xs">
+        <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0 shadow-sm shadow-blue-500/20">
           <FiShield size={20} />
         </div>
-        <div className="text-xs sm:text-sm text-slate-700 space-y-1">
+        <div className="text-xs sm:text-sm text-slate-700 space-y-1.5 min-w-0">
           <p className="font-bold text-slate-900">Kebijakan Hak Akses (Role-Based Access Control):</p>
-          <ul className="list-disc list-inside space-y-1 text-slate-600">
+          <ul className="list-disc pl-4 space-y-1 text-slate-600">
             <li>
-              <strong>fikihrz3135@gmail.com (Superadmin):</strong> Memiliki kontrol penuh, termasuk menambah, mengganti kata sandi, dan menghapus akun admin lainnya.
+              <strong className="break-all">fikihrz3135@gmail.com</strong> <strong>(Superadmin):</strong> Memiliki kontrol penuh, termasuk menambah, mengganti kata sandi, dan menghapus akun admin lainnya.
             </li>
             <li>
               <strong>Admin yang Ditambahkan (Role Admin):</strong> Hanya dapat mengelola konten website (Proyek, Layanan, Review, Pengaturan), dan <em>tidak memiliki akses</em> ke menu Kelola Admin ini.
@@ -249,23 +249,109 @@ const Users = () => {
         </div>
       </div>
 
-      {/* Users Table */}
-      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-          <h2 className="text-sm font-bold text-slate-800 flex items-center gap-2">
-            <FiUser className="text-blue-600" />
-            <span>Daftar Pengguna Panel Admin ({users.length})</span>
+      {/* Users List */}
+      <div className="bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
+        <div className="px-4 sm:px-5 py-4 border-b border-slate-100 flex items-center justify-between gap-2">
+          <h2 className="text-sm font-bold text-slate-800 flex items-center gap-2 min-w-0">
+            <FiUser className="text-blue-600 flex-shrink-0" />
+            <span className="truncate">Daftar Pengguna Admin ({users.length})</span>
           </h2>
           <button
             onClick={fetchUsers}
             disabled={loading}
-            className="text-xs font-semibold text-blue-600 hover:text-blue-700 cursor-pointer"
+            className="text-xs font-semibold text-blue-600 hover:text-blue-700 cursor-pointer whitespace-nowrap flex-shrink-0"
           >
             {loading ? 'Memuat...' : 'Muat Ulang'}
           </button>
         </div>
 
-        <div className="overflow-x-auto">
+        {/* Mobile Card View */}
+        <div className="md:hidden divide-y divide-slate-100">
+          {loading ? (
+            <div className="text-center py-8 text-xs text-slate-400">Memuat daftar pengguna admin...</div>
+          ) : users.length === 0 ? (
+            <div className="text-center py-8 text-xs text-slate-400">Belum ada pengguna admin terdaftar.</div>
+          ) : (
+            users.map((u) => {
+              const isMainSuper = u.email.toLowerCase().trim() === 'fikihrz3135@gmail.com';
+              const isCurrent = currentUser?.email?.toLowerCase().trim() === u.email.toLowerCase().trim();
+
+              return (
+                <div key={u._id} className="p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center font-bold text-xs shadow-xs flex-shrink-0 ${
+                        isMainSuper
+                          ? 'bg-amber-500 text-white'
+                          : 'bg-blue-50 text-blue-700 border border-blue-200'
+                      }`}>
+                        {u.name ? u.name.charAt(0).toUpperCase() : 'A'}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-bold text-slate-900 text-sm truncate">{u.name || 'Admin'}</span>
+                          {isCurrent && (
+                            <span className="text-[10px] text-blue-600 font-bold bg-blue-50 border border-blue-200 px-1.5 py-0.5 rounded whitespace-nowrap">
+                              Akun Anda
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs font-mono text-slate-500 truncate mt-0.5">{u.email}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-between gap-2 pt-1">
+                    {isMainSuper ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-300/80 whitespace-nowrap">
+                        <FiShield size={11} className="text-amber-600" />
+                        Superadmin
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200 whitespace-nowrap">
+                        <FiUser size={11} className="text-blue-500" />
+                        Admin (Staf)
+                      </span>
+                    )}
+
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setResetError('');
+                          setResetPasswordVal('');
+                          setResetTargetUser(u);
+                        }}
+                        className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-blue-50 hover:text-blue-600 transition-colors cursor-pointer"
+                      >
+                        <FiKey size={13} />
+                        <span>Sandi</span>
+                      </button>
+                      {!isMainSuper && (
+                        <button
+                          type="button"
+                          onClick={() => setDeleteTargetUser(u)}
+                          disabled={isCurrent}
+                          className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-colors cursor-pointer ${
+                            isCurrent
+                              ? 'text-slate-300 bg-slate-50 cursor-not-allowed'
+                              : 'text-red-600 bg-red-50 hover:bg-red-100'
+                          }`}
+                        >
+                          <FiTrash2 size={13} />
+                          <span>Hapus</span>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* Desktop Table View */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full text-left text-xs sm:text-sm">
             <thead className="bg-slate-50/80 text-slate-500 font-semibold border-b border-slate-100 text-[11px] uppercase tracking-wider">
               <tr>
@@ -308,7 +394,7 @@ const Users = () => {
                           <div>
                             <span className="font-bold text-slate-900 block">{u.name || 'Admin'}</span>
                             {isCurrent && (
-                              <span className="text-[10px] text-blue-600 font-bold bg-blue-50 px-1.5 py-0.5 rounded">
+                              <span className="inline-block text-[10px] text-blue-600 font-bold bg-blue-50 px-1.5 py-0.5 rounded whitespace-nowrap">
                                 Akun Anda Saat Ini
                               </span>
                             )}
