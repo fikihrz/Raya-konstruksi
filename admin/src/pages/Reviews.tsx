@@ -191,15 +191,27 @@ const Reviews = () => {
 
       {/* Form Modal / Panel */}
       {editingId !== null && (
-        <div className="bg-white p-5 sm:p-6 rounded-2xl shadow-lg border border-slate-200">
-          <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
-            <h3 className="text-lg font-bold text-slate-800">
-              {editingId === 0 ? 'Tambah Testimoni Baru' : 'Edit Testimoni & Foto Profil'}
-            </h3>
-            <button onClick={() => setEditingId(null)} className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer">
-              <FiX size={20} />
-            </button>
-          </div>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/60 backdrop-blur-sm overflow-y-auto"
+          onClick={() => setEditingId(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white p-5 sm:p-6 rounded-2xl shadow-2xl border border-slate-200 w-full max-w-3xl max-h-[92vh] overflow-y-auto my-auto"
+          >
+            <div className="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 sticky top-0 bg-white z-10">
+              <h3 className="text-base sm:text-lg font-bold text-slate-800">
+                {editingId === 0 ? 'Tambah Testimoni Baru' : 'Edit Testimoni & Foto Profil'}
+              </h3>
+              <button
+                type="button"
+                onClick={() => setEditingId(null)}
+                className="text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 cursor-pointer"
+                aria-label="Tutup"
+              >
+                <FiX size={20} />
+              </button>
+            </div>
 
           <form onSubmit={handleSave} className="space-y-5">
             <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
@@ -342,19 +354,20 @@ const Reviews = () => {
               <button
                 type="submit"
                 disabled={saving || uploadingAvatar}
-                className="bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm flex items-center gap-2 shadow-sm transition-all cursor-pointer"
+                className="flex-1 sm:flex-none justify-center bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm flex items-center gap-2 shadow-sm transition-all cursor-pointer"
               >
                 <FiSave /> {saving ? 'Menyimpan...' : 'Simpan Ulasan'}
               </button>
               <button
                 type="button"
                 onClick={() => setEditingId(null)}
-                className="bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-colors cursor-pointer"
+                className="flex-1 sm:flex-none justify-center bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2.5 rounded-xl font-semibold text-xs sm:text-sm transition-colors cursor-pointer"
               >
                 Batal
               </button>
             </div>
           </form>
+          </div>
         </div>
       )}
 
@@ -448,10 +461,10 @@ const Reviews = () => {
                 <span className="text-slate-400 text-[11px]">{item.date || 'Testimoni Resmi'}</span>
                 <div className="flex items-center gap-1.5">
                   <button
+                    type="button"
                     onClick={() => {
                       setEditingId(item.id);
-                      setFormData(item);
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                      setFormData({ ...item });
                     }}
                     className="inline-flex items-center gap-1 px-2.5 py-1.5 text-blue-600 hover:bg-blue-50 rounded-lg font-semibold transition-colors cursor-pointer"
                     title="Edit & Upload Foto Profil"
@@ -460,6 +473,7 @@ const Reviews = () => {
                     <span>Edit / Foto</span>
                   </button>
                   <button
+                    type="button"
                     onClick={() => handleDelete(item.id)}
                     className="p-1.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors cursor-pointer"
                     title="Hapus"
