@@ -99,14 +99,22 @@ const Footer = () => {
               >
                 <FaTiktok size={14} />
               </a>
-              <a
-                href={`mailto:${settings.emailAddress || 'contact@rayakonstruksi.com'}`}
+              <button
+                type="button"
+                onClick={() => {
+                  window.dispatchEvent(new CustomEvent('open-email-modal', {
+                    detail: {
+                      subject: `Konsultasi Proyek - ${settings.companyName || 'Raya Konstruksi Jaya'}`,
+                      body: `Halo Tim ${settings.companyName || 'Raya Konstruksi Jaya'},\n\nSaya tertarik berkonsultasi mengenai kebutuhan proyek konstruksi.\n\nTerima kasih.`
+                    }
+                  }));
+                }}
                 aria-label="Email Resmi"
-                className="h-9 w-9 rounded-xl bg-slate-900 border border-slate-800 hover:border-blue-500/50 hover:bg-blue-500/10 text-slate-400 hover:text-blue-400 flex items-center justify-center transition-all shadow-sm"
-                title="Email Resmi"
+                className="h-9 w-9 rounded-xl bg-slate-900 border border-slate-800 hover:border-blue-500/50 hover:bg-blue-500/10 text-slate-400 hover:text-blue-400 flex items-center justify-center transition-all shadow-sm cursor-pointer"
+                title="Email Resmi (Buka Opsi Email / Gmail)"
               >
                 <FiMail size={15} />
-              </a>
+              </button>
             </div>
           </div>
 
@@ -137,9 +145,21 @@ const Footer = () => {
               </li>
               <li className="flex items-center gap-3">
                 <FiMail className="text-blue-400 flex-shrink-0" size={16} />
-                <a href={`mailto:${settings.emailAddress || 'contact@rayakonstruksi.com'}`} className="hover:text-blue-400 transition-colors truncate">
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('open-email-modal', {
+                      detail: {
+                        subject: `Konsultasi Proyek - ${settings.companyName || 'Raya Konstruksi Jaya'}`,
+                        body: `Halo Tim ${settings.companyName || 'Raya Konstruksi Jaya'},\n\nSaya tertarik berkonsultasi mengenai kebutuhan proyek konstruksi.\n\nTerima kasih.`
+                      }
+                    }));
+                  }}
+                  className="hover:text-blue-400 transition-colors truncate text-left cursor-pointer"
+                  title="Klik untuk membuka email / Gmail"
+                >
                   {settings.emailAddress || 'contact@rayakonstruksi.com'}
-                </a>
+                </button>
               </li>
               <li className="flex items-center gap-3 pt-1 border-t border-slate-900 text-slate-400 text-xs">
                 <FiClock className="text-blue-400 flex-shrink-0" size={15} />

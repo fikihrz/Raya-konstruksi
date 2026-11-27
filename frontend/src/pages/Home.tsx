@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { FiHome, FiArrowRight, FiPhoneCall, FiMail, FiMapPin, FiX, FiCalendar, FiMap, FiChevronLeft, FiChevronRight, FiPause, FiPlay, FiStar, FiEdit3, FiMaximize, FiMinimize, FiVolume2, FiVolumeX, FiSearch, FiFilter } from 'react-icons/fi';
 import { FaWhatsapp, FaStar } from 'react-icons/fa';
 import { useLanguage } from '../context/LanguageContext';
+import { EmailModal } from '../components/EmailModal';
 
 const Home = () => {
   const { t, lang, translateText } = useLanguage();
@@ -62,6 +63,21 @@ const Home = () => {
 
   // Consultation Modal State
   const [consultService, setConsultService] = useState<string | null>(null);
+  
+  // Email Modal State
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const [emailModalSubject, setEmailModalSubject] = useState('');
+  const [emailModalBody, setEmailModalBody] = useState('');
+
+  useEffect(() => {
+    const handler = (e: any) => {
+      if (e.detail?.subject) setEmailModalSubject(e.detail.subject);
+      if (e.detail?.body) setEmailModalBody(e.detail.body);
+      setIsEmailModalOpen(true);
+    };
+    window.addEventListener('open-email-modal', handler);
+    return () => window.removeEventListener('open-email-modal', handler);
+  }, []);
   const [newReview, setNewReview] = useState({
     name: '',
     company: '',
@@ -1614,13 +1630,18 @@ const Home = () => {
                 <FaWhatsapp className="text-xl text-green-400" />
                 <span>{t('contact.btnWa')}</span>
               </a>
-              <a 
-                href={`mailto:${settings.emailAddress || 'contact@rayakonstruksi.com'}?subject=Konsultasi Rencana Proyek ${settings.companyName || 'Raya Konstruksi Jaya'}`}
+              <button 
+                type="button"
+                onClick={() => {
+                  setEmailModalSubject(`Konsultasi Rencana Proyek - ${settings.companyName || 'Raya Konstruksi Jaya'}`);
+                  setEmailModalBody(`Halo Tim ${settings.companyName || 'Raya Konstruksi Jaya'},\n\nSaya tertarik untuk berkonsultasi mengenai rencana proyek saya.\nMohon informasi lebih lanjut mengenai tahapan, estimasi biaya, dan jadwal pengerjaan.\n\nTerima kasih.`);
+                  setIsEmailModalOpen(true);
+                }}
                 className="inline-flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-primary-container/50 text-white font-bold py-4.5 px-8 rounded-2xl transition-all duration-300 backdrop-blur-md hover:scale-[1.02] shadow-xl text-sm md:text-base cursor-pointer"
               >
                 <FiMail className="text-xl text-primary-container" />
                 <span>{t('contact.btnEmail')}</span>
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -1731,20 +1752,22 @@ const Home = () => {
                   </a>
 
                   {/* Email Option */}
-                  <a
-                    href={(() => {
+                  <button
+                    type="button"
+                    onClick={() => {
                       const company = settings.companyName || 'Raya Konstruksi Jaya';
-                      const emailAddr = settings.emailAddress || 'contact@rayakonstruksi.com';
                       const subject = t('consult.emailSubject')
                         .replace('{service}', consultService || '')
                         .replace('{company}', company);
                       const body = t('consult.emailBody')
                         .replace(/\{company\}/g, company)
                         .replace(/\{service\}/g, consultService || '');
-                      return `mailto:${emailAddr}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                    })()}
-                    onClick={() => setConsultService(null)}
-                    className="group flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-blue-950/40 via-slate-800/80 to-slate-800/80 hover:to-blue-950/40 border border-blue-500/30 hover:border-blue-400 transition-all duration-300 no-underline cursor-pointer shadow-lg hover:shadow-blue-950/40"
+                      setEmailModalSubject(subject);
+                      setEmailModalBody(body);
+                      setConsultService(null);
+                      setIsEmailModalOpen(true);
+                    }}
+                    className="w-full group flex items-center gap-4 p-4 rounded-2xl bg-gradient-to-r from-blue-950/40 via-slate-800/80 to-slate-800/80 hover:to-blue-950/40 border border-blue-500/30 hover:border-blue-400 transition-all duration-300 text-left cursor-pointer shadow-lg hover:shadow-blue-950/40"
                   >
                     <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-600/30 group-hover:scale-105 transition-transform flex-shrink-0">
                       <FiMail size={22} />
@@ -1758,7 +1781,7 @@ const Home = () => {
                     <div className="w-8 h-8 rounded-full bg-slate-800 group-hover:bg-blue-600 text-slate-400 group-hover:text-white flex items-center justify-center transition-all flex-shrink-0">
                       <FiArrowRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
                     </div>
-                  </a>
+                  </button>
                 </div>
 
                 {/* Footer Note & Cancel Button */}
@@ -1946,6 +1969,16 @@ const Home = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Global Email Contact Modal */}
+      <EmailModal
+        isOpen={isEmailModalOpen}
+        onClose={() => setIsEmailModalOpen(false)}
+        emailAddress={settings.emailAddress || 'contact@rayakonstruksi.com'}
+        companyName={settings.companyName || 'Raya Konstruksi Jaya'}
+        defaultSubject={emailModalSubject || `Konsultasi Proyek - ${settings.companyName || 'Raya Konstruksi Jaya'}`}
+        defaultBody={emailModalBody || `Halo Tim ${settings.companyName || 'Raya Konstruksi Jaya'},\n\nSaya ingin berkonsultasi mengenai kebutuhan proyek saya.\n\nTerima kasih.`}
+      />
     </div>
   );
 };

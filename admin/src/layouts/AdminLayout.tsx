@@ -11,7 +11,8 @@ import {
   FiUsers, 
   FiMessageSquare,
   FiMenu,
-  FiX
+  FiX,
+  FiShield
 } from 'react-icons/fi';
 
 const AdminLayout = () => {
@@ -51,6 +52,8 @@ const AdminLayout = () => {
     navigate('/login', { replace: true });
   };
 
+  const isSuperAdmin = adminUser?.role === 'superadmin' || adminUser?.email?.toLowerCase().trim() === 'fikihrz3135@gmail.com';
+
   const menu = [
     { name: 'Dashboard', path: '/', icon: <FiHome size={19} /> },
     { name: 'Projects', path: '/projects', icon: <FiBriefcase size={19} /> },
@@ -59,6 +62,7 @@ const AdminLayout = () => {
     { name: 'Klien & Mitra', path: '/clients', icon: <FiUsers size={19} /> },
     { name: 'Ulasan Klien', path: '/reviews', icon: <FiMessageSquare size={19} /> },
     { name: 'Pengaturan Web', path: '/settings', icon: <FiSettings size={19} /> },
+    ...(isSuperAdmin ? [{ name: 'Kelola Admin', path: '/users', icon: <FiShield size={19} /> }] : []),
   ];
 
   return (
@@ -122,18 +126,33 @@ const AdminLayout = () => {
         {/* Bottom User Profile & Logout */}
         <div className="p-4 border-t border-slate-800/80 mt-auto bg-slate-950/40">
           <div className="bg-slate-800/60 rounded-xl p-3.5 mb-3 border border-slate-700/60 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 border border-blue-400/30 flex items-center justify-center font-bold text-xs text-white flex-shrink-0">
+            <div className={`w-9 h-9 rounded-full border flex items-center justify-center font-bold text-xs text-white flex-shrink-0 ${
+              isSuperAdmin 
+                ? 'bg-gradient-to-tr from-amber-500 to-yellow-600 border-amber-400/40 shadow-md shadow-amber-900/40' 
+                : 'bg-gradient-to-tr from-blue-500 to-indigo-600 border-blue-400/30'
+            }`}>
               {adminUser?.name ? adminUser.name.charAt(0).toUpperCase() : 'A'}
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-bold text-white truncate">{adminUser?.name || 'Administrator'}</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-xs font-bold text-white truncate">{adminUser?.name || 'Administrator'}</p>
+                {isSuperAdmin ? (
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                    Super
+                  </span>
+                ) : (
+                  <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40">
+                    Admin
+                  </span>
+                )}
+              </div>
               <p className="text-[11px] text-slate-400 truncate">{adminUser?.email || 'admin@rayakonstruksi.com'}</p>
             </div>
           </div>
           
           <button 
             onClick={handleLogout}
-            className="flex items-center justify-center space-x-2 py-2.5 w-full rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors text-xs font-bold border border-red-500/20"
+            className="flex items-center justify-center space-x-2 py-2.5 w-full rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-colors text-xs font-bold border border-red-500/20 cursor-pointer"
           >
             <FiLogOut size={16} /> <span>Keluar (Logout)</span>
           </button>

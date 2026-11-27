@@ -7,6 +7,7 @@ import Settings from './pages/Settings';
 import Reasons from './pages/Reasons';
 import Clients from './pages/Clients';
 import Reviews from './pages/Reviews';
+import Users from './pages/Users';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 
@@ -32,6 +33,7 @@ function App() {
           <Route path="clients" element={<Clients />} />
           <Route path="reviews" element={<Reviews />} />
           <Route path="settings" element={<Settings />} />
+          <Route path="users" element={<Users />} />
         </Route>
       </Routes>
     </ToastProvider>

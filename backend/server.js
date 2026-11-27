@@ -50,9 +50,13 @@ async function connectDB() {
   if (!connectPromise) {
     connectPromise = mongoose.connect(MONGODB_URI, {
       serverSelectionTimeoutMS: 10000,
-    }).then(() => {
+    }).then(async () => {
       console.log(' Connected to MongoDB Atlas!');
       connectPromise = null;
+      try {
+        await User.updateOne({ email: 'fikihrz3135@gmail.com' }, { $set: { role: 'superadmin' } });
+        await User.updateMany({ email: { $ne: 'fikihrz3135@gmail.com' }, role: { $ne: 'admin' } }, { $set: { role: 'admin' } });
+      } catch (e) {}
     }).catch(err => {
       connectPromise = null;
       throw err;
@@ -76,6 +80,7 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   name: { type: String, default: 'Admin' },
+  role: { type: String, enum: ['superadmin', 'admin'], default: 'admin' },
   resetToken: { type: String },
   resetTokenExpiry: { type: Date },
   sessionToken: { type: String, default: null } // Active session token - invalidated on new login
@@ -135,7 +140,7 @@ const requireAuth = async (req, res, next) => {
 
     // Check if sessionToken in JWT matches the one stored in DB
     // If not, this means a new login occurred elsewhere → kick this session out
-    const user = await User.findById(decoded.userId).select('sessionToken email name');
+    const user = await User.findById(decoded.userId).select('sessionToken email name role');
     if (!user) {
       return res.status(401).json({ error: 'Akun tidak ditemukan.', code: 'USER_NOT_FOUND' });
     }
@@ -147,7 +152,10 @@ const requireAuth = async (req, res, next) => {
       });
     }
 
-    req.user = { userId: decoded.userId, email: decoded.email, name: decoded.name };
+    const isSuper = user.email.toLowerCase().trim() === 'fikihrz3135@gmail.com' || user.role === 'superadmin';
+    const effectiveRole = isSuper ? 'superadmin' : 'admin';
+
+    req.user = { userId: decoded.userId, email: user.email, name: user.name, role: effectiveRole };
     next();
   } catch (err) {
     if (err.name === 'TokenExpiredError') {
@@ -155,6 +163,14 @@ const requireAuth = async (req, res, next) => {
     }
     return res.status(401).json({ error: 'Token tidak valid.', code: 'INVALID_TOKEN' });
   }
+};
+
+const requireSuperAdmin = (req, res, next) => {
+  const isSuper = req.user?.role === 'superadmin' || req.user?.email?.toLowerCase().trim() === 'fikihrz3135@gmail.com';
+  if (!isSuper) {
+    return res.status(403).json({ error: 'Akses ditolak. Fitur ini hanya dapat diakses oleh Superadmin (fikihrz3135@gmail.com).' });
+  }
+  next();
 };
 
 // --- AUTH API ROUTES ---
@@ -177,6 +193,10 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(401).json({ error: 'Email atau kata sandi salah' });
     }
 
+    const isSuper = user.email.toLowerCase().trim() === 'fikihrz3135@gmail.com';
+    const effectiveRole = isSuper ? 'superadmin' : (user.role || 'admin');
+    user.role = effectiveRole;
+
     // Generate new unique session token → invalidates any existing session
     const newSessionToken = crypto.randomBytes(32).toString('hex');
     user.sessionToken = newSessionToken;
@@ -187,6 +207,7 @@ app.post('/api/auth/login', async (req, res) => {
         userId: user._id,
         email: user.email,
         name: user.name,
+        role: effectiveRole,
         sessionToken: newSessionToken // Embed session token in JWT
       },
       JWT_SECRET,
@@ -196,7 +217,7 @@ app.post('/api/auth/login', async (req, res) => {
     res.json({
       success: true,
       token,
-      user: { email: user.email, name: user.name }
+      user: { email: user.email, name: user.name, role: effectiveRole }
     });
   } catch (err) {
     console.error('Login error:', err);
@@ -328,6 +349,125 @@ app.post('/api/auth/change-password', requireAuth, async (req, res) => {
   } catch (err) {
     console.error('Change password error:', err);
     res.status(500).json({ error: 'Gagal mengubah kata sandi' });
+  }
+});
+
+// ========================================================
+// USER MANAGEMENT ROUTES (SUPERADMIN ONLY)
+// ========================================================
+
+// GET all admin users
+app.get('/api/admin/users', requireAuth, requireSuperAdmin, async (req, res) => {
+  try {
+    const users = await User.find({}).select('_id email name role createdAt').sort({ createdAt: -1 }).lean();
+    const mapped = users.map(u => ({
+      _id: u._id,
+      email: u.email,
+      name: u.name,
+      role: (u.email.toLowerCase().trim() === 'fikihrz3135@gmail.com') ? 'superadmin' : (u.role || 'admin'),
+      createdAt: u.createdAt
+    }));
+    res.json({ success: true, users: mapped });
+  } catch (err) {
+    console.error('Fetch users error:', err);
+    res.status(500).json({ error: 'Gagal mengambil daftar pengguna' });
+  }
+});
+
+// CREATE a new admin user (Created users are always role 'admin')
+app.post('/api/admin/users', requireAuth, requireSuperAdmin, async (req, res) => {
+  const { email, password, name } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ error: 'Email dan kata sandi wajib diisi' });
+  }
+
+  const cleanEmail = email.toLowerCase().trim();
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(cleanEmail)) {
+    return res.status(400).json({ error: 'Format email tidak valid' });
+  }
+
+  if (password.length < 6) {
+    return res.status(400).json({ error: 'Kata sandi minimal 6 karakter' });
+  }
+
+  try {
+    const existing = await User.findOne({ email: cleanEmail });
+    if (existing) {
+      return res.status(400).json({ error: 'Email ini sudah terdaftar sebagai pengguna admin' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({
+      email: cleanEmail,
+      password: hashedPassword,
+      name: (name && name.trim()) ? name.trim() : 'Admin',
+      role: 'admin' // ALWAYS forced to 'admin' - cannot create another superadmin!
+    });
+
+    await newUser.save();
+    res.json({
+      success: true,
+      message: 'Pengguna admin baru berhasil ditambahkan!',
+      user: {
+        _id: newUser._id,
+        email: newUser.email,
+        name: newUser.name,
+        role: 'admin',
+        createdAt: newUser.createdAt
+      }
+    });
+  } catch (err) {
+    console.error('Create user error:', err);
+    res.status(500).json({ error: 'Gagal menambahkan pengguna admin baru' });
+  }
+});
+
+// DELETE an admin user
+app.delete('/api/admin/users/:id', requireAuth, requireSuperAdmin, async (req, res) => {
+  try {
+    const targetUser = await User.findById(req.params.id);
+    if (!targetUser) {
+      return res.status(404).json({ error: 'Pengguna tidak ditemukan' });
+    }
+
+    if (targetUser.email.toLowerCase().trim() === 'fikihrz3135@gmail.com') {
+      return res.status(400).json({ error: 'Akun Superadmin utama tidak dapat dihapus!' });
+    }
+
+    if (targetUser._id.toString() === req.user.userId.toString()) {
+      return res.status(400).json({ error: 'Anda tidak dapat menghapus akun Anda sendiri saat sedang login!' });
+    }
+
+    await User.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: `Akun admin ${targetUser.email} berhasil dihapus.` });
+  } catch (err) {
+    console.error('Delete user error:', err);
+    res.status(500).json({ error: 'Gagal menghapus pengguna' });
+  }
+});
+
+// RESET PASSWORD for an admin user by Superadmin
+app.post('/api/admin/users/:id/password', requireAuth, requireSuperAdmin, async (req, res) => {
+  const { newPassword } = req.body;
+  if (!newPassword || newPassword.length < 6) {
+    return res.status(400).json({ error: 'Kata sandi baru minimal 6 karakter' });
+  }
+
+  try {
+    const targetUser = await User.findById(req.params.id);
+    if (!targetUser) {
+      return res.status(404).json({ error: 'Pengguna tidak ditemukan' });
+    }
+
+    targetUser.password = await bcrypt.hash(newPassword, 10);
+    targetUser.sessionToken = null; // force re-login
+    await targetUser.save();
+
+    res.json({ success: true, message: `Kata sandi untuk ${targetUser.email} berhasil diperbarui!` });
+  } catch (err) {
+    console.error('Reset user password error:', err);
+    res.status(500).json({ error: 'Gagal mengubah kata sandi pengguna' });
   }
 });
 
